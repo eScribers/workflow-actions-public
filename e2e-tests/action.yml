@@ -44,8 +44,8 @@ runs:
     - name: Setup env file
       uses: cuchi/jinja2-action@v1.2.0
       with:
-        template: ./e2e/common/TestSuites/Authentication/Authentication.xml.j2
-        output_file: ./e2e/common/TestSuites/Authentication/Authentication.xml
+        template: ./common/TestSuites/Authentication/Authentication.xml.j2
+        output_file: ./common/TestSuites/Authentication/Authentication.xml
         strict: true
         variables: |
           BACKEND_URL=${{ env.BACKEND_URL }}
@@ -54,7 +54,7 @@ runs:
 
     - name: Show Authentication.xml
       run: |
-        cat ./e2e/common/TestSuites/Authentication/Authentication.xml
+        cat ./common/TestSuites/Authentication/Authentication.xml
       shell: bash
 
     - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
@@ -77,13 +77,13 @@ runs:
 
     - name: Build project
       run: |
-        dotnet build ./e2e 
+        dotnet build 
       shell: bash
 
     - name: Run tests
       run: |
         google-chrome --version 
         chromedriver --version
-        ./e2e/TestPerformer/bin/Debug/net6.0/TestPerformer load ./e2e/Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./e2e/common/TestSuites/Authentication/Authentication.xml
-        ls -l ./e2e/TestPerformer/bin/Debug/net6.0/Reports/*
+        ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/Authentication/Authentication.xml
+        ls -l ./TestPerformer/bin/Debug/net6.0/Reports/*
       shell: bash
