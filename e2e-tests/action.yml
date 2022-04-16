@@ -35,6 +35,12 @@ runs:
            echo "TABULA_PASSWORD=${{ inputs.tabula-password }}" >> $GITHUB_ENV
       shell: bash
 
+    - name: DEBUG 
+      run: |
+           pwd
+           ls -la ./*
+      shell: bash
+
     - name: Setup env file
       uses: cuchi/jinja2-action@v1.2.0
       with:
