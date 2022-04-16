@@ -48,9 +48,11 @@ runs:
         sudo apt-get update
         sudo apt-get install terraform=0.14.10  
         which terraform
+      shell: bash
 
     - name: Check terraform version
       run: terraform --version
+      shell: bash
 
     - name: Create DynamoDB lock table
       run: |
@@ -63,6 +65,7 @@ runs:
             AttributeName=LockID,KeyType=HASH | true
       env:
         TEMPENV_VERSION: "${{ env.TEMPENV_VERSION }}"
+      shell: bash
 
     - name: Deploy infrastructure
       run: |
@@ -80,12 +83,14 @@ runs:
         TF_VAR_do_migration: "false"
         TF_VAR_deletion_protection: "false"
         TEMPENV_VERSION: "${{ env.TEMPENV_VERSION }}"
+      shell: bash
 
     - name: Define variables for VPN servers
       run: |
         ls -l infrastructure
         echo "VPN_SERVER_PRIVATE_IP=$(cat infrastructure/private_ip)" >> $GITHUB_ENV
         echo "VPN_SERVER_PUBLIC_IP=$(cat infrastructure/public_ip)" >> $GITHUB_ENV
+      shell: bash
 
     - name: Get VPN Profile
       run: |
@@ -95,6 +100,7 @@ runs:
       env:
         VPN_SERVER_PRIVATE_IP: "${{ env.VPN_SERVER_PRIVATE_IP }}" 
         VPN_SERVER_PUBLIC_IP: "${{ env.VPN_SERVER_PUBLIC_IP }}" 
+      shell: bash
 
     - name: Upload private_ip
       uses: actions/upload-artifact@v1
