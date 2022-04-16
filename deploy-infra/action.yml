@@ -58,6 +58,7 @@ runs:
       shell: bash
 
     - name: Create DynamoDB lock table
+      continue-on-error: true
       run: |
         aws dynamodb create-table --table-name $TEMPENV_VERSION-terraform-state-lock-dynamo \
           --attribute-definitions \
