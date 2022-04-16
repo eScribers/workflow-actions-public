@@ -13,6 +13,9 @@ inputs:
   default-region:
     description: 'AWS Default region'
     required: true
+  token:
+    description: 'Token to github'
+    required: true
 
 
 
@@ -34,7 +37,7 @@ runs:
       with:
         repository: eScribers/DEVOPS
         ref: refs/heads/master
-        token: ${{ secrets.GIT_TOKEN }}
+        token: ${{ inputs.token }}
 
 
 
