@@ -58,7 +58,6 @@ runs:
       shell: bash
 
     - name: Create DynamoDB lock table
-      continue-on-error: true
       run: |
         aws dynamodb create-table --table-name $TEMPENV_VERSION-terraform-state-lock-dynamo \
           --attribute-definitions \
@@ -66,7 +65,7 @@ runs:
           --provisioned-throughput \
             ReadCapacityUnits=20,WriteCapacityUnits=20 \
           --key-schema \
-            AttributeName=LockID,KeyType=HASH | true
+            AttributeName=LockID,KeyType=HASH 2> /dev/null | true
       env:
         TEMPENV_VERSION: "${{ env.TEMPENV_VERSION }}"
       shell: bash
