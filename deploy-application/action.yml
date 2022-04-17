@@ -25,6 +25,55 @@ inputs:
   account-id:
     description: 'AWS Account ID for ECR  from secrets'
     required: true
+  oleksb-key:
+    description: 'Public key for adding to server from secrets'
+    required: true
+  inf-logzio-token:
+    description: 'Public key for adding to server from secrets'
+    required: true
+  twilio-sid:
+    description: 'Public key for adding to server from secrets'
+    required: true
+  twilio-token:
+    description: 'Public key for adding to server from secrets'
+    required: true
+  twilio-sip-cl:
+    description: 'Public key for adding to server from secrets'
+    required: true
+  twilio-video-sid:
+    description: 'Public key for adding to server from secrets'
+    required: true
+  twilio-video-token:
+    description: 'Public key for adding to server from secrets'
+    required: true
+  postmarkapp-api-key:
+    description: 'Public key for adding to server from secrets'
+    required: true
+  loggly-key:
+    description: 'Public key for adding to server from secrets'
+    required: true
+  fussion-api-key:
+    description: 'Public key for adding to server from secrets'
+    required: true
+  vieoapp-secret-key:
+    description: 'Public key for adding to server from secrets'
+    required: true
+  encryption-key:
+    description: 'Public key for adding to server from secrets'
+    required: true
+  doe-google-spreadsheet-id:
+    description: 'Public key for adding to server from secrets'
+    required: true
+  doe-google-spreadsheet-ho:
+    description: 'Public key for adding to server from secrets'
+    required: true
+  doe-google-spreadsheet-ar:
+    description: 'Public key for adding to server from secrets'
+    required: true
+  doe-google-spreadsheet-oa:
+    description: 'Public key for adding to server from secrets'
+    required: true
+
 
 
 runs:
@@ -40,6 +89,26 @@ runs:
            echo "AWS_SECRET_ACCESS_KEY=${{ inputs.secret-key }}" >> $GITHUB_ENV
            echo "AWS_DEFAULT_REGION=${{ inputs.default-region }}" >> $GITHUB_ENV
            echo "RESOURCES_AWS_ACCOUNT_ID=${{ inputs.account-id }}" >> $GITHUB_ENV
+           echo "OLEKSB_KEY=${{ inputs.oleksb-key }}" >> $GITHUB_ENV
+           echo "INF_LOGZIO_TOKEN=${{ inputs.inf-logzio-token }}" >> $GITHUB_ENV
+           echo "TWILIO_SID=${{ inputs.twilio-sid }}" >> $GITHUB_ENV
+           echo "TWILIO_TOKEN=${{ inputs.twilio-token }}" >> $GITHUB_ENV
+           echo "TWILIO_SIP_CL=${{ inputs.twilio-sip-cl }}" >> $GITHUB_ENV
+           echo "TWILIO_VIDEO_SID=${{ inputs.twilio-video-sid }}" >> $GITHUB_ENV
+           echo "TWILIO_VIDEO_TOKEN=${{ inputs.twilio-video-token }}" >> $GITHUB_ENV
+           echo "POSTMARKAPP_API_KEY=${{ inputs.postmarkapp-api-key }}" >> $GITHUB_ENV
+           echo "LOGGLY_KEY=${{ inputs.loggly-key }}" >> $GITHUB_ENV
+           echo "FUSION_API_KEY=${{ inputs.fussion-api-key }}" >> $GITHUB_ENV
+           echo "VIDEOAPP_SECRET_KEY=${{ inputs.vieoapp-secret-key }}" >> $GITHUB_ENV
+           echo "ENCRYPTION_KEY=${{ inputs.encryption-key }}" >> $GITHUB_ENV
+           echo "DOE_GOOGLE_SPREADSHEET_ID=${{ inputs.doe-google-spreadsheet-id }}" >> $GITHUB_ENV
+           echo "DOE_GOOGLE_SPREADSHEET_HO=${{ inputs.doe-google-spreadsheet-ho }}" >> $GITHUB_ENV
+           echo "DOE_GOOGLE_SPREADSHEET_AR=${{ inputs.doe-google-spreadsheet-ar }}" >> $GITHUB_ENV
+           echo "DOE_GOOGLE_SPREADSHEET_OA=${{ inputs.doe-google-spreadsheet-oa }}" >> $GITHUB_ENV
+           echo "ENV_NAME=$TEMPENV_VERSION" >> $GITHUB_ENV
+           echo "COOKIE_DOMAIN=escribers.io" >> $GITHUB_ENV
+
+#############
       shell: bash
 
     - name: DEBUG 
@@ -78,10 +147,9 @@ runs:
       with:
         direction: download
         host: ${{ env.VPN_SERVER_PUBLIC_IP }}
-        # fingerprint: ${{ secrets.SSH_TARGET_FINGERPRINT }}
         insecure_ignore_fingerprint: true
         username: ubuntu
-        key: ${{ secrets.OLEKSB_KEY }}
+        key: ${{ env.OLEKSB_KEY }}
         source: /home/ubuntu/client.ovpn
         target: ./client.ovpn
     - name: check variables
@@ -105,23 +173,23 @@ runs:
            echo "DB_DEFAULT_DATABASE=${{ env.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
            echo "DB_READ_DATABASE=${{ env.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
            echo "DB_REP_DATABASE=${{ env.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
-           echo "INF_LOGZIO_TOKEN=${{ secrets.INF_LOGZIO_TOKEN }}" >> $GITHUB_ENV
-           echo "TWILIO_SID=${{ secrets.TWILIO_SID }}" >> $GITHUB_ENV
-           echo "TWILIO_TOKEN=${{ secrets.TWILIO_TOKEN }}" >> $GITHUB_ENV
-           echo "TWILIO_SIP_CL=${{ secrets.TWILIO_SIP_CL }}" >> $GITHUB_ENV
-           echo "TWILIO_VIDEO_SID=${{ secrets.TWILIO_VIDEO_SID }}" >> $GITHUB_ENV
-           echo "TWILIO_VIDEO_TOKEN=${{ secrets.TWILIO_VIDEO_TOKEN }}" >> $GITHUB_ENV
-           echo "POSTMARKAPP_API_KEY=${{ secrets.POSTMARKAPP_API_KEY }}" >> $GITHUB_ENV
-           echo "LOGGLY_KEY=${{ secrets.LOGGLY_KEY }}" >> $GITHUB_ENV
-           echo "FUSION_API_KEY=${{ secrets.FUSION_API_KEY }}" >> $GITHUB_ENV
-           echo "VIDEOAPP_SECRET_KEY=${{ secrets.VIDEOAPP_SECRET_KEY }}" >> $GITHUB_ENV
-           echo "ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }}" >> $GITHUB_ENV
+           echo "INF_LOGZIO_TOKEN=${{ env.INF_LOGZIO_TOKEN }}" >> $GITHUB_ENV
+           echo "TWILIO_SID=${{ env.TWILIO_SID }}" >> $GITHUB_ENV
+           echo "TWILIO_TOKEN=${{ env.TWILIO_TOKEN }}" >> $GITHUB_ENV
+           echo "TWILIO_SIP_CL=${{ env.TWILIO_SIP_CL }}" >> $GITHUB_ENV
+           echo "TWILIO_VIDEO_SID=${{ env.TWILIO_VIDEO_SID }}" >> $GITHUB_ENV
+           echo "TWILIO_VIDEO_TOKEN=${{ env.TWILIO_VIDEO_TOKEN }}" >> $GITHUB_ENV
+           echo "POSTMARKAPP_API_KEY=${{ env.POSTMARKAPP_API_KEY }}" >> $GITHUB_ENV
+           echo "LOGGLY_KEY=${{ env.LOGGLY_KEY }}" >> $GITHUB_ENV
+           echo "FUSION_API_KEY=${{ env.FUSION_API_KEY }}" >> $GITHUB_ENV
+           echo "VIDEOAPP_SECRET_KEY=${{ env.VIDEOAPP_SECRET_KEY }}" >> $GITHUB_ENV
+           echo "ENCRYPTION_KEY=${{ env.ENCRYPTION_KEY }}" >> $GITHUB_ENV
            echo "ENV_NAME=$TEMPENV_VERSION" >> $GITHUB_ENV
            echo "COOKIE_DOMAIN=escribers.io" >> $GITHUB_ENV
-           echo "DOE_GOOGLE_SPREADSHEET_ID=${{ secrets.DOE_GOOGLE_SPREADSHEET_ID }}" >> $GITHUB_ENV
-           echo "DOE_GOOGLE_SPREADSHEET_HO=${{ secrets.DOE_GOOGLE_SPREADSHEET_HO }}" >> $GITHUB_ENV
-           echo "DOE_GOOGLE_SPREADSHEET_AR=${{ secrets.DOE_GOOGLE_SPREADSHEET_AR }}" >> $GITHUB_ENV
-           echo "DOE_GOOGLE_SPREADSHEET_OA=${{ secrets.DOE_GOOGLE_SPREADSHEET_OA }}" >> $GITHUB_ENV
+           echo "DOE_GOOGLE_SPREADSHEET_ID=${{ env.DOE_GOOGLE_SPREADSHEET_ID }}" >> $GITHUB_ENV
+           echo "DOE_GOOGLE_SPREADSHEET_HO=${{ env.DOE_GOOGLE_SPREADSHEET_HO }}" >> $GITHUB_ENV
+           echo "DOE_GOOGLE_SPREADSHEET_AR=${{ env.DOE_GOOGLE_SPREADSHEET_AR }}" >> $GITHUB_ENV
+           echo "DOE_GOOGLE_SPREADSHEET_OA=${{ env.DOE_GOOGLE_SPREADSHEET_OA }}" >> $GITHUB_ENV
            echo "TAB_FRONTEND_URL=https://tabula-frontend-sandbox-aws-us-east-1.s3.amazonaws.com" >> $GITHUB_ENV
            echo "Deploy to $TEMPENV_VERSION"
       env:
@@ -240,7 +308,7 @@ runs:
         host: ${{ env.WORKER_LIST_IPS }} #"10.0.4.125,10.0.5.39"
         username: ubuntu
         port: 22
-        key: ${{ secrets.OLEKSB_KEY }}
+        key: ${{ env.OLEKSB_KEY }}
         source: "./application/config/delete_db.php,./application/config/create_db.php,./deploy/docker-compose.yaml.template,./application/config/env,./.htaccess.example"
         target: "/home/ubuntu"
     - name: Create AWS credentials file
@@ -252,7 +320,7 @@ runs:
       with:
         host: ${{ env.WORKER_LIST_IPS }}
         username: ubuntu
-        key: ${{ secrets.OLEKSB_KEY }}
+        key: ${{ env.OLEKSB_KEY }}
         port: 22
         script: |
           rm -rf ~/.aws
@@ -275,7 +343,7 @@ runs:
       with:
         host: ${{ env.WORKER_LIST_IPS }}
         username: ubuntu
-        key: ${{ secrets.OLEKSB_KEY }}
+        key: ${{ env.OLEKSB_KEY }}
         port: 22
         script: |
           whoami
