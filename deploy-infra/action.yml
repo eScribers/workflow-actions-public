@@ -58,7 +58,6 @@ runs:
       shell: bash
 
     - name: Create DynamoDB lock table
-      continue-on-error: true
       run: |
         aws dynamodb create-table --table-name $TEMPENV_VERSION-terraform-state-lock-dynamo \
           --attribute-definitions \
@@ -72,6 +71,7 @@ runs:
       shell: bash
 
     - name: Deploy infrastructure
+      if: always()
       run: |
         terraform -chdir=./infrastructure init -backend-config="bucket=escribers-infra-tempenv-terraform-state" -backend-config="key=$TEMPENV_VERSION.tfstate" -backend-config="dynamodb_table=$TEMPENV_VERSION-terraform-state-lock-dynamo"
         terraform -chdir=./infrastructure apply -auto-approve 
