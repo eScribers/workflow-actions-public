@@ -47,6 +47,7 @@ runs:
         ls -l ./*
         echo "VPN_SERVER_PRIVATE_IP=$(cat private_ip/private_ip)" >> $GITHUB_ENV
         echo "VPN_SERVER_PUBLIC_IP=$(cat public_ip/public_ip)" >> $GITHUB_ENV
+      shell: bash
     - name: check variables
       run: |
         echo $VPN_SERVER_PUBLIC_IP
@@ -55,6 +56,8 @@ runs:
       env:
         VPN_SERVER_PRIVATE_IP: "${{ env.VPN_SERVER_PRIVATE_IP }}" 
         VPN_SERVER_PUBLIC_IP: "${{ env.VPN_SERVER_PUBLIC_IP }}" 
+      shell: bash
+
     - name: Get VPN Profile
       uses: nicklasfrahm/scp-action@main
       with:
@@ -70,6 +73,7 @@ runs:
       run: |
         ls -l ./*
         pwd
+      shell: bash
     - name: Define variables depends on env
       run: |
            echo "ENV_NAME=$TEMPENV_VERSION" >> $GITHUB_ENV
@@ -113,6 +117,7 @@ runs:
            echo "Deploy to $TEMPENV_VERSION"
       env:
         TEMPENV_VERSION: ${{ steps.vars.outputs.tag }}
+      shell: bash
     - name: "Create Docker image and push it to ECR repository"
       uses: "kciter/aws-ecr-action@v4"
       with:
@@ -128,11 +133,17 @@ runs:
         tags: "latest,${{ github.sha }}"
     - name: Install OpenVPN
       run: sudo apt-cache policy  openvpn && sudo apt-get --fix-missing --assume-yes --no-install-recommends install openvpn=2.4.7-1ubuntu2
+      shell: bash
+
     - name: Connect VPN
       run: sudo openvpn --config "client.ovpn" --daemon
+      shell: bash
+
     - name: Wait for a VPN connection
       timeout-minutes: 3
       run: until ping -c1 "${{ env.VPN_SERVER_PRIVATE_IP }}"; do sleep 2; done
+      shell: bash
+
     - name: Add credentials to Amazon 
       uses: "aws-actions/configure-aws-credentials@v1"
       with:
@@ -141,13 +152,18 @@ runs:
         aws-secret-access-key: "${{ env.AWS_SECRET_ACCESS_KEY }}"
     - name: Get instancesIDs
       run: echo "WORKER_INSTANCE_IDs=$(aws elb describe-load-balancers --load-balancer-names $ELB_NAME --output json --query "LoadBalancerDescriptions[*].Instances[*].InstanceId" | jq -r '. | map(.[])| @csv' | tr -d '"')" >> $GITHUB_ENV
+      shell: bash
 
     - name: Get instances IPs
       run: echo "WORKER_LIST_IPS=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=$TEMPENV_VERSION-Webserver-*" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' | jq -r '.| .[] |.[]|.[]' | paste -sd, -)" >> $GITHUB_ENV
       env:
         TEMPENV_VERSION: ${{ steps.vars.outputs.tag }}
+      shell: bash
+
     - name: Get RDS instance endpoint
       run: echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier $RDS_INSTANCE_NAME --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')" >> $GITHUB_ENV
+      shell: bash
+
 ####################
     - name: Setup create_db.php file
       uses: cuchi/jinja2-action@v1.2.0
@@ -267,6 +283,7 @@ runs:
           sudo docker exec tabula_backend php create_db.php
           sudo docker exec tabula_backend php index.php migrate initdata
           sudo docker exec tabula_backend php index.php migrate devdata
+        shell: bash
 ####################  
     - name: Output credentials
       run: |
@@ -282,7 +299,9 @@ runs:
       env:
         ENV_NAME: "${{ env.ENV_NAME }}"
         WORKER_LIST_IPS: "${{ env.WORKER_LIST_IPS }}"
+      shell: bash
     - name: Kill VPN connection
       if: always()
       run: |
         sudo killall openvpn   
+      shell: bash
