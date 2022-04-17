@@ -32,50 +32,257 @@ runs:
            pwd
            ls -la ./*
       shell: bash
+###############################
 
+    - name: Download private_ip
+      uses: actions/download-artifact@v1
+      with:
+        name: private_ip
+    - name: Download public_ip
+      uses: actions/download-artifact@v1
+      with:
+        name: public_ip
+    - name: Define variables for VPN servers
+      run: |
+        ls -l ./*
+        echo "VPN_SERVER_PRIVATE_IP=$(cat private_ip/private_ip)" >> $GITHUB_ENV
+        echo "VPN_SERVER_PUBLIC_IP=$(cat public_ip/public_ip)" >> $GITHUB_ENV
+    - name: check variables
+      run: |
+        echo $VPN_SERVER_PUBLIC_IP
+        echo =====================================
+        echo $VPN_SERVER_PRIVATE_IP
+      env:
+        VPN_SERVER_PRIVATE_IP: "${{ env.VPN_SERVER_PRIVATE_IP }}" 
+        VPN_SERVER_PUBLIC_IP: "${{ env.VPN_SERVER_PUBLIC_IP }}" 
+    - name: Get VPN Profile
+      uses: nicklasfrahm/scp-action@main
+      with:
+        direction: download
+        host: ${{ env.VPN_SERVER_PUBLIC_IP }}
+        # fingerprint: ${{ secrets.SSH_TARGET_FINGERPRINT }}
+        insecure_ignore_fingerprint: true
+        username: ubuntu
+        key: ${{ secrets.OLEKSB_KEY }}
+        source: /home/ubuntu/client.ovpn
+        target: ./client.ovpn
+    - name: check variables
+      run: |
+        ls -l ./*
+        pwd
+    - name: Define variables depends on env
+      run: |
+           echo "ENV_NAME=$TEMPENV_VERSION" >> $GITHUB_ENV
+           echo "ENVIRONMENT=$TEMPENV_VERSION" >> $GITHUB_ENV
+           echo "RDS_INSTANCE_NAME=$TEMPENV_VERSION-tabula" >> $GITHUB_ENV
+           echo "ELB_NAME=$TEMPENV_VERSION-elb-tabula" >> $GITHUB_ENV
+           echo "AWS_ACCESS_KEY_ID=${{ secrets.SANDBOX_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
+           echo "AWS_SECRET_ACCESS_KEY=${{ secrets.SANDBOX_AWS_SECRET_KEY }}" >> $GITHUB_ENV
+           echo "AWS_DEFAULT_REGION=${{ secrets.SANDBOX_AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
+           echo "RESOURCES_ACCESS_KEY_ID=${{ secrets.SANDBOX_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
+           echo "RESOURCES_SECRET_ACCESS_KEY=${{ secrets.SANDBOX_AWS_SECRET_KEY }}" >> $GITHUB_ENV
+           echo "RESOURCES_DEFAULT_REGION=${{ secrets.SANDBOX_AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
+           echo "RESOURCES_AWS_ACCOUNT_ID=${{ secrets.SANDBOX_AWS_ACCOUNT_ID }}" >> $GITHUB_ENV
+           echo "DB_DEFAULT_PASSWORD=${{ secrets.SANDBOX_DB_PASSWORD }}" >> $GITHUB_ENV
+           echo "DB_READ_PASSWORD=${{ secrets.SANDBOX_DB_PASSWORD }}" >> $GITHUB_ENV
+           echo "DB_REP_PASSWORD=${{ secrets.SANDBOX_DB_PASSWORD }}" >> $GITHUB_ENV
+           echo "DB_DEFAULT_USER=${{ secrets.SANDBOX_DB_USER }}" >> $GITHUB_ENV
+           echo "DB_READ_USER=${{ secrets.SANDBOX_DB_USER }}" >> $GITHUB_ENV
+           echo "DB_REP_USER=${{ secrets.SANDBOX_DB_USER }}" >> $GITHUB_ENV
+           echo "DB_DEFAULT_DATABASE=${{ secrets.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
+           echo "DB_READ_DATABASE=${{ secrets.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
+           echo "DB_REP_DATABASE=${{ secrets.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
+           echo "INF_LOGZIO_TOKEN=${{ secrets.INF_LOGZIO_TOKEN }}" >> $GITHUB_ENV
+           echo "TWILIO_SID=${{ secrets.TWILIO_SID }}" >> $GITHUB_ENV
+           echo "TWILIO_TOKEN=${{ secrets.TWILIO_TOKEN }}" >> $GITHUB_ENV
+           echo "TWILIO_SIP_CL=${{ secrets.TWILIO_SIP_CL }}" >> $GITHUB_ENV
+           echo "TWILIO_VIDEO_SID=${{ secrets.TWILIO_VIDEO_SID }}" >> $GITHUB_ENV
+           echo "TWILIO_VIDEO_TOKEN=${{ secrets.TWILIO_VIDEO_TOKEN }}" >> $GITHUB_ENV
+           echo "POSTMARKAPP_API_KEY=${{ secrets.POSTMARKAPP_API_KEY }}" >> $GITHUB_ENV
+           echo "LOGGLY_KEY=${{ secrets.LOGGLY_KEY }}" >> $GITHUB_ENV
+           echo "FUSION_API_KEY=${{ secrets.FUSION_API_KEY }}" >> $GITHUB_ENV
+           echo "VIDEOAPP_SECRET_KEY=${{ secrets.VIDEOAPP_SECRET_KEY }}" >> $GITHUB_ENV
+           echo "ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }}" >> $GITHUB_ENV
+           echo "ENV_NAME=$TEMPENV_VERSION" >> $GITHUB_ENV
+           echo "COOKIE_DOMAIN=escribers.io" >> $GITHUB_ENV
+           echo "DOE_GOOGLE_SPREADSHEET_ID=${{ secrets.DOE_GOOGLE_SPREADSHEET_ID }}" >> $GITHUB_ENV
+           echo "DOE_GOOGLE_SPREADSHEET_HO=${{ secrets.DOE_GOOGLE_SPREADSHEET_HO }}" >> $GITHUB_ENV
+           echo "DOE_GOOGLE_SPREADSHEET_AR=${{ secrets.DOE_GOOGLE_SPREADSHEET_AR }}" >> $GITHUB_ENV
+           echo "DOE_GOOGLE_SPREADSHEET_OA=${{ secrets.DOE_GOOGLE_SPREADSHEET_OA }}" >> $GITHUB_ENV
+           echo "TAB_FRONTEND_URL=https://tabula-frontend-sandbox-aws-us-east-1.s3.amazonaws.com" >> $GITHUB_ENV
+           echo "Deploy to $TEMPENV_VERSION"
+      env:
+        TEMPENV_VERSION: ${{ steps.vars.outputs.tag }}
+    - name: "Create Docker image and push it to ECR repository"
+      uses: "kciter/aws-ecr-action@v4"
+      with:
+        access_key_id: "${{ env.RESOURCES_ACCESS_KEY_ID }}"
+        account_id: "${{ env.RESOURCES_AWS_ACCOUNT_ID }}"
+        secret_access_key: "${{ env.RESOURCES_SECRET_ACCESS_KEY }}"
+        create_repo: 'false'
+        dockerfile: Dockerfile.deploy
+        extra_build_args: ''
+        path: .
+        region: "${{ env.RESOURCES_DEFAULT_REGION }}"
+        repo: "${{ env.ENVIRONMENT }}/tabula"
+        tags: "latest,${{ github.sha }}"
+    - name: Install OpenVPN
+      run: sudo apt-cache policy  openvpn && sudo apt-get --fix-missing --assume-yes --no-install-recommends install openvpn=2.4.7-1ubuntu2
+    - name: Connect VPN
+      run: sudo openvpn --config "client.ovpn" --daemon
+    - name: Wait for a VPN connection
+      timeout-minutes: 3
+      run: until ping -c1 "${{ env.VPN_SERVER_PRIVATE_IP }}"; do sleep 2; done
+    - name: Add credentials to Amazon 
+      uses: "aws-actions/configure-aws-credentials@v1"
+      with:
+        aws-access-key-id: "${{ env.AWS_ACCESS_KEY_ID }}"
+        aws-region: "${{ env.AWS_DEFAULT_REGION }}"
+        aws-secret-access-key: "${{ env.AWS_SECRET_ACCESS_KEY }}"
+    - name: Get instancesIDs
+      run: echo "WORKER_INSTANCE_IDs=$(aws elb describe-load-balancers --load-balancer-names $ELB_NAME --output json --query "LoadBalancerDescriptions[*].Instances[*].InstanceId" | jq -r '. | map(.[])| @csv' | tr -d '"')" >> $GITHUB_ENV
+
+    - name: Get instances IPs
+      run: echo "WORKER_LIST_IPS=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=$TEMPENV_VERSION-Webserver-*" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' | jq -r '.| .[] |.[]|.[]' | paste -sd, -)" >> $GITHUB_ENV
+      env:
+        TEMPENV_VERSION: ${{ steps.vars.outputs.tag }}
+    - name: Get RDS instance endpoint
+      run: echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier $RDS_INSTANCE_NAME --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')" >> $GITHUB_ENV
+####################
+    - name: Setup create_db.php file
+      uses: cuchi/jinja2-action@v1.2.0
+      with:
+        template: ./.github/scripts/create_db.php
+        output_file: ./application/config/create_db.php
+        strict: true
+        variables: |
+          DB_DEFAULT_PASSWORD=${{ env.DB_DEFAULT_PASSWORD }}
+          DB_DEFAULT_USER=${{ env.DB_DEFAULT_USER }}
+          DB_DEFAULT_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_DEFAULT_DATABASE }}
+          RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com
+    - name: Setup delete_db.php file
+      uses: cuchi/jinja2-action@v1.2.0
+      with:
+        template: ./.github/scripts/delete_db.php
+        output_file: ./application/config/delete_db.php
+        strict: true
+        variables: |
+          DB_DEFAULT_PASSWORD=${{ env.DB_DEFAULT_PASSWORD }}
+          DB_DEFAULT_USER=${{ env.DB_DEFAULT_USER }}
+          DB_DEFAULT_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_DEFAULT_DATABASE }}
+          RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com
     - name: Setup env file
       uses: cuchi/jinja2-action@v1.2.0
       with:
-        template: ./common/TestSuites/Authentication/Authentication.xml.j2
-        output_file: ./common/TestSuites/Authentication/Authentication.xml
+        template: ./application/config/env.j2
+        output_file: ./application/config/env
         strict: true
         variables: |
-          BACKEND_URL=${{ env.BACKEND_URL }}
-          TABULA_LOGIN=${{ env.TABULA_LOGIN }}
-          TABULA_PASSWORD=${{ env.TABULA_PASSWORD }}
-
-    - name: Show Authentication.xml
-      run: |
-        cat ./common/TestSuites/Authentication/Authentication.xml
-      shell: bash
-
-    - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
-      uses: actions/setup-dotnet@v1.7.2
+          DB_DEFAULT_PASSWORD=${{ env.DB_DEFAULT_PASSWORD }}
+          DB_READ_PASSWORD=${{ env.DB_READ_PASSWORD }}
+          DB_REP_PASSWORD=${{ env.DB_REP_PASSWORD }}
+          DB_DEFAULT_USER=${{ env.DB_DEFAULT_USER }}
+          DB_READ_USER=${{ env.DB_READ_USER }}
+          DB_REP_USER=${{ env.DB_REP_USER }}
+          DB_DEFAULT_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_DEFAULT_DATABASE }}
+          DB_READ_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_READ_DATABASE }}
+          DB_REP_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_REP_DATABASE }}
+          INF_LOGZIO_TOKEN=${{ env.INF_LOGZIO_TOKEN }}
+          ELB_DNS=tabula-${{ env.ENV_NAME }}-aws.escribers.io
+          RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com
+          TWILIO_SID=${{ env.TWILIO_SID }}
+          TWILIO_TOKEN=${{ env.TWILIO_TOKEN }}
+          TWILIO_SIP_CL=${{ env.TWILIO_SIP_CL }}
+          TWILIO_VIDEO_SID=${{ env.TWILIO_VIDEO_SID }}
+          TWILIO_VIDEO_TOKEN=${{ env.TWILIO_VIDEO_TOKEN }}
+          POSTMARKAPP_API_KEY=${{ env.POSTMARKAPP_API_KEY }}
+          LOGGLY_KEY=${{ env.LOGGLY_KEY }}
+          FUSION_API_KEY=${{ env.FUSION_API_KEY }}
+          VIDEOAPP_SECRET_KEY=${{ env.VIDEOAPP_SECRET_KEY }}
+          ENCRYPTION_KEY=${{ env.ENCRYPTION_KEY }}
+          TABULA_AWS_ACCESS_KEY_ID=${{ env.AWS_ACCESS_KEY_ID }}
+          TABULA_AWS_SECRET_ACCESS_KEY=${{ env.AWS_SECRET_ACCESS_KEY }}
+          COOKIE_DOMAIN=${{ env.COOKIE_DOMAIN }}
+          DOE_GOOGLE_SPREADSHEET_ID=${{ env.DOE_GOOGLE_SPREADSHEET_ID }}
+          DOE_GOOGLE_SPREADSHEET_HO=${{ env.DOE_GOOGLE_SPREADSHEET_HO }}
+          DOE_GOOGLE_SPREADSHEET_AR=${{ env.DOE_GOOGLE_SPREADSHEET_AR }}
+          DOE_GOOGLE_SPREADSHEET_OA=${{ env.DOE_GOOGLE_SPREADSHEET_OA }}
+          FRONTEND_URL=${{ env.TAB_FRONTEND_URL }}
+####################
+    - name: copy docker-compose via ssh key
+      uses: appleboy/scp-action@master
       with:
-        dotnet-version: ${{ matrix.dotnet-version }}
-
-    - name: Install GoogleChrome Driver
+        host: ${{ env.WORKER_LIST_IPS }} #"10.0.4.125,10.0.5.39"
+        username: ubuntu
+        port: 22
+        key: ${{ secrets.OLEKSB_KEY }}
+        source: "./application/config/delete_db.php,./application/config/create_db.php,./deploy/docker-compose.yaml.template,./application/config/env,./.htaccess.example"
+        target: "/home/ubuntu"
+    - name: Create AWS credentials file
+      uses: appleboy/ssh-action@master
+      env:
+        AWS_ACCESS_KEY_ID: "${{ env.RESOURCES_ACCESS_KEY_ID }}"
+        AWS_SECRET_ACCESS_KEY: "${{ env.RESOURCES_SECRET_ACCESS_KEY }}"
+        AWS_DEFAULT_REGION: "${{ env.RESOURCES_DEFAULT_REGION }}"
+      with:
+        host: ${{ env.WORKER_LIST_IPS }}
+        username: ubuntu
+        key: ${{ secrets.OLEKSB_KEY }}
+        port: 22
+        script: |
+          rm -rf ~/.aws
+          mkdir ~/.aws
+          touch ~/.aws/credentials
+          chmod 600 ~/.aws/credentials
+          echo "[default]" > ~/.aws/credentials
+          echo "aws_access_key_id=${{ env.AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
+          echo "aws_secret_access_key=${{ env.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
+          
+    - name: Start docker-compose
+      uses: appleboy/ssh-action@master
+      env:
+        AWS_ACCESS_KEY_ID: "${{ env.AWS_ACCESS_KEY_ID }}"
+        AWS_SECRET_ACCESS_KEY: "${{ env.AWS_SECRET_ACCESS_KEY }}"
+        AWS_DEFAULT_REGION: "${{ env.AWS_DEFAULT_REGION }}"
+        DB_PASSWORD: "${{ env.DB_DEFAULT_PASSWORD }}"
+        INF_LOGZIO_TOKEN: "${{ env.INF_LOGZIO_TOKEN }}"
+        ENV_NAME: "${{ env.ENV_NAME }}"
+      with:
+        host: ${{ env.WORKER_LIST_IPS }}
+        username: ubuntu
+        key: ${{ secrets.OLEKSB_KEY }}
+        port: 22
+        script: |
+          whoami
+          ls -al
+          cp ./application/config/env ./.env
+          cp ./.htaccess.example ./.htaccess
+          aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin ${{ env.RESOURCES_AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+          sudo docker rm -f $(sudo docker ps -a -q) | true
+          sudo docker rmi $(sudo docker images --all -q) | true
+          export ENV_NAME=${{ env.ENV_NAME }}
+          docker-compose -f ./deploy/docker-compose.yaml.template config > ./deploy/docker-compose.yaml
+          sudo docker-compose -f ./deploy/docker-compose.yaml up -d
+          sudo docker exec tabula_backend php delete_db.php
+          sudo docker exec tabula_backend php create_db.php
+          sudo docker exec tabula_backend php index.php migrate initdata
+          sudo docker exec tabula_backend php index.php migrate devdata
+####################  
+    - name: Output credentials
       run: |
-        google-chrome --version 
-        chromedriver --version
-        wget https://chromedriver.storage.googleapis.com/100.0.4896.60/chromedriver_linux64.zip
-        unzip chromedriver_linux64.zip
-        sudo mv chromedriver /usr/bin/chromedriver
-        sudo chown root:root /usr/bin/chromedriver
-        sudo chmod +x /usr/bin/chromedriver
-        google-chrome --version 
-        chromedriver --version
-      shell: bash
-
-    - name: Build project
+        echo "===Show client.ovpn profile==="
+        cat ./client.ovpn
+        echo "=============================="
+        echo "===Show URL profile==="
+        echo "tabula-${{ env.ENV_NAME }}-aws.escribers.io"
+        echo "=============================="
+        echo "===Show Server IPs==="
+        echo "$WORKER_LIST_IPS"
+        echo "=============================="
+      env:
+        ENV_NAME: "${{ env.ENV_NAME }}"
+        WORKER_LIST_IPS: "${{ env.WORKER_LIST_IPS }}"
+    - name: Kill VPN connection
+      if: always()
       run: |
-        dotnet build 
-      shell: bash
-
-    - name: Run tests
-      run: |
-        google-chrome --version 
-        chromedriver --version
-        ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/Authentication/Authentication.xml
-        ls -l ./TestPerformer/bin/Debug/net6.0/Reports/*
-      shell: bash
+        sudo killall openvpn   
