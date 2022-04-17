@@ -65,13 +65,13 @@ runs:
           --provisioned-throughput \
             ReadCapacityUnits=20,WriteCapacityUnits=20 \
           --key-schema \
-            AttributeName=LockID,KeyType=HASH 2> /dev/null | true
+            AttributeName=LockID,KeyType=HASH || true
       env:
         TEMPENV_VERSION: "${{ env.TEMPENV_VERSION }}"
       shell: bash
 
     - name: Deploy infrastructure
-      if: always()
+      # if: always()
       run: |
         terraform -chdir=./infrastructure init -backend-config="bucket=escribers-infra-tempenv-terraform-state" -backend-config="key=$TEMPENV_VERSION.tfstate" -backend-config="dynamodb_table=$TEMPENV_VERSION-terraform-state-lock-dynamo"
         terraform -chdir=./infrastructure apply -auto-approve 
