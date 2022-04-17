@@ -217,7 +217,6 @@ runs:
       shell: bash
 
     - name: Wait for a VPN connection
-      timeout-minutes: 3
       run: until ping -c1 "${{ env.VPN_SERVER_PRIVATE_IP }}"; do sleep 2; done
       shell: bash
 
