@@ -1,20 +1,30 @@
 name: "Run e2e test"
 description: "Run tests..."
 inputs:
-  dotnet-version:
+  tempenv-version:
     description: 'The dotnet version to use'
-    default: '6.0.x'
-    required: false
-  backend-url:
-    description: 'URL to tabula deployed'
     required: true
-  tabula-login:
-    description: 'Login to tabula portal'
+  db-password:
+    description: 'DB Password from secrets'
     required: true
-  tabula-password:
-    description: 'Password to tabula portal'
+  db-user:
+    description: 'DB User from secrets'
     required: true
-
+  db-database:
+    description: 'DB  from secrets'
+    required: true
+  access-key:
+    description: 'AWS Access Key from secrets'
+    required: true
+  secret-key:
+    description: 'AWS Secret Key from secrets'
+    required: true
+  default-region:
+    description: 'AWS Default Region from secrets'
+    required: true
+  account-id:
+    description: 'AWS Account ID for ECR  from secrets'
+    required: true
 
 
 runs:
@@ -22,9 +32,14 @@ runs:
   steps: 
     - name: Define variables 
       run: |
-           echo "BACKEND_URL=${{ inputs.backend-url }}" >> $GITHUB_ENV
-           echo "TABULA_LOGIN=${{ inputs.tabula-login }}" >> $GITHUB_ENV
-           echo "TABULA_PASSWORD=${{ inputs.tabula-password }}" >> $GITHUB_ENV
+           echo "TEMPENV_VERSION=${{ inputs.tempenv-version }}" >> $GITHUB_ENV
+           echo "SANDBOX_DB_PASSWORD=${{ inputs.db-password }}" >> $GITHUB_ENV
+           echo "SANDBOX_DB_USER=${{ inputs.db-user }}" >> $GITHUB_ENV
+           echo "SANDBOX_DB_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
+           echo "AWS_ACCESS_KEY_ID=${{ inputs.access-key }}" >> $GITHUB_ENV
+           echo "AWS_SECRET_ACCESS_KEY=${{ inputs.secret-key }}" >> $GITHUB_ENV
+           echo "AWS_DEFAULT_REGION=${{ inputs.default-region }}" >> $GITHUB_ENV
+           echo "RESOURCES_AWS_ACCOUNT_ID=${{ inputs.account-id }}" >> $GITHUB_ENV
       shell: bash
 
     - name: DEBUG 
@@ -80,22 +95,16 @@ runs:
            echo "ENVIRONMENT=$TEMPENV_VERSION" >> $GITHUB_ENV
            echo "RDS_INSTANCE_NAME=$TEMPENV_VERSION-tabula" >> $GITHUB_ENV
            echo "ELB_NAME=$TEMPENV_VERSION-elb-tabula" >> $GITHUB_ENV
-           echo "AWS_ACCESS_KEY_ID=${{ secrets.SANDBOX_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
-           echo "AWS_SECRET_ACCESS_KEY=${{ secrets.SANDBOX_AWS_SECRET_KEY }}" >> $GITHUB_ENV
-           echo "AWS_DEFAULT_REGION=${{ secrets.SANDBOX_AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
-           echo "RESOURCES_ACCESS_KEY_ID=${{ secrets.SANDBOX_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
-           echo "RESOURCES_SECRET_ACCESS_KEY=${{ secrets.SANDBOX_AWS_SECRET_KEY }}" >> $GITHUB_ENV
-           echo "RESOURCES_DEFAULT_REGION=${{ secrets.SANDBOX_AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
-           echo "RESOURCES_AWS_ACCOUNT_ID=${{ secrets.SANDBOX_AWS_ACCOUNT_ID }}" >> $GITHUB_ENV
-           echo "DB_DEFAULT_PASSWORD=${{ secrets.SANDBOX_DB_PASSWORD }}" >> $GITHUB_ENV
-           echo "DB_READ_PASSWORD=${{ secrets.SANDBOX_DB_PASSWORD }}" >> $GITHUB_ENV
-           echo "DB_REP_PASSWORD=${{ secrets.SANDBOX_DB_PASSWORD }}" >> $GITHUB_ENV
-           echo "DB_DEFAULT_USER=${{ secrets.SANDBOX_DB_USER }}" >> $GITHUB_ENV
-           echo "DB_READ_USER=${{ secrets.SANDBOX_DB_USER }}" >> $GITHUB_ENV
-           echo "DB_REP_USER=${{ secrets.SANDBOX_DB_USER }}" >> $GITHUB_ENV
-           echo "DB_DEFAULT_DATABASE=${{ secrets.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
-           echo "DB_READ_DATABASE=${{ secrets.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
-           echo "DB_REP_DATABASE=${{ secrets.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
+           echo "RESOURCES_DEFAULT_REGION=${{ env.AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
+           echo "DB_DEFAULT_PASSWORD=${{ env.SANDBOX_DB_PASSWORD }}" >> $GITHUB_ENV
+           echo "DB_READ_PASSWORD=${{ env.SANDBOX_DB_PASSWORD }}" >> $GITHUB_ENV
+           echo "DB_REP_PASSWORD=${{ env.SANDBOX_DB_PASSWORD }}" >> $GITHUB_ENV
+           echo "DB_DEFAULT_USER=${{ env.SANDBOX_DB_USER }}" >> $GITHUB_ENV
+           echo "DB_READ_USER=${{ env.SANDBOX_DB_USER }}" >> $GITHUB_ENV
+           echo "DB_REP_USER=${{ env.SANDBOX_DB_USER }}" >> $GITHUB_ENV
+           echo "DB_DEFAULT_DATABASE=${{ env.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
+           echo "DB_READ_DATABASE=${{ env.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
+           echo "DB_REP_DATABASE=${{ env.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
            echo "INF_LOGZIO_TOKEN=${{ secrets.INF_LOGZIO_TOKEN }}" >> $GITHUB_ENV
            echo "TWILIO_SID=${{ secrets.TWILIO_SID }}" >> $GITHUB_ENV
            echo "TWILIO_TOKEN=${{ secrets.TWILIO_TOKEN }}" >> $GITHUB_ENV
@@ -121,14 +130,14 @@ runs:
     - name: "Create Docker image and push it to ECR repository"
       uses: "kciter/aws-ecr-action@v4"
       with:
-        access_key_id: "${{ env.RESOURCES_ACCESS_KEY_ID }}"
+        access_key_id: "${{ env.AWS_ACCESS_KEY_ID }}"
         account_id: "${{ env.RESOURCES_AWS_ACCOUNT_ID }}"
         secret_access_key: "${{ env.RESOURCES_SECRET_ACCESS_KEY }}"
         create_repo: 'false'
         dockerfile: Dockerfile.deploy
         extra_build_args: ''
         path: .
-        region: "${{ env.RESOURCES_DEFAULT_REGION }}"
+        region: "${{ env.AWS_DEFAULT_REGION }}"
         repo: "${{ env.ENVIRONMENT }}/tabula"
         tags: "latest,${{ github.sha }}"
     - name: Install OpenVPN
@@ -237,8 +246,8 @@ runs:
     - name: Create AWS credentials file
       uses: appleboy/ssh-action@master
       env:
-        AWS_ACCESS_KEY_ID: "${{ env.RESOURCES_ACCESS_KEY_ID }}"
-        AWS_SECRET_ACCESS_KEY: "${{ env.RESOURCES_SECRET_ACCESS_KEY }}"
+        AWS_ACCESS_KEY_ID: "${{ env.AWS_ACCESS_KEY_ID }}"
+        AWS_SECRET_ACCESS_KEY: "${{ env.AWS_SECRET_ACCESS_KEY }}"
         AWS_DEFAULT_REGION: "${{ env.RESOURCES_DEFAULT_REGION }}"
       with:
         host: ${{ env.WORKER_LIST_IPS }}
@@ -273,7 +282,7 @@ runs:
           ls -al
           cp ./application/config/env ./.env
           cp ./.htaccess.example ./.htaccess
-          aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin ${{ env.RESOURCES_AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+          aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin ${{ env.AWS_DEFAULT_REGION }}.dkr.ecr.us-east-1.amazonaws.com
           sudo docker rm -f $(sudo docker ps -a -q) | true
           sudo docker rmi $(sudo docker images --all -q) | true
           export ENV_NAME=${{ env.ENV_NAME }}
