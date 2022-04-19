@@ -88,6 +88,11 @@ runs:
     - name: Define variables 
       run: |
            echo "TEMPENV_VERSION=${{ inputs.tempenv-version }}" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Define variables 
+      run: |
+           echo "TEMPENV_VERSION=${{ inputs.tempenv-version }}" >> $GITHUB_ENV
            echo "SANDBOX_DB_PASSWORD=${{ inputs.db-password }}" >> $GITHUB_ENV
            echo "SANDBOX_DB_USER=${{ inputs.db-user }}" >> $GITHUB_ENV
            echo "SANDBOX_DB_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
@@ -111,7 +116,7 @@ runs:
            echo "DOE_GOOGLE_SPREADSHEET_HO=${{ inputs.doe-google-spreadsheet-ho }}" >> $GITHUB_ENV
            echo "DOE_GOOGLE_SPREADSHEET_AR=${{ inputs.doe-google-spreadsheet-ar }}" >> $GITHUB_ENV
            echo "DOE_GOOGLE_SPREADSHEET_OA=${{ inputs.doe-google-spreadsheet-oa }}" >> $GITHUB_ENV
-           echo "ENV_NAME=$TEMPENV_VERSION" >> $GITHUB_ENV
+           echo "ENV_NAME=${{ inputs.tempenv-version }}" >> $GITHUB_ENV
            echo "COOKIE_DOMAIN=escribers.io" >> $GITHUB_ENV
       shell: bash
 
