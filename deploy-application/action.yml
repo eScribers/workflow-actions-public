@@ -79,6 +79,12 @@ inputs:
 runs:
   using: "composite"
   steps: 
+    - name: DEBUG 
+      run: |
+           pwd
+           ls -la ./*
+      shell: bash
+
     - name: Define variables 
       run: |
            echo "TEMPENV_VERSION=${{ inputs.tempenv-version }}" >> $GITHUB_ENV
