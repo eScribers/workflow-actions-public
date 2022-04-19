@@ -107,8 +107,6 @@ runs:
            echo "DOE_GOOGLE_SPREADSHEET_OA=${{ inputs.doe-google-spreadsheet-oa }}" >> $GITHUB_ENV
            echo "ENV_NAME=$TEMPENV_VERSION" >> $GITHUB_ENV
            echo "COOKIE_DOMAIN=escribers.io" >> $GITHUB_ENV
-
-#############
       shell: bash
 
     - name: DEBUG 
