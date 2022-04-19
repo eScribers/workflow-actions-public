@@ -114,35 +114,35 @@ runs:
            echo "COOKIE_DOMAIN=escribers.io" >> $GITHUB_ENV
       shell: bash
 
-    - name: Define variables 
-      run: |
-           echo "TEMPENV_VERSION=${{ inputs.tempenv-version }}" >> $GITHUB_ENV
-           echo "SANDBOX_DB_PASSWORD=${{ inputs.db-password }}" >> $GITHUB_ENV
-           echo "SANDBOX_DB_USER=${{ inputs.db-user }}" >> $GITHUB_ENV
-           echo "SANDBOX_DB_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
-           echo "AWS_ACCESS_KEY_ID=${{ inputs.access-key }}" >> $GITHUB_ENV
-           echo "AWS_SECRET_ACCESS_KEY=${{ inputs.secret-key }}" >> $GITHUB_ENV
-           echo "AWS_DEFAULT_REGION=${{ inputs.default-region }}" >> $GITHUB_ENV
-           echo "RESOURCES_AWS_ACCOUNT_ID=${{ inputs.account-id }}" >> $GITHUB_ENV
-           echo "OLEKSB_KEY=${{ inputs.oleksb-key }}" >> $GITHUB_ENV
-           echo "INF_LOGZIO_TOKEN=${{ inputs.inf-logzio-token }}" >> $GITHUB_ENV
-           echo "TWILIO_SID=${{ inputs.twilio-sid }}" >> $GITHUB_ENV
-           echo "TWILIO_TOKEN=${{ inputs.twilio-token }}" >> $GITHUB_ENV
-           echo "TWILIO_SIP_CL=${{ inputs.twilio-sip-cl }}" >> $GITHUB_ENV
-           echo "TWILIO_VIDEO_SID=${{ inputs.twilio-video-sid }}" >> $GITHUB_ENV
-           echo "TWILIO_VIDEO_TOKEN=${{ inputs.twilio-video-token }}" >> $GITHUB_ENV
-           echo "POSTMARKAPP_API_KEY=${{ inputs.postmarkapp-api-key }}" >> $GITHUB_ENV
-           echo "LOGGLY_KEY=${{ inputs.loggly-key }}" >> $GITHUB_ENV
-           echo "FUSION_API_KEY=${{ inputs.fussion-api-key }}" >> $GITHUB_ENV
-           echo "VIDEOAPP_SECRET_KEY=${{ inputs.vieoapp-secret-key }}" >> $GITHUB_ENV
-           echo "ENCRYPTION_KEY=${{ inputs.encryption-key }}" >> $GITHUB_ENV
-           echo "DOE_GOOGLE_SPREADSHEET_ID=${{ inputs.doe-google-spreadsheet-id }}" >> $GITHUB_ENV
-           echo "DOE_GOOGLE_SPREADSHEET_HO=${{ inputs.doe-google-spreadsheet-ho }}" >> $GITHUB_ENV
-           echo "DOE_GOOGLE_SPREADSHEET_AR=${{ inputs.doe-google-spreadsheet-ar }}" >> $GITHUB_ENV
-           echo "DOE_GOOGLE_SPREADSHEET_OA=${{ inputs.doe-google-spreadsheet-oa }}" >> $GITHUB_ENV
-           echo "ENV_NAME=${{ inputs.tempenv-version }}" >> $GITHUB_ENV
-           echo "COOKIE_DOMAIN=escribers.io" >> $GITHUB_ENV
-      shell: bash
+    # - name: Define variables 
+    #   run: |
+    #        echo "TEMPENV_VERSION=${{ inputs.tempenv-version }}" >> $GITHUB_ENV
+    #        echo "SANDBOX_DB_PASSWORD=${{ inputs.db-password }}" >> $GITHUB_ENV
+    #        echo "SANDBOX_DB_USER=${{ inputs.db-user }}" >> $GITHUB_ENV
+    #        echo "SANDBOX_DB_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
+    #        echo "AWS_ACCESS_KEY_ID=${{ inputs.access-key }}" >> $GITHUB_ENV
+    #        echo "AWS_SECRET_ACCESS_KEY=${{ inputs.secret-key }}" >> $GITHUB_ENV
+    #        echo "AWS_DEFAULT_REGION=${{ inputs.default-region }}" >> $GITHUB_ENV
+    #        echo "RESOURCES_AWS_ACCOUNT_ID=${{ inputs.account-id }}" >> $GITHUB_ENV
+    #        echo "OLEKSB_KEY=${{ inputs.oleksb-key }}" >> $GITHUB_ENV
+    #        echo "INF_LOGZIO_TOKEN=${{ inputs.inf-logzio-token }}" >> $GITHUB_ENV
+    #        echo "TWILIO_SID=${{ inputs.twilio-sid }}" >> $GITHUB_ENV
+    #        echo "TWILIO_TOKEN=${{ inputs.twilio-token }}" >> $GITHUB_ENV
+    #        echo "TWILIO_SIP_CL=${{ inputs.twilio-sip-cl }}" >> $GITHUB_ENV
+    #        echo "TWILIO_VIDEO_SID=${{ inputs.twilio-video-sid }}" >> $GITHUB_ENV
+    #        echo "TWILIO_VIDEO_TOKEN=${{ inputs.twilio-video-token }}" >> $GITHUB_ENV
+    #        echo "POSTMARKAPP_API_KEY=${{ inputs.postmarkapp-api-key }}" >> $GITHUB_ENV
+    #        echo "LOGGLY_KEY=${{ inputs.loggly-key }}" >> $GITHUB_ENV
+    #        echo "FUSION_API_KEY=${{ inputs.fussion-api-key }}" >> $GITHUB_ENV
+    #        echo "VIDEOAPP_SECRET_KEY=${{ inputs.vieoapp-secret-key }}" >> $GITHUB_ENV
+    #        echo "ENCRYPTION_KEY=${{ inputs.encryption-key }}" >> $GITHUB_ENV
+    #        echo "DOE_GOOGLE_SPREADSHEET_ID=${{ inputs.doe-google-spreadsheet-id }}" >> $GITHUB_ENV
+    #        echo "DOE_GOOGLE_SPREADSHEET_HO=${{ inputs.doe-google-spreadsheet-ho }}" >> $GITHUB_ENV
+    #        echo "DOE_GOOGLE_SPREADSHEET_AR=${{ inputs.doe-google-spreadsheet-ar }}" >> $GITHUB_ENV
+    #        echo "DOE_GOOGLE_SPREADSHEET_OA=${{ inputs.doe-google-spreadsheet-oa }}" >> $GITHUB_ENV
+    #        echo "ENV_NAME=${{ inputs.tempenv-version }}" >> $GITHUB_ENV
+    #        echo "COOKIE_DOMAIN=escribers.io" >> $GITHUB_ENV
+    #   shell: bash
 
     - name: DEBUG 
       run: |
