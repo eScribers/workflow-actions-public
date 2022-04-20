@@ -77,9 +77,6 @@ inputs:
   token:
     description: 'Token to github'
     required: true
-  oleksb-key:
-    description: 'Token to github'
-    required: true
 
 
 runs:
