@@ -167,8 +167,8 @@ runs:
       shell: bash
     - name: Define variables depends on env
       run: |
-           echo "RDS_INSTANCE_NAME=$TEMPENV_VERSION-tabula" >> $GITHUB_ENV
-           echo "ELB_NAME=$TEMPENV_VERSION-elb-tabula" >> $GITHUB_ENV
+           echo "RDS_INSTANCE_NAME=${{ env.TEMPENV_VERSION }}-tabula" >> $GITHUB_ENV
+           echo "ELB_NAME=${{ env.TEMPENV_VERSION }}-elb-tabula" >> $GITHUB_ENV
            echo "RESOURCES_DEFAULT_REGION=${{ env.AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
            echo "DB_DEFAULT_PASSWORD=${{ env.SANDBOX_DB_PASSWORD }}" >> $GITHUB_ENV
            echo "DB_READ_PASSWORD=${{ env.SANDBOX_DB_PASSWORD }}" >> $GITHUB_ENV
@@ -190,16 +190,14 @@ runs:
            echo "FUSION_API_KEY=${{ env.FUSION_API_KEY }}" >> $GITHUB_ENV
            echo "VIDEOAPP_SECRET_KEY=${{ env.VIDEOAPP_SECRET_KEY }}" >> $GITHUB_ENV
            echo "ENCRYPTION_KEY=${{ env.ENCRYPTION_KEY }}" >> $GITHUB_ENV
-           echo "ENV_NAME=$TEMPENV_VERSION" >> $GITHUB_ENV
+           echo "ENV_NAME=${{ env.TEMPENV_VERSION }}" >> $GITHUB_ENV
            echo "COOKIE_DOMAIN=escribers.io" >> $GITHUB_ENV
            echo "DOE_GOOGLE_SPREADSHEET_ID=${{ env.DOE_GOOGLE_SPREADSHEET_ID }}" >> $GITHUB_ENV
            echo "DOE_GOOGLE_SPREADSHEET_HO=${{ env.DOE_GOOGLE_SPREADSHEET_HO }}" >> $GITHUB_ENV
            echo "DOE_GOOGLE_SPREADSHEET_AR=${{ env.DOE_GOOGLE_SPREADSHEET_AR }}" >> $GITHUB_ENV
            echo "DOE_GOOGLE_SPREADSHEET_OA=${{ env.DOE_GOOGLE_SPREADSHEET_OA }}" >> $GITHUB_ENV
            echo "TAB_FRONTEND_URL=https://tabula-frontend-sandbox-aws-us-east-1.s3.amazonaws.com" >> $GITHUB_ENV
-           echo "Deploy to $TEMPENV_VERSION"
-      env:
-        TEMPENV_VERSION: ${{ steps.vars.outputs.tag }}
+           echo "Deploy to ${{ env.TEMPENV_VERSION }}"
       shell: bash
     - name: "Create Docker image and push it to ECR repository"
       uses: "kciter/aws-ecr-action@v4"
