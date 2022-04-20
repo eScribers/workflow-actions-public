@@ -74,7 +74,9 @@ inputs:
   doe-google-spreadsheet-oa:
     description: 'Public key for adding to server from secrets'
     required: true
-
+  token:
+    description: 'Token to github'
+    required: true
 
 
 runs:
@@ -85,6 +87,13 @@ runs:
            pwd
            ls -la ./*
       shell: bash
+
+    - name: Checkout tabula infra repo
+      uses: actions/checkout@master
+      with:
+        repository: eScribers/tabula
+        ref: refs/heads/master
+        token: ${{ inputs.token }}
 
     - name: Define variables 
       run: |
@@ -127,6 +136,7 @@ runs:
       uses: actions/download-artifact@v1
       with:
         name: private_ip
+
     - name: Download public_ip
       uses: actions/download-artifact@v1
       with:
@@ -165,6 +175,7 @@ runs:
         ls -l ./*
         pwd
       shell: bash
+
     - name: Define variables depends on env
       run: |
            echo "RDS_INSTANCE_NAME=${{ env.TEMPENV_VERSION }}-tabula" >> $GITHUB_ENV
@@ -199,6 +210,7 @@ runs:
            echo "TAB_FRONTEND_URL=https://tabula-frontend-sandbox-aws-us-east-1.s3.amazonaws.com" >> $GITHUB_ENV
            echo "Deploy to ${{ env.TEMPENV_VERSION }}"
       shell: bash
+
     - name: "Create Docker image and push it to ECR repository"
       uses: "kciter/aws-ecr-action@v4"
       with:
@@ -208,10 +220,11 @@ runs:
         create_repo: 'false'
         dockerfile: Dockerfile.deploy
         extra_build_args: ''
-        path: .
+        path: /home/runner/work/tabula-automation-tests/tabula-automation-tests/
         region: "${{ env.AWS_DEFAULT_REGION }}"
         repo: "${{ env.ENVIRONMENT }}/tabula"
         tags: "latest,${{ github.sha }}"
+
     - name: Install OpenVPN
       run: sudo apt-cache policy  openvpn && sudo apt-get --fix-missing --assume-yes --no-install-recommends install openvpn=2.4.7-1ubuntu2
       shell: bash
@@ -230,6 +243,7 @@ runs:
         aws-access-key-id: "${{ env.AWS_ACCESS_KEY_ID }}"
         aws-region: "${{ env.AWS_DEFAULT_REGION }}"
         aws-secret-access-key: "${{ env.AWS_SECRET_ACCESS_KEY }}"
+
     - name: Get instancesIDs
       run: echo "WORKER_INSTANCE_IDs=$(aws elb describe-load-balancers --load-balancer-names $ELB_NAME --output json --query "LoadBalancerDescriptions[*].Instances[*].InstanceId" | jq -r '. | map(.[])| @csv' | tr -d '"')" >> $GITHUB_ENV
       shell: bash
@@ -256,6 +270,7 @@ runs:
           DB_DEFAULT_USER=${{ env.DB_DEFAULT_USER }}
           DB_DEFAULT_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_DEFAULT_DATABASE }}
           RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com
+
     - name: Setup delete_db.php file
       uses: cuchi/jinja2-action@v1.2.0
       with:
@@ -267,6 +282,7 @@ runs:
           DB_DEFAULT_USER=${{ env.DB_DEFAULT_USER }}
           DB_DEFAULT_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_DEFAULT_DATABASE }}
           RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com
+
     - name: Setup env file
       uses: cuchi/jinja2-action@v1.2.0
       with:
@@ -314,6 +330,7 @@ runs:
         key: ${{ env.OLEKSB_KEY }}
         source: "./application/config/delete_db.php,./application/config/create_db.php,./deploy/docker-compose.yaml.template,./application/config/env,./.htaccess.example"
         target: "/home/ubuntu"
+
     - name: Create AWS credentials file
       uses: appleboy/ssh-action@master
       env:
@@ -365,6 +382,7 @@ runs:
           sudo docker exec tabula_backend php index.php migrate devdata
         shell: bash
 ####################  
+
     - name: Output credentials
       run: |
         echo "===Show client.ovpn profile==="
@@ -380,6 +398,7 @@ runs:
         ENV_NAME: "${{ env.ENV_NAME }}"
         WORKER_LIST_IPS: "${{ env.WORKER_LIST_IPS }}"
       shell: bash
+
     - name: Kill VPN connection
       if: always()
       run: |
