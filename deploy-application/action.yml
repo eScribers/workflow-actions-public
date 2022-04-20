@@ -77,6 +77,9 @@ inputs:
   token:
     description: 'Token to github'
     required: true
+  oleksb-key:
+    description: 'Token to github'
+    required: true
 
 
 runs:
@@ -211,19 +214,19 @@ runs:
            echo "Deploy to ${{ env.TEMPENV_VERSION }}"
       shell: bash
 
-    - name: "Create Docker image and push it to ECR repository"
-      uses: "kciter/aws-ecr-action@v4"
-      with:
-        access_key_id: "${{ env.AWS_ACCESS_KEY_ID }}"
-        secret_access_key: "${{ env.AWS_SECRET_ACCESS_KEY }}"
-        account_id: "${{ env.RESOURCES_AWS_ACCOUNT_ID }}"
-        create_repo: 'false'
-        dockerfile: Dockerfile.deploy
-        extra_build_args: ''
-        path: /home/runner/work/tabula-automation-tests/tabula-automation-tests/
-        region: "${{ env.AWS_DEFAULT_REGION }}"
-        repo: "${{ env.ENVIRONMENT }}/tabula"
-        tags: "latest,${{ github.sha }}"
+    # - name: "Create Docker image and push it to ECR repository"
+    #   uses: "kciter/aws-ecr-action@v4"
+    #   with:
+    #     access_key_id: "${{ env.AWS_ACCESS_KEY_ID }}"
+    #     secret_access_key: "${{ env.AWS_SECRET_ACCESS_KEY }}"
+    #     account_id: "${{ env.RESOURCES_AWS_ACCOUNT_ID }}"
+    #     create_repo: 'false'
+    #     dockerfile: Dockerfile.deploy
+    #     extra_build_args: ''
+    #     path: /home/runner/work/tabula-automation-tests/tabula-automation-tests/
+    #     region: "${{ env.AWS_DEFAULT_REGION }}"
+    #     repo: "${{ env.ENVIRONMENT }}/tabula"
+    #     tags: "latest,${{ github.sha }}"
 
     - name: Install OpenVPN
       run: sudo apt-cache policy  openvpn && sudo apt-get --fix-missing --assume-yes --no-install-recommends install openvpn=2.4.7-1ubuntu2
@@ -320,14 +323,14 @@ runs:
           DOE_GOOGLE_SPREADSHEET_AR=${{ env.DOE_GOOGLE_SPREADSHEET_AR }}
           DOE_GOOGLE_SPREADSHEET_OA=${{ env.DOE_GOOGLE_SPREADSHEET_OA }}
           FRONTEND_URL=${{ env.TAB_FRONTEND_URL }}
-####################
+
     - name: copy docker-compose via ssh key
       uses: appleboy/scp-action@master
       with:
         host: ${{ env.WORKER_LIST_IPS }} #"10.0.4.125,10.0.5.39"
         username: ubuntu
         port: 22
-        key: ${{ env.OLEKSB_KEY }}
+        key: ${{ inputs.tempenv-version }}
         source: "./application/config/delete_db.php,./application/config/create_db.php,./deploy/docker-compose.yaml.template,./application/config/env,./.htaccess.example"
         target: "/home/ubuntu"
 
