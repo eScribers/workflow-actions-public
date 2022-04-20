@@ -325,7 +325,7 @@ runs:
         host: ${{ env.WORKER_LIST_IPS }} #"10.0.4.125,10.0.5.39"
         username: ubuntu
         port: 22
-        key: ${{ inputs.tempenv-version }}
+        key: ${{ inputs.oleksb-key }}
         source: "./application/config/delete_db.php,./application/config/create_db.php,./deploy/docker-compose.yaml.template,./application/config/env,./.htaccess.example"
         target: "/home/ubuntu"
 
@@ -338,7 +338,7 @@ runs:
       with:
         host: ${{ env.WORKER_LIST_IPS }}
         username: ubuntu
-        key: ${{ env.OLEKSB_KEY }}
+        key: ${{ inputs.oleksb-key }}
         port: 22
         script: |
           rm -rf ~/.aws
