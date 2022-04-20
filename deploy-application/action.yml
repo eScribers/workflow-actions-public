@@ -184,15 +184,22 @@ runs:
       shell: bash
 
     - name: Get VPN Profile
-      uses: nicklasfrahm/scp-action@main
-      with:
-        direction: download
-        host: ${{ env.VPN_SERVER_PUBLIC_IP }}
-        insecure_ignore_fingerprint: true
-        username: ubuntu
-        key: ${{ env.OLEKSB_KEY }}
-        source: /home/ubuntu/client.ovpn
-        target: ./client.ovpn
+      run: |
+        cat private_key/private_key
+        scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i private_key/private_key ubuntu@${{ env.VPN_SERVER_PUBLIC_IP }}/home/ubuntu/client.ovpn ./client.ovpn
+        echo "OLEKSB_KEY=$(cat private_key/private_key)" >> $GITHUB_ENV
+      shell: bash
+
+    # - name: Get VPN Profile
+    #   uses: nicklasfrahm/scp-action@main
+    #   with:
+    #     direction: download
+    #     host: ${{ env.VPN_SERVER_PUBLIC_IP }}
+    #     insecure_ignore_fingerprint: true
+    #     username: ubuntu
+    #     key: ${{ env.OLEKSB_KEY }}
+    #     source: /home/ubuntu/client.ovpn
+    #     target: ./client.ovpn
     - name: check variables
       run: |
         ls -l ./*
