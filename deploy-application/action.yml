@@ -170,6 +170,7 @@ runs:
         ls -l ./*
         echo "VPN_SERVER_PRIVATE_IP=$(cat private_ip/private_ip)" >> $GITHUB_ENV
         echo "VPN_SERVER_PUBLIC_IP=$(cat public_ip/public_ip)" >> $GITHUB_ENV
+        echo "OLEKSB_KEY=$(cat private_key/private_key)" >> $GITHUB_ENV
       shell: bash
     - name: check variables
       run: |
