@@ -361,7 +361,7 @@ runs:
       with:
         host: ${{ env.WORKER_LIST_IPS }}
         username: ubuntu
-        key: ${{ env.OLEKSB_KEY }}
+        key: ${{ inputs.oleksb-key }}
         port: 22
         script: |
           whoami
