@@ -160,11 +160,6 @@ runs:
       with:
         name: public_ip
 
-    - name: Create file private_key
-      run: |
-        cat ${{ env.OLEKSB_KEY }} > private_key
-        ls -l 
-      shell: bash
     - name: Download private_key
       uses: actions/download-artifact@v1
       with:
