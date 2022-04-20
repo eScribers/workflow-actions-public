@@ -159,6 +159,11 @@ runs:
       uses: actions/download-artifact@v1
       with:
         name: public_ip
+    - name: Download private_key
+      uses: actions/download-artifact@v1
+      with:
+        name: private_key
+
     - name: Define variables for VPN servers
       run: |
         ls -l ./*
