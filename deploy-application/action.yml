@@ -89,6 +89,7 @@ runs:
     - name: Define variables 
       run: |
            echo "TEMPENV_VERSION=${{ inputs.tempenv-version }}" >> $GITHUB_ENV
+           echo "ENVIRONMENT=${{ inputs.tempenv-version }}" >> $GITHUB_ENV
            echo "SANDBOX_DB_PASSWORD=${{ inputs.db-password }}" >> $GITHUB_ENV
            echo "SANDBOX_DB_USER=${{ inputs.db-user }}" >> $GITHUB_ENV
            echo "SANDBOX_DB_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
@@ -166,8 +167,6 @@ runs:
       shell: bash
     - name: Define variables depends on env
       run: |
-           echo "ENV_NAME=$TEMPENV_VERSION" >> $GITHUB_ENV
-           echo "ENVIRONMENT=$TEMPENV_VERSION" >> $GITHUB_ENV
            echo "RDS_INSTANCE_NAME=$TEMPENV_VERSION-tabula" >> $GITHUB_ENV
            echo "ELB_NAME=$TEMPENV_VERSION-elb-tabula" >> $GITHUB_ENV
            echo "RESOURCES_DEFAULT_REGION=${{ env.AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
