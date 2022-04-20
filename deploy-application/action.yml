@@ -245,8 +245,8 @@ runs:
       uses: "kciter/aws-ecr-action@v4"
       with:
         access_key_id: "${{ env.AWS_ACCESS_KEY_ID }}"
+        secret_access_key: "${{ env.AWS_SECRET_ACCESS_KEY }}"
         account_id: "${{ env.RESOURCES_AWS_ACCOUNT_ID }}"
-        secret_access_key: "${{ env.RESOURCES_SECRET_ACCESS_KEY }}"
         create_repo: 'false'
         dockerfile: Dockerfile.deploy
         extra_build_args: ''
