@@ -376,6 +376,7 @@ runs:
           sudo docker-compose -f ./deploy/docker-compose.yaml up -d
           sudo docker exec tabula_backend php delete_db.php
           sudo docker exec tabula_backend php create_db.php
+          sudo docker exec tabula_backend php index.php migrate
           sudo docker exec tabula_backend php index.php migrate initdata
           sudo docker exec tabula_backend php index.php migrate devdata
         shell: bash
