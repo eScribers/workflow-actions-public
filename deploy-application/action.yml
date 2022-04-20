@@ -185,7 +185,8 @@ runs:
     - name: Get VPN Profile
       run: |
         cat private_key/private_key
-        scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i private_key/private_key ubuntu@${{ env.VPN_SERVER_PUBLIC_IP }}/home/ubuntu/client.ovpn ./client.ovpn
+        chmod 600 private_key/private_key
+        scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i private_key/private_key ubuntu@${{ env.VPN_SERVER_PUBLIC_IP }}:/home/ubuntu/client.ovpn ./client.ovpn
         echo "OLEKSB_KEY=$(cat private_key/private_key)" >> $GITHUB_ENV
       shell: bash
 
