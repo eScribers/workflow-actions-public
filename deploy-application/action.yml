@@ -368,7 +368,7 @@ runs:
           ls -al
           cp ./application/config/env ./.env
           cp ./.htaccess.example ./.htaccess
-          aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin ${{ env.AWS_DEFAULT_REGION }}.dkr.ecr.us-east-1.amazonaws.com
+          aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin ${{ env.RESOURCES_AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
           sudo docker rm -f $(sudo docker ps -a -q) | true
           sudo docker rmi $(sudo docker images --all -q) | true
           export ENV_NAME=${{ env.ENV_NAME }}
