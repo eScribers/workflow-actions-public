@@ -249,9 +249,7 @@ runs:
       shell: bash
 
     - name: Get instances IPs
-      run: echo "WORKER_LIST_IPS=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=$TEMPENV_VERSION-Webserver-*" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' | jq -r '.| .[] |.[]|.[]' | paste -sd, -)" >> $GITHUB_ENV
-      env:
-        TEMPENV_VERSION: ${{ steps.vars.outputs.tag }}
+      run: echo "WORKER_LIST_IPS=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=${{ env.TEMPENV_VERSION }}-Webserver-*" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' | jq -r '.| .[] |.[]|.[]' | paste -sd, -)" >> $GITHUB_ENV
       shell: bash
 
     - name: Get RDS instance endpoint
