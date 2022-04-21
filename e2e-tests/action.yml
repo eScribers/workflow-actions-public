@@ -14,6 +14,12 @@ inputs:
   tabula-password:
     description: 'Password to tabula portal'
     required: true
+  access-key:
+    description: 'AWS Access Key from secrets'
+    required: true
+  secret-key:
+    description: 'AWS Secret Key from secrets'
+    required: true
 
 
 
@@ -79,3 +85,10 @@ runs:
         ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/Authentication/Authentication.xml
         ls -l ./TestPerformer/bin/Debug/net6.0/Reports/*
       shell: bash
+
+    - uses: shallwefootball/s3-upload-action@master
+      with:
+        aws_key_id: ${{ inputs.access-key }}
+        aws_secret_access_key: ${{ inputs.secret-key }}
+        aws_bucket: "escribers-automation-tests-e2e-reports"
+        source_dir: './TestPerformer/bin/Debug/net6.0/Reports/'
