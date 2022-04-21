@@ -375,7 +375,7 @@ runs:
 
     - name: Add Demo User
       uses: appleboy/ssh-action@master
-      if: ${{ inputs.tabula-login != "" }}
+      if: ${{ inputs.tabula-login }}
       with:
         host: ${{ env.WORKER_LIST_IPS }}
         username: ubuntu

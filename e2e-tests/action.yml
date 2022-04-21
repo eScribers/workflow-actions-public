@@ -100,11 +100,4 @@ runs:
       run: |
         aws s3 cp ./TestPerformer/bin/Debug/net6.0/Reports/ s3://escribers-automation-tests-e2e-reports/ --recursive 
       shell: bash
-    # - uses: shallwefootball/s3-upload-action@master
-    #   if: always()
-    #   with:
-    #     aws_key_id: ${{ inputs.access-key }}
-    #     aws_secret_access_key: ${{ inputs.secret-key }}
-    #     aws_bucket: "escribers-automation-tests-e2e-reports"
-    #     source_dir: './TestPerformer/bin/Debug/net6.0/Reports/'
-    #     destination_dir: './'
+
