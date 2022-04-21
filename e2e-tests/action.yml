@@ -87,6 +87,7 @@ runs:
       shell: bash
 
     - uses: shallwefootball/s3-upload-action@master
+      if: always()
       with:
         aws_key_id: ${{ inputs.access-key }}
         aws_secret_access_key: ${{ inputs.secret-key }}
