@@ -93,3 +93,4 @@ runs:
         aws_secret_access_key: ${{ inputs.secret-key }}
         aws_bucket: "escribers-automation-tests-e2e-reports"
         source_dir: './TestPerformer/bin/Debug/net6.0/Reports/'
+        destination_dir: './'

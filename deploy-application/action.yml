@@ -77,17 +77,16 @@ inputs:
   token:
     description: 'Token to github'
     required: true
-
+  tabula-login:
+    description: 'Login to tabula portal'
+    required: false
+  tabula-password:
+    description: 'Password to tabula portal'
+    required: false
 
 runs:
   using: "composite"
   steps: 
-    - name: DEBUG 
-      run: |
-           pwd
-           ls -la ./*
-      shell: bash
-
     - name: Checkout tabula infra repo
       uses: actions/checkout@master
       with:
@@ -124,13 +123,6 @@ runs:
            echo "ENV_NAME=${{ inputs.tempenv-version }}" >> $GITHUB_ENV
            echo "COOKIE_DOMAIN=escribers.io" >> $GITHUB_ENV
       shell: bash
-
-    - name: DEBUG 
-      run: |
-           pwd
-           ls -la ./*
-      shell: bash
-###############################
 
     - name: Download private_ip
       uses: actions/download-artifact@v1
@@ -380,6 +372,19 @@ runs:
           sudo docker exec tabula_backend php index.php migrate initdata
           sudo docker exec tabula_backend php index.php migrate devdata
         shell: bash
+
+    - name: Add Demo User
+      uses: appleboy/ssh-action@master
+      if: ${{ inputs.tabula-login != "" }}
+      with:
+        host: ${{ env.WORKER_LIST_IPS }}
+        username: ubuntu
+        key: ${{ inputs.oleksb-key }}
+        port: 22
+        script: |
+          whoami
+          sudo docker exec -ti tabula_backend php index.php dbSetup createManager ${{ inputs.tabula-login }} ${{ inputs.tabula-password }} test@test.com "Test User Manager"
+
 ####################  
 
     - name: Output credentials
