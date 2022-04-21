@@ -97,7 +97,7 @@ runs:
     - name: Upload report to S3
       run: |
         aws s3 cp ./TestPerformer/bin/Debug/net6.0/Reports/ s3://escribers-automation-tests-e2e-reports/ --recursive 
-
+      shell: bash
     # - uses: shallwefootball/s3-upload-action@master
     #   if: always()
     #   with:
