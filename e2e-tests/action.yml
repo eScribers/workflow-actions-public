@@ -89,12 +89,14 @@ runs:
 
     - name: Add credentials to Amazon 
       uses: "aws-actions/configure-aws-credentials@v1"
+      if: always()
       with:
         aws-access-key-id: "${{ inputs.access-key }}"
         aws-region: "us-east-1"
         aws-secret-access-key: "${{ inputs.secret-key }}"
 
     - name: Upload report to S3
+      if: always()
       run: |
         aws s3 cp ./TestPerformer/bin/Debug/net6.0/Reports/ s3://escribers-automation-tests-e2e-reports/ --recursive 
       shell: bash
