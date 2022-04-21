@@ -86,11 +86,23 @@ runs:
         ls -l ./TestPerformer/bin/Debug/net6.0/Reports/*
       shell: bash
 
-    - uses: shallwefootball/s3-upload-action@master
-      if: always()
+
+    - name: Add credentials to Amazon 
+      uses: "aws-actions/configure-aws-credentials@v1"
       with:
-        aws_key_id: ${{ inputs.access-key }}
-        aws_secret_access_key: ${{ inputs.secret-key }}
-        aws_bucket: "escribers-automation-tests-e2e-reports"
-        source_dir: './TestPerformer/bin/Debug/net6.0/Reports/'
-        destination_dir: './'
+        aws-access-key-id: "${{ inputs.access-key }}"
+        aws-region: "us-east-1"
+        aws-secret-access-key: "${{ inputs.secret-key }}"
+
+    - name: Upload report to S3
+      run: |
+        aws s3 cp ./TestPerformer/bin/Debug/net6.0/Reports/ s3://escribers-automation-tests-e2e-reports/ --recursive 
+
+    # - uses: shallwefootball/s3-upload-action@master
+    #   if: always()
+    #   with:
+    #     aws_key_id: ${{ inputs.access-key }}
+    #     aws_secret_access_key: ${{ inputs.secret-key }}
+    #     aws_bucket: "escribers-automation-tests-e2e-reports"
+    #     source_dir: './TestPerformer/bin/Debug/net6.0/Reports/'
+    #     destination_dir: './'
