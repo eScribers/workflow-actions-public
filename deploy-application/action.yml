@@ -383,7 +383,7 @@ runs:
         port: 22
         script: |
           whoami
-          sudo docker exec -ti tabula_backend php index.php dbSetup createManager ${{ inputs.tabula-login }} ${{ inputs.tabula-password }} test.test.com "Test User Manager"
+          sudo docker exec tabula_backend php index.php dbSetup createManager ${{ inputs.tabula-login }} ${{ inputs.tabula-password }} test.test.com "Test User Manager"
         shell: bash
 
 ####################  
