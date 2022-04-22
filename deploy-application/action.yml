@@ -384,7 +384,7 @@ runs:
         script: |
           whoami
           sudo docker exec -ti tabula_backend php index.php dbSetup createManager ${{ inputs.tabula-login }} ${{ inputs.tabula-password }} test@test.com "Test User Manager"
-
+      shell: bash
 ####################  
 
     - name: Output credentials
