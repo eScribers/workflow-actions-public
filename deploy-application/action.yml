@@ -311,16 +311,6 @@ runs:
           DOE_GOOGLE_SPREADSHEET_OA=${{ env.DOE_GOOGLE_SPREADSHEET_OA }}
           FRONTEND_URL=${{ env.TAB_FRONTEND_URL }}
 
-    - name: copy docker-compose via ssh key
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ env.WORKER_LIST_IPS }} #"10.0.4.125,10.0.5.39"
-        username: ubuntu
-        port: 22
-        key: ${{ inputs.oleksb-key }}
-        source: "./application/config/delete_db.php,./application/config/create_db.php,./deploy/docker-compose.yaml.template,./application/config/env,./.htaccess.example"
-        target: "/home/ubuntu"
-
     - name: Create AWS credentials file
       uses: appleboy/ssh-action@master
       env:
@@ -340,6 +330,16 @@ runs:
           echo "[default]" > ~/.aws/credentials
           echo "aws_access_key_id=${{ env.AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
           echo "aws_secret_access_key=${{ env.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
+
+    - name: copy docker-compose via ssh key
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ env.WORKER_LIST_IPS }} #"10.0.4.125,10.0.5.39"
+        username: ubuntu
+        port: 22
+        key: ${{ inputs.oleksb-key }}
+        source: "./application/config/delete_db.php,./application/config/create_db.php,./deploy/docker-compose.yaml.template,./application/config/env,./.htaccess.example"
+        target: "/home/ubuntu"
           
     - name: Start docker-compose
       uses: appleboy/ssh-action@master
