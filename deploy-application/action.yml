@@ -393,15 +393,15 @@ runs:
 ####################
 ##### RUN TESTS  ####
 ####################
-    - name: Run tests
-      uses: eScribers/workflow-actions-public/e2e-tests@master
-      with:
-        backend-url: "https://${{ env.ELB_DNS }}"
-        tabula-login: ${{ env.TABULA_LOGIN }}
-        tabula-password: ${{ env.TABULA_PASSWORD }}
-        access-key: ${{ env.AWS_ACCESS_KEY_ID }}
-        secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-        token: ${{ inputs.token }}  
+    # - name: Run tests
+    #   uses: eScribers/workflow-actions-public/e2e-tests@master
+    #   with:
+    #     backend-url: "https://${{ env.ELB_DNS }}"
+    #     tabula-login: ${{ env.TABULA_LOGIN }}
+    #     tabula-password: ${{ env.TABULA_PASSWORD }}
+    #     access-key: ${{ env.AWS_ACCESS_KEY_ID }}
+    #     secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+    #     token: ${{ inputs.token }}  
 
 ####################  
 
