@@ -26,8 +26,16 @@ inputs:
 runs:
   using: "composite"
   steps: 
+    - name: Checkout devops infra repo
+      uses: actions/checkout@master
+      with:
+        repository: eScribers/tabula-automation-tests
+        ref: refs/heads/master
+        token: ${{ inputs.token }}
+
     - name: Define variables 
       run: |
+           ls -l 
            echo "BACKEND_URL=${{ inputs.backend-url }}" >> $GITHUB_ENV
            echo "TABULA_LOGIN=${{ inputs.tabula-login }}" >> $GITHUB_ENV
            echo "TABULA_PASSWORD=${{ inputs.tabula-password }}" >> $GITHUB_ENV
