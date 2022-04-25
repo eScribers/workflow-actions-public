@@ -347,7 +347,7 @@ runs:
       id: split
       with:
         string: "${{ env.WORKER_LIST_IPS }}"
-        separator: ,
+        separator: ','
         limit: -1
 
     - name: Execute Deploy Command №1
