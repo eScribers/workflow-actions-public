@@ -401,6 +401,7 @@ runs:
         tabula-password: ${{ env.TABULA_PASSWORD }}
         access-key: ${{ env.AWS_ACCESS_KEY_ID }}
         secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        token: ${{ inputs.token }}  
 
 ####################  
 

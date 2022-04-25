@@ -20,7 +20,9 @@ inputs:
   secret-key:
     description: 'AWS Secret Key from secrets'
     required: true
-
+  token:
+    description: 'Token to github'
+    required: true
 
 
 runs:
@@ -100,6 +102,7 @@ runs:
     - name: Upload report to S3
       if: always()
       run: |
+        ls -l ./*
         aws s3 cp ./TestPerformer/bin/Debug/net6.0/Reports/ s3://escribers-automation-tests-e2e-reports/ --recursive 
       shell: bash
 
