@@ -315,25 +315,7 @@ runs:
           DOE_GOOGLE_SPREADSHEET_OA=${{ env.DOE_GOOGLE_SPREADSHEET_OA }}
           FRONTEND_URL=${{ env.TAB_FRONTEND_URL }}
 
-    - name: Create AWS credentials file
-      uses: appleboy/ssh-action@master
-      env:
-        AWS_ACCESS_KEY_ID: "${{ env.AWS_ACCESS_KEY_ID }}"
-        AWS_SECRET_ACCESS_KEY: "${{ env.AWS_SECRET_ACCESS_KEY }}"
-        AWS_DEFAULT_REGION: "${{ env.RESOURCES_DEFAULT_REGION }}"
-      with:
-        host: ${{ env.WORKER_LIST_IPS }}
-        username: ubuntu
-        key: ${{ inputs.oleksb-key }}
-        port: 22
-        script: |
-          rm -rf ~/.aws
-          mkdir ~/.aws
-          touch ~/.aws/credentials
-          chmod 600 ~/.aws/credentials
-          echo "[default]" > ~/.aws/credentials
-          echo "aws_access_key_id=${{ env.AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
-          echo "aws_secret_access_key=${{ env.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
+
 
 ####################
 ##### Execute Deploy Command  ####
@@ -360,6 +342,7 @@ runs:
         account-id: ${{ env.RESOURCES_AWS_ACCOUNT_ID }}
         default-region: ${{ env.AWS_DEFAULT_REGION }}
         tempenv-version: ${{ env.ENV_NAME }}
+        token: ${{ inputs.token }}  
         
     - name: Execute Deploy Command №2
       uses: eScribers/workflow-actions-public/e2e-tests@sandbox
@@ -371,6 +354,7 @@ runs:
         account-id: ${{ env.RESOURCES_AWS_ACCOUNT_ID }}
         default-region: ${{ env.AWS_DEFAULT_REGION }}
         tempenv-version: ${{ env.ENV_NAME }}
+        token: ${{ inputs.token }}
 
     - name: Execute Deploy Command №3
       uses: eScribers/workflow-actions-public/e2e-tests@sandbox
@@ -382,6 +366,7 @@ runs:
         account-id: ${{ env.RESOURCES_AWS_ACCOUNT_ID }}
         default-region: ${{ env.AWS_DEFAULT_REGION }}
         tempenv-version: ${{ env.ENV_NAME }}
+        token: ${{ inputs.token }}
 ######
     # - name: copy docker-compose via ssh key
     #   uses: appleboy/scp-action@master
