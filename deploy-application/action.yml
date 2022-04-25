@@ -216,7 +216,7 @@ runs:
         create_repo: 'false'
         dockerfile: Dockerfile.deploy
         extra_build_args: ''
-        path: /home/runner/work/tabula-automation-tests/tabula-automation-tests/
+        path: ${{ inputs.docker-path }}
         region: "${{ env.AWS_DEFAULT_REGION }}"
         repo: "${{ env.ENVIRONMENT }}/tabula"
         tags: "latest,${{ github.sha }}"
