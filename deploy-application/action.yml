@@ -1,6 +1,10 @@
 name: "Run e2e test"
 description: "Run tests..."
 inputs:
+  docker-path:
+    description: 'Path where dockerfile located'
+    default: "/home/runner/work/tabula-automation-tests/tabula-automation-tests/"
+    required: true
   tempenv-version:
     description: 'The dotnet version to use'
     default: "testenv-e2e-2"
