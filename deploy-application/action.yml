@@ -179,23 +179,6 @@ runs:
            echo "DB_DEFAULT_DATABASE=${{ env.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
            echo "DB_READ_DATABASE=${{ env.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
            echo "DB_REP_DATABASE=${{ env.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
-           echo "INF_LOGZIO_TOKEN=${{ env.INF_LOGZIO_TOKEN }}" >> $GITHUB_ENV
-           echo "TWILIO_SID=${{ env.TWILIO_SID }}" >> $GITHUB_ENV
-           echo "TWILIO_TOKEN=${{ env.TWILIO_TOKEN }}" >> $GITHUB_ENV
-           echo "TWILIO_SIP_CL=${{ env.TWILIO_SIP_CL }}" >> $GITHUB_ENV
-           echo "TWILIO_VIDEO_SID=${{ env.TWILIO_VIDEO_SID }}" >> $GITHUB_ENV
-           echo "TWILIO_VIDEO_TOKEN=${{ env.TWILIO_VIDEO_TOKEN }}" >> $GITHUB_ENV
-           echo "POSTMARKAPP_API_KEY=${{ env.POSTMARKAPP_API_KEY }}" >> $GITHUB_ENV
-           echo "LOGGLY_KEY=${{ env.LOGGLY_KEY }}" >> $GITHUB_ENV
-           echo "FUSION_API_KEY=${{ env.FUSION_API_KEY }}" >> $GITHUB_ENV
-           echo "VIDEOAPP_SECRET_KEY=${{ env.VIDEOAPP_SECRET_KEY }}" >> $GITHUB_ENV
-           echo "ENCRYPTION_KEY=${{ env.ENCRYPTION_KEY }}" >> $GITHUB_ENV
-           echo "ENV_NAME=${{ env.TEMPENV_VERSION }}" >> $GITHUB_ENV
-           echo "COOKIE_DOMAIN=escribers.io" >> $GITHUB_ENV
-           echo "DOE_GOOGLE_SPREADSHEET_ID=${{ env.DOE_GOOGLE_SPREADSHEET_ID }}" >> $GITHUB_ENV
-           echo "DOE_GOOGLE_SPREADSHEET_HO=${{ env.DOE_GOOGLE_SPREADSHEET_HO }}" >> $GITHUB_ENV
-           echo "DOE_GOOGLE_SPREADSHEET_AR=${{ env.DOE_GOOGLE_SPREADSHEET_AR }}" >> $GITHUB_ENV
-           echo "DOE_GOOGLE_SPREADSHEET_OA=${{ env.DOE_GOOGLE_SPREADSHEET_OA }}" >> $GITHUB_ENV
            echo "TAB_FRONTEND_URL=https://tabula-frontend-sandbox-aws-us-east-1.s3.amazonaws.com" >> $GITHUB_ENV
            echo "Deploy to ${{ env.TEMPENV_VERSION }}"
       shell: bash
@@ -401,10 +384,11 @@ runs:
     #       sudo docker exec tabula_backend php index.php migrate initdata
     #       sudo docker exec tabula_backend php index.php migrate devdata
     #     shell: bash
+##############
 
     - name: Add Demo User
       uses: appleboy/ssh-action@master
-      if: ${{ inputs.tabula-login }}
+      if: ${{ inputs.tempenv-version == 'testenv-e2e-2' }}
       with:
         host: ${{ env.WORKER_LIST_IPS }}
         username: ubuntu
@@ -422,8 +406,8 @@ runs:
       uses: eScribers/workflow-actions-public/e2e-tests@master
       with:
         backend-url: "https://${{ env.ELB_DNS }}"
-        tabula-login: ${{ env.TABULA_LOGIN }}
-        tabula-password: ${{ env.TABULA_PASSWORD }}
+        tabula-login: ${{ inputs.tabula-login }}
+        tabula-password: ${{ inputs.tabula-password }}
         access-key: ${{ env.AWS_ACCESS_KEY_ID }}
         secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
         token: ${{ inputs.token }}  
