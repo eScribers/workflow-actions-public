@@ -417,7 +417,7 @@ runs:
     - name: Output credentials
       run: |
         echo "===Show client.ovpn profile==="
-        cat ./client.ovpn
+        cat ./client.ovpn || true
         echo "=============================="
         echo "===Show URL profile==="
         echo "tabula-${{ env.ENV_NAME }}-aws.escribers.io"
