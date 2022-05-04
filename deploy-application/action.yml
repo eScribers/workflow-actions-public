@@ -172,6 +172,19 @@ runs:
         pwd
       shell: bash
 
+    - name: Define environment bucket depends on env
+      run: |
+        if [[ "${{ env.TEMPENV_VERSION }}" != 'production' ]]; then
+           echo "ENVIRONMENT_BUCKET=${{ env.TEMPENV_VERSION }}-" >> $GITHUB_ENV
+           echo "Deploy to noPRODUCTION"
+        elif [[ "${{ env.TEMPENV_VERSION }}" == 'production' ]]; then
+           echo "ENVIRONMENT_BUCKET=" >> $GITHUB_ENV
+           echo "Deploy to PRODUCTION"
+        else
+           echo "Nothing to deploy"
+           exit 1
+        fi
+
     - name: Define variables depends on env
       run: |
            echo "RDS_INSTANCE_NAME=${{ env.TEMPENV_VERSION }}-tabula" >> $GITHUB_ENV
@@ -284,6 +297,7 @@ runs:
         output_file: ./application/config/env
         strict: true
         variables: |
+          ENVIRONMENT_BUCKET=${{ env.ENVIRONMENT_BUCKET }}
           DB_DEFAULT_PASSWORD=${{ env.DB_DEFAULT_PASSWORD }}
           DB_READ_PASSWORD=${{ env.DB_READ_PASSWORD }}
           DB_REP_PASSWORD=${{ env.DB_REP_PASSWORD }}
