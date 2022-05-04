@@ -36,7 +36,6 @@ runs:
 
     - name: Define variables 
       run: |
-           ls -l 
            echo "BACKEND_URL=${{ inputs.backend-url }}" >> $GITHUB_ENV
            echo "TABULA_LOGIN=${{ inputs.tabula-login }}" >> $GITHUB_ENV
            echo "TABULA_PASSWORD=${{ inputs.tabula-password }}" >> $GITHUB_ENV
@@ -86,7 +85,6 @@ runs:
         google-chrome --version 
         chromedriver --version
         ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/Authentication/Authentication.xml
-        ls -l ./TestPerformer/bin/Debug/net6.0/Reports/*
       shell: bash
 
 
@@ -101,7 +99,6 @@ runs:
     - name: Upload report to S3
       if: always()
       run: |
-        ls -l ./*
         aws s3 cp ./TestPerformer/bin/Debug/net6.0/Reports/ s3://escribers-automation-tests-e2e-reports/ --recursive 
       shell: bash
 

@@ -145,7 +145,6 @@ runs:
 
     - name: Define variables for VPN servers
       run: |
-        ls -l ./
         echo "VPN_SERVER_PRIVATE_IP=$(cat private_ip/private_ip)" >> $GITHUB_ENV
         echo "VPN_SERVER_PUBLIC_IP=$(cat public_ip/public_ip)" >> $GITHUB_ENV
       shell: bash
@@ -166,25 +165,6 @@ runs:
         scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i private_key/private_key ubuntu@${{ env.VPN_SERVER_PUBLIC_IP }}:/home/ubuntu/client.ovpn ./client.ovpn
       shell: bash
 
-    - name: check variables
-      run: |
-        ls -l ./*
-        pwd
-      shell: bash
-
-    - name: Define environment bucket depends on env
-      run: |
-        if [[ "${{ env.TEMPENV_VERSION }}" != 'production' ]]; then
-           echo "ENVIRONMENT_BUCKET=${{ env.TEMPENV_VERSION }}-" >> $GITHUB_ENV
-           echo "Deploy to noPRODUCTION"
-        elif [[ "${{ env.TEMPENV_VERSION }}" == 'production' ]]; then
-           echo "ENVIRONMENT_BUCKET=" >> $GITHUB_ENV
-           echo "Deploy to PRODUCTION"
-        else
-           echo "Nothing to deploy"
-           exit 1
-        fi
-
     - name: Define variables depends on env
       run: |
            echo "RDS_INSTANCE_NAME=${{ env.TEMPENV_VERSION }}-tabula" >> $GITHUB_ENV
@@ -199,25 +179,22 @@ runs:
            echo "DB_DEFAULT_DATABASE=${{ env.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
            echo "DB_READ_DATABASE=${{ env.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
            echo "DB_REP_DATABASE=${{ env.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
-           echo "INF_LOGZIO_TOKEN=${{ env.INF_LOGZIO_TOKEN }}" >> $GITHUB_ENV
-           echo "TWILIO_SID=${{ env.TWILIO_SID }}" >> $GITHUB_ENV
-           echo "TWILIO_TOKEN=${{ env.TWILIO_TOKEN }}" >> $GITHUB_ENV
-           echo "TWILIO_SIP_CL=${{ env.TWILIO_SIP_CL }}" >> $GITHUB_ENV
-           echo "TWILIO_VIDEO_SID=${{ env.TWILIO_VIDEO_SID }}" >> $GITHUB_ENV
-           echo "TWILIO_VIDEO_TOKEN=${{ env.TWILIO_VIDEO_TOKEN }}" >> $GITHUB_ENV
-           echo "POSTMARKAPP_API_KEY=${{ env.POSTMARKAPP_API_KEY }}" >> $GITHUB_ENV
-           echo "LOGGLY_KEY=${{ env.LOGGLY_KEY }}" >> $GITHUB_ENV
-           echo "FUSION_API_KEY=${{ env.FUSION_API_KEY }}" >> $GITHUB_ENV
-           echo "VIDEOAPP_SECRET_KEY=${{ env.VIDEOAPP_SECRET_KEY }}" >> $GITHUB_ENV
-           echo "ENCRYPTION_KEY=${{ env.ENCRYPTION_KEY }}" >> $GITHUB_ENV
-           echo "ENV_NAME=${{ env.TEMPENV_VERSION }}" >> $GITHUB_ENV
-           echo "COOKIE_DOMAIN=escribers.io" >> $GITHUB_ENV
-           echo "DOE_GOOGLE_SPREADSHEET_ID=${{ env.DOE_GOOGLE_SPREADSHEET_ID }}" >> $GITHUB_ENV
-           echo "DOE_GOOGLE_SPREADSHEET_HO=${{ env.DOE_GOOGLE_SPREADSHEET_HO }}" >> $GITHUB_ENV
-           echo "DOE_GOOGLE_SPREADSHEET_AR=${{ env.DOE_GOOGLE_SPREADSHEET_AR }}" >> $GITHUB_ENV
-           echo "DOE_GOOGLE_SPREADSHEET_OA=${{ env.DOE_GOOGLE_SPREADSHEET_OA }}" >> $GITHUB_ENV
            echo "TAB_FRONTEND_URL=https://tabula-frontend-sandbox-aws-us-east-1.s3.amazonaws.com" >> $GITHUB_ENV
            echo "Deploy to ${{ env.TEMPENV_VERSION }}"
+      shell: bash
+
+    - name: Define environment bucket depends on env
+      run: |
+        if [[ "${{ env.TEMPENV_VERSION }}" != 'production' ]]; then
+           echo "ENVIRONMENT_BUCKET=${{ env.TEMPENV_VERSION }}-" >> $GITHUB_ENV
+           echo "Deploy to noPRODUCTION"
+        elif [[ "${{ env.TEMPENV_VERSION }}" == 'production' ]]; then
+           echo "ENVIRONMENT_BUCKET=" >> $GITHUB_ENV
+           echo "Deploy to PRODUCTION"
+        else
+           echo "Nothing to deploy"
+           exit 1
+        fi
       shell: bash
 
     - name: "Create Docker image and push it to ECR repository"
@@ -329,71 +306,104 @@ runs:
           DOE_GOOGLE_SPREADSHEET_OA=${{ env.DOE_GOOGLE_SPREADSHEET_OA }}
           FRONTEND_URL=${{ env.TAB_FRONTEND_URL }}
 
-    - name: Create AWS credentials file
-      uses: appleboy/ssh-action@master
-      env:
-        AWS_ACCESS_KEY_ID: "${{ env.AWS_ACCESS_KEY_ID }}"
-        AWS_SECRET_ACCESS_KEY: "${{ env.AWS_SECRET_ACCESS_KEY }}"
-        AWS_DEFAULT_REGION: "${{ env.RESOURCES_DEFAULT_REGION }}"
-      with:
-        host: ${{ env.WORKER_LIST_IPS }}
-        username: ubuntu
-        key: ${{ inputs.oleksb-key }}
-        port: 22
-        script: |
-          rm -rf ~/.aws
-          mkdir ~/.aws
-          touch ~/.aws/credentials
-          chmod 600 ~/.aws/credentials
-          echo "[default]" > ~/.aws/credentials
-          echo "aws_access_key_id=${{ env.AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
-          echo "aws_secret_access_key=${{ env.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
 
-    - name: copy docker-compose via ssh key
-      uses: appleboy/scp-action@master
+
+####################
+##### Execute Deploy Command  ####
+####################
+    - name: Show variable
+      run: echo "${{ env.WORKER_LIST_IPS }}"
+      shell: bash
+
+    - name: Split version code
+      uses: xom9ikk/split@v1
+      id: split
       with:
-        host: ${{ env.WORKER_LIST_IPS }} #"10.0.4.125,10.0.5.39"
-        username: ubuntu
-        port: 22
-        key: ${{ inputs.oleksb-key }}
-        source: "./application/config/delete_db.php,./application/config/create_db.php,./deploy/docker-compose.yaml.template,./application/config/env,./.htaccess.example"
-        target: "/home/ubuntu"
+        string: "${{ env.WORKER_LIST_IPS }}"
+        separator: ','
+        limit: -1
+
+    - name: Execute Deploy Command №1
+      uses: eScribers/workflow-actions-public/execute-deploy@master
+      with:
+        host_ip: ${{ steps.split.outputs._0 }}
+        oleksb-key: ${{ inputs.oleksb-key }}
+        access-key: ${{ env.AWS_ACCESS_KEY_ID }}
+        secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        account-id: ${{ env.RESOURCES_AWS_ACCOUNT_ID }}
+        default-region: ${{ env.AWS_DEFAULT_REGION }}
+        tempenv-version: ${{ env.ENV_NAME }}
+        token: ${{ inputs.token }}  
+        
+    - name: Execute Deploy Command №2
+      uses: eScribers/workflow-actions-public/execute-deploy@master
+      with:
+        host_ip: ${{ steps.split.outputs._1 }}
+        oleksb-key: ${{ inputs.oleksb-key }}
+        access-key: ${{ env.AWS_ACCESS_KEY_ID }}
+        secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        account-id: ${{ env.RESOURCES_AWS_ACCOUNT_ID }}
+        default-region: ${{ env.AWS_DEFAULT_REGION }}
+        tempenv-version: ${{ env.ENV_NAME }}
+        token: ${{ inputs.token }}
+
+    - name: Execute Deploy Command №3
+      uses: eScribers/workflow-actions-public/execute-deploy@master
+      with:
+        host_ip: ${{ steps.split.outputs._2 }}
+        oleksb-key: ${{ inputs.oleksb-key }}
+        access-key: ${{ env.AWS_ACCESS_KEY_ID }}
+        secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        account-id: ${{ env.RESOURCES_AWS_ACCOUNT_ID }}
+        default-region: ${{ env.AWS_DEFAULT_REGION }}
+        tempenv-version: ${{ env.ENV_NAME }}
+        token: ${{ inputs.token }}
+######
+    # - name: copy docker-compose via ssh key
+    #   uses: appleboy/scp-action@master
+    #   with:
+    #     host: ${{ env.WORKER_LIST_IPS }} #"10.0.4.125,10.0.5.39"
+    #     username: ubuntu
+    #     port: 22
+    #     key: ${{ inputs.oleksb-key }}
+    #     source: "./application/config/delete_db.php,./application/config/create_db.php,./deploy/docker-compose.yaml.template,./application/config/env,./.htaccess.example"
+    #     target: "/home/ubuntu"
           
-    - name: Start docker-compose
-      uses: appleboy/ssh-action@master
-      env:
-        AWS_ACCESS_KEY_ID: "${{ env.AWS_ACCESS_KEY_ID }}"
-        AWS_SECRET_ACCESS_KEY: "${{ env.AWS_SECRET_ACCESS_KEY }}"
-        AWS_DEFAULT_REGION: "${{ env.AWS_DEFAULT_REGION }}"
-        DB_PASSWORD: "${{ env.DB_DEFAULT_PASSWORD }}"
-        INF_LOGZIO_TOKEN: "${{ env.INF_LOGZIO_TOKEN }}"
-        ENV_NAME: "${{ env.ENV_NAME }}"
-      with:
-        host: ${{ env.WORKER_LIST_IPS }}
-        username: ubuntu
-        key: ${{ inputs.oleksb-key }}
-        port: 22
-        script: |
-          whoami
-          ls -al
-          cp ./application/config/env ./.env
-          cp ./.htaccess.example ./.htaccess
-          aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin ${{ env.RESOURCES_AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
-          sudo docker rm -f $(sudo docker ps -a -q) | true
-          sudo docker rmi $(sudo docker images --all -q) | true
-          export ENV_NAME=${{ env.ENV_NAME }}
-          docker-compose -f ./deploy/docker-compose.yaml.template config > ./deploy/docker-compose.yaml
-          sudo docker-compose -f ./deploy/docker-compose.yaml up -d
-          sudo docker exec tabula_backend php delete_db.php
-          sudo docker exec tabula_backend php create_db.php
-          sudo docker exec tabula_backend php index.php migrate
-          sudo docker exec tabula_backend php index.php migrate initdata
-          sudo docker exec tabula_backend php index.php migrate devdata
-        shell: bash
+    # - name: Start docker-compose
+    #   uses: appleboy/ssh-action@master
+    #   env:
+    #     AWS_ACCESS_KEY_ID: "${{ env.AWS_ACCESS_KEY_ID }}"
+    #     AWS_SECRET_ACCESS_KEY: "${{ env.AWS_SECRET_ACCESS_KEY }}"
+    #     AWS_DEFAULT_REGION: "${{ env.AWS_DEFAULT_REGION }}"
+    #     DB_PASSWORD: "${{ env.DB_DEFAULT_PASSWORD }}"
+    #     ENV_NAME: "${{ env.ENV_NAME }}"
+    #   with:
+    #     host: ${{ env.WORKER_LIST_IPS }}
+    #     username: ubuntu
+    #     key: ${{ inputs.oleksb-key }}
+    #     port: 22
+    #     script: |
+    #       whoami
+    #       ls -al
+    #       cp ./application/config/env ./.env
+    #       cp ./.htaccess.example ./.htaccess
+    #       aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin ${{ env.RESOURCES_AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+    #       sudo docker rm -f $(sudo docker ps -a -q) | true
+    #       sudo docker rmi $(sudo docker images --all -q) | true
+    #       export ENV_NAME=${{ env.ENV_NAME }}
+    #       docker-compose -f ./deploy/docker-compose.yaml.template config > ./deploy/docker-compose.yaml
+    #       sudo docker-compose -f ./deploy/docker-compose.yaml up -d
+    #       sudo docker exec tabula_backend php delete_db.php
+    #       sudo docker exec tabula_backend php create_db.php
+    #       sudo docker exec tabula_backend php index.php migrate
+    #       sudo docker exec tabula_backend php index.php migrate initdata
+    #       sudo docker exec tabula_backend php index.php migrate devdata
+    #     shell: bash
+##############
 
     - name: Add Demo User
       uses: appleboy/ssh-action@master
-      if: ${{ inputs.tabula-login }}
+      if: ${{ inputs.tempenv-version == 'testenv-e2e-2' }}
       with:
         host: ${{ env.WORKER_LIST_IPS }}
         username: ubuntu
@@ -407,22 +417,22 @@ runs:
 ####################
 ##### RUN TESTS  ####
 ####################
-    # - name: Run tests
-    #   uses: eScribers/workflow-actions-public/e2e-tests@master
-    #   with:
-    #     backend-url: "https://${{ env.ELB_DNS }}"
-    #     tabula-login: ${{ env.TABULA_LOGIN }}
-    #     tabula-password: ${{ env.TABULA_PASSWORD }}
-    #     access-key: ${{ env.AWS_ACCESS_KEY_ID }}
-    #     secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-    #     token: ${{ inputs.token }}  
+    - name: Run tests
+      uses: eScribers/workflow-actions-public/e2e-tests@master
+      with:
+        backend-url: "https://${{ env.ELB_DNS }}"
+        tabula-login: ${{ inputs.tabula-login }}
+        tabula-password: ${{ inputs.tabula-password }}
+        access-key: ${{ env.AWS_ACCESS_KEY_ID }}
+        secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        token: ${{ inputs.token }}  
 
 ####################  
 
     - name: Output credentials
       run: |
         echo "===Show client.ovpn profile==="
-        cat ./client.ovpn
+        cat ./client.ovpn || true
         echo "=============================="
         echo "===Show URL profile==="
         echo "tabula-${{ env.ENV_NAME }}-aws.escribers.io"
