@@ -195,6 +195,7 @@ runs:
            echo "Nothing to deploy"
            exit 1
         fi
+      shell: bash
 
     - name: "Create Docker image and push it to ECR repository"
       uses: "kciter/aws-ecr-action@v4"
