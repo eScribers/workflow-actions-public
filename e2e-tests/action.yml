@@ -24,7 +24,6 @@ inputs:
     description: 'Token to github'
     required: true
 
-
 runs:
   using: "composite"
   steps: 
