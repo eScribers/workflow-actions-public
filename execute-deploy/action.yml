@@ -85,9 +85,9 @@ runs:
           sudo docker exec tabula_backend php index.php migrate
         shell: bash
 
-    - name: Start docker-compose
+    - name: Recreate DB
       uses: appleboy/ssh-action@master
-      if: ${{ inputs.tempenv-version == 'testenv-e2e-2' }}
+      if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') }}
       env:
         AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.secret-key }}
@@ -104,9 +104,9 @@ runs:
           sudo docker exec tabula_backend php create_db.php
         shell: bash
 
-    - name: Start docker-compose
+    - name: Run migrations
       uses: appleboy/ssh-action@master
-      if: ${{ inputs.tempenv-version == 'testenv-e2e-2' }}
+      if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') }}
       env:
         AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.secret-key }}
