@@ -299,9 +299,9 @@ runs:
           DB_DEFAULT_USER=${{ env.DB_DEFAULT_USER }}
           DB_READ_USER=${{ env.DB_READ_USER }}
           DB_REP_USER=${{ env.DB_REP_USER }}
-          DB_DEFAULT_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_DEFAULT_DATABASE }}
-          DB_READ_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_READ_DATABASE }}
-          DB_REP_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_REP_DATABASE }}
+          DB_DEFAULT_DATABASE=${{ env.DB_DEFAULT_DATABASE }}
+          DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}
+          DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}
           INF_LOGZIO_TOKEN=${{ env.INF_LOGZIO_TOKEN }}
           ELB_DNS=tabula-${{ env.ENV_NAME }}-aws.escribers.io
           RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com
