@@ -189,6 +189,7 @@ runs:
            echo "DB_DEFAULT_DATABASE=${{ env.DB_DEFAULT_DATABASE }}" >> $GITHUB_ENV
            echo "DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
            echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
+           echo "Deploy to static envs"
       shell: bash
 
     - name: Define variables for DB for tempenvs
@@ -197,6 +198,7 @@ runs:
            echo "DB_DEFAULT_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_DEFAULT_DATABASE }}" >> $GITHUB_ENV
            echo "DB_READ_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
            echo "DB_REP_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
+           echo "Deploy to tempenvs "
       shell: bash
 
     - name: Define environment bucket depends on env
