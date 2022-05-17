@@ -183,6 +183,22 @@ runs:
            echo "Deploy to ${{ env.TEMPENV_VERSION }}"
       shell: bash
 
+    - name: Define variables for DB for static envs
+      if: ${{ startsWith(inputs.tempenv-version, 'prep-02') || startsWith(inputs.tempenv-version, 'sandbox') || startsWith(inputs.tempenv-version, 'production') }}
+      run: |
+           echo "DB_DEFAULT_DATABASE=${{ env.DB_DEFAULT_DATABASE }}" >> $GITHUB_ENV
+           echo "DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
+           echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Define variables for DB for tempenvs
+      if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') }}
+      run: |
+           echo "DB_DEFAULT_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_DEFAULT_DATABASE }}" >> $GITHUB_ENV
+           echo "DB_READ_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
+           echo "DB_REP_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
+      shell: bash
+
     - name: Define environment bucket depends on env
       run: |
         if [[ "${{ env.TEMPENV_VERSION }}" != 'production' ]]; then
