@@ -80,6 +80,7 @@ runs:
           sudo docker rm -f $(sudo docker ps -a -q) | true
           sudo docker rmi $(sudo docker images --all -q) | true
           export ENV_NAME=${{ env.ENV_NAME }}
+          export RESOURCES_AWS_ACCOUNT_ID=${{ env.RESOURCES_AWS_ACCOUNT_ID }}
           docker-compose -f ./deploy/docker-compose.yaml.template config > ./deploy/docker-compose.yaml
           sudo docker-compose -f ./deploy/docker-compose.yaml up -d
         shell: bash
