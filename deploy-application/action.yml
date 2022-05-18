@@ -183,24 +183,6 @@ runs:
            echo "Deploy to ${{ env.TEMPENV_VERSION }}"
       shell: bash
 
-    - name: Define variables for DB for static envs
-      if: ${{ startsWith(inputs.tempenv-version, 'prep-02') || startsWith(inputs.tempenv-version, 'sandbox') || startsWith(inputs.tempenv-version, 'production') }}
-      run: |
-           echo "DB_DEFAULT_DATABASE=${{ env.DB_DEFAULT_DATABASE }}" >> $GITHUB_ENV
-           echo "DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
-           echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
-           echo "Deploy to static envs"
-      shell: bash
-
-    - name: Define variables for DB for tempenvs
-      if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') }}
-      run: |
-           echo "DB_DEFAULT_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_DEFAULT_DATABASE }}" >> $GITHUB_ENV
-           echo "DB_READ_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
-           echo "DB_REP_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
-           echo "Deploy to tempenvs "
-      shell: bash
-
     - name: Define environment bucket depends on env
       run: |
         if [[ "${{ env.TEMPENV_VERSION }}" != 'production' ]]; then
@@ -260,6 +242,25 @@ runs:
       run: echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier $RDS_INSTANCE_NAME --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')" >> $GITHUB_ENV
       shell: bash
 
+    - name: Define variables for DB for static envs
+      if: ${{ startsWith(inputs.tempenv-version, 'prep-02') || startsWith(inputs.tempenv-version, 'sandbox') || startsWith(inputs.tempenv-version, 'production') }}
+      run: |
+           echo "DB_DEFAULT_DATABASE=${{ env.DB_DEFAULT_DATABASE }}" >> $GITHUB_ENV
+           echo "DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
+           echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
+           echo "Deploy to static envs"
+      shell: bash
+
+    - name: Define variables for DB for tempenvs
+      if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') }}
+      run: |
+           echo "DB_DEFAULT_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_DEFAULT_DATABASE }}" >> $GITHUB_ENV
+           echo "DB_READ_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
+           echo "DB_REP_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
+           RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com
+           echo "Deploy to tempenvs "
+      shell: bash
+
 ####################
     - name: Setup create_db.php file
       uses: cuchi/jinja2-action@v1.2.0
@@ -304,7 +305,7 @@ runs:
           DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}
           INF_LOGZIO_TOKEN=${{ env.INF_LOGZIO_TOKEN }}
           ELB_DNS=tabula-${{ env.ENV_NAME }}-aws.escribers.io
-          RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com
+          RDS_ENDPOINT=${{ env.RDS_ENDPOINT }}
           TWILIO_SID=${{ env.TWILIO_SID }}
           TWILIO_TOKEN=${{ env.TWILIO_TOKEN }}
           TWILIO_SIP_CL=${{ env.TWILIO_SIP_CL }}
