@@ -422,7 +422,8 @@ runs:
 
     - name: Add Demo User
       uses: appleboy/ssh-action@master
-      if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') }}
+      if: ${{ inputs.tempenv-version != 'production' }}
+      # if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') }}
       with:
         host: ${{ env.WORKER_LIST_IPS }}
         username: ubuntu
