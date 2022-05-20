@@ -85,7 +85,7 @@ runs:
         TF_VAR_env_name: "${{ env.TEMPENV_VERSION }}"
         TF_VAR_do_migration: "false"
         TF_VAR_deletion_protection: "false"
-        TF_VAR_instance_count: 2
+        TF_VAR_instance_count: "2"
         TEMPENV_VERSION: "${{ env.TEMPENV_VERSION }}"
       shell: bash
 
