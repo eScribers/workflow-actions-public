@@ -366,59 +366,17 @@ runs:
         tempenv-version: ${{ env.ENV_NAME }}
         token: ${{ inputs.token }}
 
-    - name: Execute Deploy Command №3
-      uses: eScribers/workflow-actions-public/execute-deploy@master
-      with:
-        host_ip: ${{ steps.split.outputs._2 }}
-        oleksb-key: ${{ inputs.oleksb-key }}
-        access-key: ${{ env.AWS_ACCESS_KEY_ID }}
-        secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-        account-id: ${{ env.RESOURCES_AWS_ACCOUNT_ID }}
-        default-region: ${{ env.AWS_DEFAULT_REGION }}
-        tempenv-version: ${{ env.ENV_NAME }}
-        token: ${{ inputs.token }}
-######
-    # - name: copy docker-compose via ssh key
-    #   uses: appleboy/scp-action@master
+    # - name: Execute Deploy Command №3
+    #   uses: eScribers/workflow-actions-public/execute-deploy@master
     #   with:
-    #     host: ${{ env.WORKER_LIST_IPS }} #"10.0.4.125,10.0.5.39"
-    #     username: ubuntu
-    #     port: 22
-    #     key: ${{ inputs.oleksb-key }}
-    #     source: "./application/config/delete_db.php,./application/config/create_db.php,./deploy/docker-compose.yaml.template,./application/config/env,./.htaccess.example"
-    #     target: "/home/ubuntu"
-          
-    # - name: Start docker-compose
-    #   uses: appleboy/ssh-action@master
-    #   env:
-    #     AWS_ACCESS_KEY_ID: "${{ env.AWS_ACCESS_KEY_ID }}"
-    #     AWS_SECRET_ACCESS_KEY: "${{ env.AWS_SECRET_ACCESS_KEY }}"
-    #     AWS_DEFAULT_REGION: "${{ env.AWS_DEFAULT_REGION }}"
-    #     DB_PASSWORD: "${{ env.DB_DEFAULT_PASSWORD }}"
-    #     ENV_NAME: "${{ env.ENV_NAME }}"
-    #   with:
-    #     host: ${{ env.WORKER_LIST_IPS }}
-    #     username: ubuntu
-    #     key: ${{ inputs.oleksb-key }}
-    #     port: 22
-    #     script: |
-    #       whoami
-    #       ls -al
-    #       cp ./application/config/env ./.env
-    #       cp ./.htaccess.example ./.htaccess
-    #       aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin ${{ env.RESOURCES_AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
-    #       sudo docker rm -f $(sudo docker ps -a -q) | true
-    #       sudo docker rmi $(sudo docker images --all -q) | true
-    #       export ENV_NAME=${{ env.ENV_NAME }}
-    #       docker-compose -f ./deploy/docker-compose.yaml.template config > ./deploy/docker-compose.yaml
-    #       sudo docker-compose -f ./deploy/docker-compose.yaml up -d
-    #       sudo docker exec tabula_backend php delete_db.php
-    #       sudo docker exec tabula_backend php create_db.php
-    #       sudo docker exec tabula_backend php index.php migrate
-    #       sudo docker exec tabula_backend php index.php migrate initdata
-    #       sudo docker exec tabula_backend php index.php migrate devdata
-    #     shell: bash
-##############
+    #     host_ip: ${{ steps.split.outputs._2 }}
+    #     oleksb-key: ${{ inputs.oleksb-key }}
+    #     access-key: ${{ env.AWS_ACCESS_KEY_ID }}
+    #     secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+    #     account-id: ${{ env.RESOURCES_AWS_ACCOUNT_ID }}
+    #     default-region: ${{ env.AWS_DEFAULT_REGION }}
+    #     tempenv-version: ${{ env.ENV_NAME }}
+    #     token: ${{ inputs.token }}
 
     - name: Add Demo User
       uses: appleboy/ssh-action@master
