@@ -51,6 +51,11 @@ runs:
           BACKEND_URL=${{ env.BACKEND_URL }}
           TABULA_LOGIN=${{ env.TABULA_LOGIN }}
           TABULA_PASSWORD=${{ env.TABULA_PASSWORD }}
+          SENDER_EMAIL_ADDRESS=""
+          SENDER_EMAIL_PASSWORD=""
+          PR_NUMBER=""
+          PROJECT_REPO=""
+          ACTION_ID=""
 
     - name: Show Authentication.xml
       run: |
