@@ -366,17 +366,17 @@ runs:
         tempenv-version: ${{ env.ENV_NAME }}
         token: ${{ inputs.token }}
 
-    # - name: Execute Deploy Command №3
-    #   uses: eScribers/workflow-actions-public/execute-deploy@master
-    #   with:
-    #     host_ip: ${{ steps.split.outputs._2 }}
-    #     oleksb-key: ${{ inputs.oleksb-key }}
-    #     access-key: ${{ env.AWS_ACCESS_KEY_ID }}
-    #     secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-    #     account-id: ${{ env.RESOURCES_AWS_ACCOUNT_ID }}
-    #     default-region: ${{ env.AWS_DEFAULT_REGION }}
-    #     tempenv-version: ${{ env.ENV_NAME }}
-    #     token: ${{ inputs.token }}
+    - name: Execute Deploy Command №3
+      uses: eScribers/workflow-actions-public/execute-deploy@master
+      with:
+        host_ip: ${{ steps.split.outputs._2 }}
+        oleksb-key: ${{ inputs.oleksb-key }}
+        access-key: ${{ env.AWS_ACCESS_KEY_ID }}
+        secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        account-id: ${{ env.RESOURCES_AWS_ACCOUNT_ID }}
+        default-region: ${{ env.AWS_DEFAULT_REGION }}
+        tempenv-version: ${{ env.ENV_NAME }}
+        token: ${{ inputs.token }}
 
     - name: Add Demo User
       uses: appleboy/ssh-action@master
