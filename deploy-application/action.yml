@@ -3,7 +3,7 @@ description: "Run tests..."
 inputs:
   git-reference:
     description: 'Git reference from where it should be deployed'
-    default: "master"
+    default: "refs/heads/master"
     required: true
   docker-path:
     description: 'Path where dockerfile located'
@@ -96,10 +96,10 @@ runs:
   using: "composite"
   steps: 
     - name: Checkout tabula infra repo
-      uses: actions/checkout@master
+      uses: actions/checkout@v3
       with:
         repository: eScribers/tabula
-        ref: refs/heads/${{ inputs.git-reference }}
+        ref: ${{ inputs.git-reference }}
         token: ${{ inputs.token }}
 
     - name: Define variables 
