@@ -4,7 +4,6 @@ inputs:
   git-reference:
     description: 'Git reference from where it should be deployed'
     default: "refs/heads/master"
-    required: true
   docker-path:
     description: 'Path where dockerfile located'
     default: "/home/runner/work/tabula-automation-tests/tabula-automation-tests/"

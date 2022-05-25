@@ -1,6 +1,9 @@
 name: "Run e2e test"
 description: "Run tests..."
 inputs:
+  git-reference:
+    description: 'Git reference from where it should be deployed'
+    default: "refs/heads/master"
   dotnet-version:
     description: 'The dotnet version to use'
     default: '6.0.x'
@@ -31,7 +34,7 @@ runs:
       uses: actions/checkout@master
       with:
         repository: eScribers/tabula-automation-tests
-        ref: refs/heads/master
+        ref: ${{ inputs.git-reference }}
         token: ${{ inputs.token }}
 
     - name: Define variables 
