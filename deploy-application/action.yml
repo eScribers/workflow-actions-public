@@ -90,6 +90,22 @@ inputs:
   tabula-password:
     description: 'Password to tabula portal'
     required: false
+  pr-number:
+    description: 'PR number where those tests was executed'
+    default: ""
+  project-repo:
+    description: 'Project repo was tested'
+    default: ""
+  action-id:
+    description: 'Action ID for preparint link to workflow'
+    default: ""
+  sender-email-address:
+    description: 'Git reference from where it should be deployed'
+    default: ""
+  sender-email-password:
+    description: 'Git reference from where it should be deployed'
+    default: ""
+
 
 runs:
   using: "composite"
@@ -407,6 +423,11 @@ runs:
         access-key: ${{ env.AWS_ACCESS_KEY_ID }}
         secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
         token: ${{ inputs.token }}  
+        sender-email-address: ${{ inputs.sender-email-address }} #${{ secrets.SENDER_EMAIL_ADDRESS }}
+        sender-email-password: ${{ inputs.sender-email-password }} #${{ secrets.SENDER_EMAIL_PASSWORD }}
+        pr-number: ${{ inputs.pr-number }}
+        project-repo: ${{ inputs.project-repo }}
+        action-id: ${{ inputs.action-id }}
 
 ####################  
 
