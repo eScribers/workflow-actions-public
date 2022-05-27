@@ -62,8 +62,8 @@ runs:
     - name: Setup env file
       uses: cuchi/jinja2-action@v1.2.0
       with:
-        template: ./common/TestSuites/Authentication/Authentication.xml.j2
-        output_file: ./common/TestSuites/Authentication/Authentication.xml
+        template: ./common/TestSuites/SmokeE2E/Smoke.xml.j2
+        output_file: ./common/TestSuites/SmokeE2E/Smoke.xml
         strict: true
         variables: |
           BACKEND_URL=${{ env.BACKEND_URL }}
@@ -77,7 +77,7 @@ runs:
 
     - name: Show Authentication.xml
       run: |
-        cat ./common/TestSuites/Authentication/Authentication.xml
+        cat ./common/TestSuites/SmokeE2E/Smoke.xml
       shell: bash
 
     - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
@@ -107,7 +107,7 @@ runs:
       run: |
         google-chrome --version 
         chromedriver --version
-        ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/Authentication/Authentication.xml
+        ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/Smoke.xml
       shell: bash
 
 
