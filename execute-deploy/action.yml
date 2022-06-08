@@ -123,7 +123,8 @@ runs:
 
     - name: Run migrations
       uses: appleboy/ssh-action@master
-      if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') || startsWith(inputs.tempenv-version, 'prep-02') }}
+      if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') }}
+#      if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') || startsWith(inputs.tempenv-version, 'prep-02') }}
       env:
         AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.secret-key }}
