@@ -277,7 +277,7 @@ runs:
       shell: bash
 
     - name: Get RDS instance endpoint
-      run: echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier $RDS_INSTANCE_NAME --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')" >> $GITHUB_ENV
+      run: echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier $RDS_INSTANCE_NAME --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')" || echo "RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com" >> $GITHUB_ENV
       shell: bash
 
     # - name: Define variables for DB for static envs
