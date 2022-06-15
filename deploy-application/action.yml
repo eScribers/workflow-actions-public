@@ -195,11 +195,24 @@ runs:
            echo "DB_DEFAULT_USER=${{ env.SANDBOX_DB_USER }}" >> $GITHUB_ENV
            echo "DB_READ_USER=${{ env.SANDBOX_DB_USER }}" >> $GITHUB_ENV
            echo "DB_REP_USER=${{ env.SANDBOX_DB_USER }}" >> $GITHUB_ENV
+           echo "TAB_FRONTEND_URL=https://tabula-frontend-sandbox-aws-us-east-1.s3.amazonaws.com" >> $GITHUB_ENV
+           echo "Deploy to ${{ env.TEMPENV_VERSION }}"
+          if [[ "${{ env.TEMPENV_VERSION }}" == 'prep-02*' ]] || [[ "${{ env.TEMPENV_VERSION }}" == 'sandbox' ]] || [[ "${{ env.TEMPENV_VERSION }}" == 'prodution' ]]; then
+           echo "DB_DEFAULT_DATABASE=${{ env.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
+           echo "DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
+           echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
+           echo "Deploy to static envs"
+          elif [[ "${{ env.TEMPENV_VERSION }}" == 'testenv-e2e-2*' ]] || [[ "${{ env.TEMPENV_VERSION }}" == 'e2e-*' ]]; then
+           echo "DB_DEFAULT_DATABASE=${{ env.ENV_NAME }}-${{ env.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
+           echo "DB_READ_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
+           echo "DB_REP_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
+           echo "RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com" >> $GITHUB_ENV
+           echo "Deploy to tempenvs "
+          else
            echo "DB_DEFAULT_DATABASE=${{ env.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
            echo "DB_READ_DATABASE=${{ env.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
            echo "DB_REP_DATABASE=${{ env.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
-           echo "TAB_FRONTEND_URL=https://tabula-frontend-sandbox-aws-us-east-1.s3.amazonaws.com" >> $GITHUB_ENV
-           echo "Deploy to ${{ env.TEMPENV_VERSION }}"
+          fi
       shell: bash
 
     - name: Define environment bucket depends on env
@@ -261,24 +274,24 @@ runs:
       run: echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier $RDS_INSTANCE_NAME --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')" >> $GITHUB_ENV
       shell: bash
 
-    - name: Define variables for DB for static envs
-      if: ${{ startsWith(inputs.tempenv-version, 'prep-02') || startsWith(inputs.tempenv-version, 'sandbox') || startsWith(inputs.tempenv-version, 'production') }}
-      run: |
-           echo "DB_DEFAULT_DATABASE=${{ env.DB_DEFAULT_DATABASE }}" >> $GITHUB_ENV
-           echo "DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
-           echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
-           echo "Deploy to static envs"
-      shell: bash
+    # - name: Define variables for DB for static envs
+    #   if: ${{ startsWith(inputs.tempenv-version, 'prep-02') || startsWith(inputs.tempenv-version, 'sandbox') || startsWith(inputs.tempenv-version, 'production') }}
+    #   run: |
+    #        echo "DB_DEFAULT_DATABASE=${{ env.DB_DEFAULT_DATABASE }}" >> $GITHUB_ENV
+    #        echo "DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
+    #        echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
+    #        echo "Deploy to static envs"
+    #   shell: bash
 
-    - name: Define variables for DB for tempenvs
-      if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') }}
-      run: |
-           echo "DB_DEFAULT_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_DEFAULT_DATABASE }}" >> $GITHUB_ENV
-           echo "DB_READ_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
-           echo "DB_REP_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
-           echo "RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com" >> $GITHUB_ENV
-           echo "Deploy to tempenvs "
-      shell: bash
+    # - name: Define variables for DB for tempenvs
+    #   if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') }}
+    #   run: |
+    #        echo "DB_DEFAULT_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_DEFAULT_DATABASE }}" >> $GITHUB_ENV
+    #        echo "DB_READ_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
+    #        echo "DB_REP_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
+    #        echo "RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com" >> $GITHUB_ENV
+    #        echo "Deploy to tempenvs "
+    #   shell: bash
 
 ####################
     - name: Setup create_db.php file
@@ -290,7 +303,7 @@ runs:
         variables: |
           DB_DEFAULT_PASSWORD=${{ env.DB_DEFAULT_PASSWORD }}
           DB_DEFAULT_USER=${{ env.DB_DEFAULT_USER }}
-          DB_DEFAULT_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_DEFAULT_DATABASE }}
+          DB_DEFAULT_DATABASE=${{ env.DB_DEFAULT_DATABASE }}
           RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com
 
     - name: Setup delete_db.php file
@@ -302,7 +315,7 @@ runs:
         variables: |
           DB_DEFAULT_PASSWORD=${{ env.DB_DEFAULT_PASSWORD }}
           DB_DEFAULT_USER=${{ env.DB_DEFAULT_USER }}
-          DB_DEFAULT_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_DEFAULT_DATABASE }}
+          DB_DEFAULT_DATABASE=${{ env.DB_DEFAULT_DATABASE }}
           RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com
 
     - name: Setup env file
@@ -416,7 +429,7 @@ runs:
       if: ${{ inputs.tempenv-version != 'production' }}
       # if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') }}
       with:
-        host: ${{ env.WORKER_LIST_IPS }}
+        host: ${{ steps.split.outputs._0 }}
         username: ubuntu
         key: ${{ inputs.oleksb-key }}
         port: 22
