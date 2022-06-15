@@ -198,18 +198,18 @@ runs:
         echo "TAB_FRONTEND_URL=https://tabula-frontend-sandbox-aws-us-east-1.s3.amazonaws.com" >> $GITHUB_ENV
         echo "Deploy to ${{ env.TEMPENV_VERSION }}"
         if [[ "${{ env.TEMPENV_VERSION }}" == prep-02* ]] || [[ "${{ env.TEMPENV_VERSION }}" == 'sandbox' ]] || [[ "${{ env.TEMPENV_VERSION }}" == 'prodution' ]]; then
-          echo "DB_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
+          echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
           echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
           echo "Deploy to static envs"
         elif [[ "${{ env.TEMPENV_VERSION }}" == testenv-e2e-2* ]] || [[ "${{ env.TEMPENV_VERSION }}" == e2e-* ]]; then
-          echo "DB_DEFAULT_DATABASE=${{ env.TEMPENV_VERSION }}-${{ inputs.db-database }}" >> $GITHUB_ENV
+          echo "DB_A_DEFAULT_DATABASE=${{ env.TEMPENV_VERSION }}-${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_READ_DATABASE=${{ env.TEMPENV_VERSION }}-${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
           echo "DB_REP_DATABASE=${{ env.TEMPENV_VERSION }}-${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
           echo "RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com" >> $GITHUB_ENV
           echo "Deploy to tempenvs "
         else
-          echo "DB_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
+          echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_READ_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_REP_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "Deploy to nowhere "
@@ -218,7 +218,7 @@ runs:
 
     - name: DEBUG
       run: |
-        echo "${{ env.DB_DEFAULT_DATABASE }}-"
+        echo "${{ env.DB_A_DEFAULT_DATABASE }}-"
       shell: bash
 
     - name: Define environment bucket depends on env
@@ -309,7 +309,7 @@ runs:
         variables: |
           DB_DEFAULT_PASSWORD=${{ env.DB_DEFAULT_PASSWORD }}
           DB_DEFAULT_USER=${{ env.DB_DEFAULT_USER }}
-          DB_DEFAULT_DATABASE=${{ env.DB_DEFAULT_DATABASE }}
+          DB_DEFAULT_DATABASE=${{ env.DB_A_DEFAULT_DATABASE }}
           RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com
 
     - name: Setup delete_db.php file
@@ -321,7 +321,7 @@ runs:
         variables: |
           DB_DEFAULT_PASSWORD=${{ env.DB_DEFAULT_PASSWORD }}
           DB_DEFAULT_USER=${{ env.DB_DEFAULT_USER }}
-          DB_DEFAULT_DATABASE=${{ env.DB_DEFAULT_DATABASE }}
+          DB_DEFAULT_DATABASE=${{ env.DB_A_DEFAULT_DATABASE }}
           RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com
 
     - name: Setup env file
@@ -338,7 +338,7 @@ runs:
           DB_DEFAULT_USER=${{ env.DB_DEFAULT_USER }}
           DB_READ_USER=${{ env.DB_READ_USER }}
           DB_REP_USER=${{ env.DB_REP_USER }}
-          DB_DEFAULT_DATABASE=${{ env.DB_DEFAULT_DATABASE }}
+          DB_DEFAULT_DATABASE=${{ env.DB_A_DEFAULT_DATABASE }}
           DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}
           DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}
           INF_LOGZIO_TOKEN=${{ env.INF_LOGZIO_TOKEN }}
