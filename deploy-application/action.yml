@@ -216,6 +216,11 @@ runs:
         fi
       shell: bash
 
+    - name: DEBUG
+      run: |
+        echo "${{ env.DB_DEFAULT_DATABASE }}-"
+      shell: bash
+
     - name: Define environment bucket depends on env
       run: |
         if [[ "${{ env.TEMPENV_VERSION }}" != 'production' ]]; then
