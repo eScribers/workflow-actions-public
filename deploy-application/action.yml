@@ -339,8 +339,8 @@ runs:
           DB_READ_USER=${{ env.DB_READ_USER }}
           DB_REP_USER=${{ env.DB_REP_USER }}
           DB_DEFAULT_DATABASE=${{ env.DB_A_DEFAULT_DATABASE }}
-          DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}
-          DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}
+          DB_READ_DATABASE=${{ env.DB_A_DEFAULT_DATABASE }}
+          DB_REP_DATABASE=${{ env.DB_A_DEFAULT_DATABASE }}
           INF_LOGZIO_TOKEN=${{ env.INF_LOGZIO_TOKEN }}
           ELB_DNS=tabula-${{ env.ENV_NAME }}-aws.escribers.io
           RDS_ENDPOINT=${{ env.RDS_ENDPOINT }}
