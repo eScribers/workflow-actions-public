@@ -51,7 +51,7 @@ runs:
     - name: copy docker-compose via ssh key
       uses: appleboy/scp-action@master
       with:
-        host: ${{ inputs.host_ip }} #"10.0.4.125,10.0.5.39"
+        host: ${{ inputs.host_ip }} 
         username: ubuntu
         port: 22
         key: ${{ inputs.oleksb-key }}
@@ -84,60 +84,3 @@ runs:
           docker-compose -f ./deploy/docker-compose.yaml.template config > ./deploy/docker-compose.yaml
           sudo docker-compose -f ./deploy/docker-compose.yaml up -d
         shell: bash
-
-#     - name: Recreate DB
-#       uses: appleboy/ssh-action@master
-#       if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') }}
-#       env:
-#         AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
-#         AWS_SECRET_ACCESS_KEY: ${{ inputs.secret-key }}
-#         AWS_DEFAULT_REGION: ${{ inputs.default-region }}
-#         RESOURCES_AWS_ACCOUNT_ID: ${{ inputs.account-id }}
-#         ENV_NAME: ${{ inputs.tempenv-version }}
-#       with:
-#         host: ${{ inputs.host_ip }}
-#         username: ubuntu
-#         key: ${{ inputs.oleksb-key }}
-#         port: 22
-#         script: |
-#           sudo docker exec tabula_backend php delete_db.php
-#           sudo docker exec tabula_backend php create_db.php
-#         shell: bash
-
-#     - name: Run default migration
-#       uses: appleboy/ssh-action@master
-#       env:
-#         AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
-#         AWS_SECRET_ACCESS_KEY: ${{ inputs.secret-key }}
-#         AWS_DEFAULT_REGION: ${{ inputs.default-region }}
-#         RESOURCES_AWS_ACCOUNT_ID: ${{ inputs.account-id }}
-#         ENV_NAME: ${{ inputs.tempenv-version }}
-#       with:
-#         host: ${{ inputs.host_ip }}
-#         username: ubuntu
-#         key: ${{ inputs.oleksb-key }}
-#         port: 22
-#         script: |
-#           sudo docker exec tabula_backend php index.php migrate
-#         shell: bash
-
-#     - name: Run migrations
-#       uses: appleboy/ssh-action@master
-#       if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') }}
-# #      if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') || startsWith(inputs.tempenv-version, 'prep-02') }}
-#       env:
-#         AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
-#         AWS_SECRET_ACCESS_KEY: ${{ inputs.secret-key }}
-#         AWS_DEFAULT_REGION: ${{ inputs.default-region }}
-#         RESOURCES_AWS_ACCOUNT_ID: ${{ inputs.account-id }}
-#         ENV_NAME: ${{ inputs.tempenv-version }}
-#       with:
-#         host: ${{ inputs.host_ip }}
-#         username: ubuntu
-#         key: ${{ inputs.oleksb-key }}
-#         port: 22
-#         script: |
-#           sudo docker exec tabula_backend php index.php migrate version 1
-#           sudo docker exec tabula_backend php index.php migrate devdata
-#           sudo docker exec tabula_backend php index.php migrate
-#         shell: bash
