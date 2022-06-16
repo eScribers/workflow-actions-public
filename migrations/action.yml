@@ -85,3 +85,21 @@ runs:
           sudo docker exec tabula_backend php index.php migrate testdata
           sudo docker exec tabula_backend php index.php migrate
         shell: bash
+
+    - name: Run migrations for e2e tests on prep-02
+      uses: appleboy/ssh-action@master
+      if: ${{ startsWith(inputs.tempenv-version, 'prep-02') }}
+      env:
+        AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.secret-key }}
+        AWS_DEFAULT_REGION: ${{ inputs.default-region }}
+        RESOURCES_AWS_ACCOUNT_ID: ${{ inputs.account-id }}
+        ENV_NAME: ${{ inputs.tempenv-version }}
+      with:
+        host: ${{ inputs.host_ip }}
+        username: ubuntu
+        key: ${{ inputs.oleksb-key }}
+        port: 22
+        script: |
+          sudo docker exec tabula_backend php index.php migrate testdata
+        shell: bash
