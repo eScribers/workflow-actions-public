@@ -184,6 +184,13 @@ runs:
         scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i private_key/private_key ubuntu@${{ env.VPN_SERVER_PUBLIC_IP }}:/home/ubuntu/client.ovpn ./client.ovpn
       shell: bash
 
+    - name: Add credentials to Amazon 
+      uses: "aws-actions/configure-aws-credentials@v1"
+      with:
+        aws-access-key-id: "${{ env.AWS_ACCESS_KEY_ID }}"
+        aws-region: "${{ env.AWS_DEFAULT_REGION }}"
+        aws-secret-access-key: "${{ env.AWS_SECRET_ACCESS_KEY }}"
+
     - name: Define variables depends on env
       run: |
         echo "RDS_INSTANCE_NAME=${{ env.TEMPENV_VERSION }}-tabula" >> $GITHUB_ENV
@@ -201,6 +208,7 @@ runs:
           echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
           echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
+          echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier ${{ env.TEMPENV_VERSION }}-tabula --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
           echo "Deploy to static envs"
         elif [[ "${{ env.TEMPENV_VERSION }}" == testenv-e2e-2* ]] || [[ "${{ env.TEMPENV_VERSION }}" == e2e-* ]]; then
           echo "DB_A_DEFAULT_DATABASE=${{ env.TEMPENV_VERSION }}-${{ inputs.db-database }}" >> $GITHUB_ENV
@@ -212,6 +220,7 @@ runs:
           echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_READ_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_REP_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
+          echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier ${{ env.TEMPENV_VERSION }}-tabula --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
           echo "Deploy to nowhere "
         fi
       shell: bash
@@ -261,13 +270,6 @@ runs:
       run: until ping -c1 "${{ env.VPN_SERVER_PRIVATE_IP }}"; do sleep 2; done
       shell: bash
 
-    - name: Add credentials to Amazon 
-      uses: "aws-actions/configure-aws-credentials@v1"
-      with:
-        aws-access-key-id: "${{ env.AWS_ACCESS_KEY_ID }}"
-        aws-region: "${{ env.AWS_DEFAULT_REGION }}"
-        aws-secret-access-key: "${{ env.AWS_SECRET_ACCESS_KEY }}"
-
     - name: Get instancesIDs
       run: echo "WORKER_INSTANCE_IDs=$(aws elb describe-load-balancers --load-balancer-names $ELB_NAME --output json --query "LoadBalancerDescriptions[*].Instances[*].InstanceId" | jq -r '. | map(.[])| @csv' | tr -d '"')" >> $GITHUB_ENV
       shell: bash
@@ -276,9 +278,9 @@ runs:
       run: echo "WORKER_LIST_IPS=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=${{ env.TEMPENV_VERSION }}-Webserver-*" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' | jq -r '.| .[] |.[]|.[]' | grep -v null | paste -sd, -)" >> $GITHUB_ENV
       shell: bash
 
-    - name: Get RDS instance endpoint
-      run: echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier $RDS_INSTANCE_NAME --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
-      shell: bash
+    # - name: Get RDS instance endpoint
+    #   run: echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier $RDS_INSTANCE_NAME --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
+    #   shell: bash
 
     # - name: Define variables for DB for static envs
     #   if: ${{ startsWith(inputs.tempenv-version, 'prep-02') || startsWith(inputs.tempenv-version, 'sandbox') || startsWith(inputs.tempenv-version, 'production') }}
