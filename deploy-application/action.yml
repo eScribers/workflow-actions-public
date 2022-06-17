@@ -430,7 +430,7 @@ runs:
         oleksb-key: ${{ inputs.oleksb-key }}
         access-key: ${{ env.AWS_ACCESS_KEY_ID }}
         secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-        account-id: ${{ env.AWS_ACCOUNT_ID }}
+        account-id: ${{ env.RESOURCE_AWS_ACCOUNT_ID }}
         default-region: ${{ env.AWS_DEFAULT_REGION }}
         tempenv-version: ${{ env.ENV_NAME }}
         token: ${{ inputs.token }}
@@ -442,7 +442,7 @@ runs:
         oleksb-key: ${{ inputs.oleksb-key }}
         access-key: ${{ env.AWS_ACCESS_KEY_ID }}
         secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-        account-id: ${{ env.AWS_ACCOUNT_ID }}
+        account-id: ${{ env.RESOURCE_AWS_ACCOUNT_ID }}
         default-region: ${{ env.AWS_DEFAULT_REGION }}
         tempenv-version: ${{ env.ENV_NAME }}
         token: ${{ inputs.token }}
@@ -454,7 +454,7 @@ runs:
         oleksb-key: ${{ inputs.oleksb-key }}
         access-key: ${{ env.AWS_ACCESS_KEY_ID }}
         secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-        account-id: ${{ env.AWS_ACCOUNT_ID }}
+        account-id: ${{ env.RESOURCE_AWS_ACCOUNT_ID }}
         default-region: ${{ env.AWS_DEFAULT_REGION }}
         tempenv-version: ${{ env.ENV_NAME }}
         token: ${{ inputs.token }}
