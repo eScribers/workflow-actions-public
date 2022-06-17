@@ -256,12 +256,12 @@ runs:
         fi
       shell: bash
 
-    # - name: docker get-login-password
-    #   run: |
-    #     aws ecr get-login-password --region ${{ env.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin 557734652023.dkr.ecr.${{ env.AWS_DEFAULT_REGION }}.amazonaws.com
-    #     sudo mkdir -p /github/home/.docker
-    #     sudo cp /home/runner/.docker/config.json /github/home/.docker/config.json.
-    #   shell: bash
+    - name: docker get-login-password
+      run: |
+        aws ecr get-login-password --region ${{ env.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin 557734652023.dkr.ecr.${{ env.AWS_DEFAULT_REGION }}.amazonaws.com
+        sudo mkdir -p /github/home/.docker
+        sudo cp /home/runner/.docker/config.json /github/home/.docker/config.json.
+      shell: bash
 
 
     - name: "Create Docker image and push it to ECR repository"
