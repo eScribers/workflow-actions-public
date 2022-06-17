@@ -105,7 +105,22 @@ inputs:
   sender-email-password:
     description: 'Git reference from where it should be deployed'
     default: ""
-
+  resource-access-key:
+    description: 'Resource AWS Access Key from secrets'
+    required: true
+    default: ""
+  resource-secret-key:
+    description: 'Resource AWS Secret Key from secrets'
+    required: true
+    default: ""
+  resource-default-region:
+    description: 'Resource AWS Default Region from secrets'
+    required: true
+    default: ""
+  resource-account-id:
+    description: 'Resource AWS Account ID for ECR  from secrets'
+    required: true
+    default: ""
 
 runs:
   using: "composite"
@@ -127,7 +142,11 @@ runs:
            echo "AWS_ACCESS_KEY_ID=${{ inputs.access-key }}" >> $GITHUB_ENV
            echo "AWS_SECRET_ACCESS_KEY=${{ inputs.secret-key }}" >> $GITHUB_ENV
            echo "AWS_DEFAULT_REGION=${{ inputs.default-region }}" >> $GITHUB_ENV
-           echo "RESOURCES_AWS_ACCOUNT_ID=${{ inputs.account-id }}" >> $GITHUB_ENV
+           echo "AWS_ACCOUNT_ID=${{ inputs.account-id }}" >> $GITHUB_ENV
+           echo "RESOURCE_AWS_ACCESS_KEY_ID=${{ inputs.resource-access-key }}" >> $GITHUB_ENV
+           echo "RESOURCE_AWS_SECRET_ACCESS_KEY=${{ inputs.resource-secret-key }}" >> $GITHUB_ENV
+           echo "RESOURCE_AWS_DEFAULT_REGION=${{ inputs.resource-default-region }}" >> $GITHUB_ENV
+           echo "RESOURCE_AWS_ACCOUNT_ID=${{ inputs.resource-account-id }}" >> $GITHUB_ENV
            echo "INF_LOGZIO_TOKEN=${{ inputs.inf-logzio-token }}" >> $GITHUB_ENV
            echo "TWILIO_SID=${{ inputs.twilio-sid }}" >> $GITHUB_ENV
            echo "TWILIO_TOKEN=${{ inputs.twilio-token }}" >> $GITHUB_ENV
@@ -184,13 +203,6 @@ runs:
         scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i private_key/private_key ubuntu@${{ env.VPN_SERVER_PUBLIC_IP }}:/home/ubuntu/client.ovpn ./client.ovpn
       shell: bash
 
-    - name: Add credentials to Amazon 
-      uses: "aws-actions/configure-aws-credentials@v1"
-      with:
-        aws-access-key-id: "${{ env.AWS_ACCESS_KEY_ID }}"
-        aws-region: "${{ env.AWS_DEFAULT_REGION }}"
-        aws-secret-access-key: "${{ env.AWS_SECRET_ACCESS_KEY }}"
-
     - name: Define variables depends on env
       run: |
         echo "RDS_INSTANCE_NAME=${{ env.TEMPENV_VERSION }}-tabula" >> $GITHUB_ENV
@@ -244,25 +256,25 @@ runs:
         fi
       shell: bash
 
-    - name: docker get-login-password
-      run: |
-        aws ecr get-login-password --region ${{ env.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin 557734652023.dkr.ecr.${{ env.AWS_DEFAULT_REGION }}.amazonaws.com
-        sudo mkdir -p /github/home/.docker
-        sudo cp /home/runner/.docker/config.json /github/home/.docker/config.json.
-      shell: bash
+    # - name: docker get-login-password
+    #   run: |
+    #     aws ecr get-login-password --region ${{ env.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin 557734652023.dkr.ecr.${{ env.AWS_DEFAULT_REGION }}.amazonaws.com
+    #     sudo mkdir -p /github/home/.docker
+    #     sudo cp /home/runner/.docker/config.json /github/home/.docker/config.json.
+    #   shell: bash
 
 
     - name: "Create Docker image and push it to ECR repository"
       uses: "kciter/aws-ecr-action@v4"
       with:
-        access_key_id: "${{ env.AWS_ACCESS_KEY_ID }}"
-        secret_access_key: "${{ env.AWS_SECRET_ACCESS_KEY }}"
-        account_id: "${{ env.RESOURCES_AWS_ACCOUNT_ID }}"
-        create_repo: 'false'
+        access_key_id: "${{ env.RESOURCE_AWS_ACCESS_KEY_ID }}"
+        secret_access_key: "${{ env.RESOURCE_AWS_SECRET_ACCESS_KEY }}"
+        account_id: "${{ env.RESOURCE_AWS_ACCOUNT_ID }}"
+        create_repo: 'true'
         dockerfile: Dockerfile.deploy
         extra_build_args: ''
         path: ${{ inputs.docker-path }}
-        region: "${{ env.AWS_DEFAULT_REGION }}"
+        region: "${{ env.RESOURCE_AWS_DEFAULT_REGION }}"
         repo: "${{ env.ENVIRONMENT }}/tabula"
         tags: "latest,${{ github.sha }}"
 
@@ -277,6 +289,13 @@ runs:
     - name: Wait for a VPN connection
       run: until ping -c1 "${{ env.VPN_SERVER_PRIVATE_IP }}"; do sleep 2; done
       shell: bash
+
+    - name: Add credentials to Amazon 
+      uses: "aws-actions/configure-aws-credentials@v1"
+      with:
+        aws-access-key-id: "${{ env.AWS_ACCESS_KEY_ID }}"
+        aws-region: "${{ env.AWS_DEFAULT_REGION }}"
+        aws-secret-access-key: "${{ env.AWS_SECRET_ACCESS_KEY }}"
 
     - name: Get instancesIDs
       run: echo "WORKER_INSTANCE_IDs=$(aws elb describe-load-balancers --load-balancer-names $ELB_NAME --output json --query "LoadBalancerDescriptions[*].Instances[*].InstanceId" | jq -r '. | map(.[])| @csv' | tr -d '"')" >> $GITHUB_ENV
@@ -372,7 +391,7 @@ runs:
           DOE_GOOGLE_SPREADSHEET_AR=${{ env.DOE_GOOGLE_SPREADSHEET_AR }}
           DOE_GOOGLE_SPREADSHEET_OA=${{ env.DOE_GOOGLE_SPREADSHEET_OA }}
           FRONTEND_URL=${{ env.TAB_FRONTEND_URL }}
-          AWS_ACCOUNT_ID=${{ env.RESOURCES_AWS_ACCOUNT_ID }}
+          AWS_ACCOUNT_ID=${{ env.AWS_ACCOUNT_ID }}
           ENV_NAME=${{ env.ENV_NAME }}
 
 
@@ -399,7 +418,7 @@ runs:
         oleksb-key: ${{ inputs.oleksb-key }}
         access-key: ${{ env.AWS_ACCESS_KEY_ID }}
         secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-        account-id: ${{ env.RESOURCES_AWS_ACCOUNT_ID }}
+        account-id: ${{ env.AWS_ACCOUNT_ID }}
         default-region: ${{ env.AWS_DEFAULT_REGION }}
         tempenv-version: ${{ env.ENV_NAME }}
         token: ${{ inputs.token }}  
@@ -411,7 +430,7 @@ runs:
         oleksb-key: ${{ inputs.oleksb-key }}
         access-key: ${{ env.AWS_ACCESS_KEY_ID }}
         secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-        account-id: ${{ env.RESOURCES_AWS_ACCOUNT_ID }}
+        account-id: ${{ env.AWS_ACCOUNT_ID }}
         default-region: ${{ env.AWS_DEFAULT_REGION }}
         tempenv-version: ${{ env.ENV_NAME }}
         token: ${{ inputs.token }}
@@ -423,7 +442,7 @@ runs:
         oleksb-key: ${{ inputs.oleksb-key }}
         access-key: ${{ env.AWS_ACCESS_KEY_ID }}
         secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-        account-id: ${{ env.RESOURCES_AWS_ACCOUNT_ID }}
+        account-id: ${{ env.AWS_ACCOUNT_ID }}
         default-region: ${{ env.AWS_DEFAULT_REGION }}
         tempenv-version: ${{ env.ENV_NAME }}
         token: ${{ inputs.token }}
@@ -435,7 +454,7 @@ runs:
         oleksb-key: ${{ inputs.oleksb-key }}
         access-key: ${{ env.AWS_ACCESS_KEY_ID }}
         secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-        account-id: ${{ env.RESOURCES_AWS_ACCOUNT_ID }}
+        account-id: ${{ env.AWS_ACCOUNT_ID }}
         default-region: ${{ env.AWS_DEFAULT_REGION }}
         tempenv-version: ${{ env.ENV_NAME }}
         token: ${{ inputs.token }}
