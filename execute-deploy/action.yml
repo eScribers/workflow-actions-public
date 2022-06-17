@@ -23,7 +23,15 @@ inputs:
   host_ip:
     description: 'IP addres of remote host'
     required: true
-
+  resource-access-key:
+    description: 'Resource AWS Access Key from secrets'
+    required: true
+    default: ""
+  resource-secret-key:
+    description: 'Resource AWS Secret Key from secrets'
+    required: true
+    default: ""
+    
 runs:
   using: "composite"
   steps: 
@@ -34,6 +42,8 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.secret-key }}
         AWS_DEFAULT_REGION: ${{ inputs.default-region }}
+        RESOURCES_ACCESS_KEY_ID: ${{ inputs.resource-access-key }}
+        RESOURCES_SECRET_ACCESS_KEY: ${{ inputs.resource-secret-key }}
       with:
         host: ${{ inputs.host_ip }}
         username: ubuntu
@@ -47,6 +57,9 @@ runs:
           echo "[default]" > ~/.aws/credentials
           echo "aws_access_key_id=${{ env.AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
           echo "aws_secret_access_key=${{ env.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
+          echo "[resources]" > ~/.aws/credentials
+          echo "aws_access_key_id=${{ env.RESOURCES_ACCESS_KEY_ID }}" >> ~/.aws/credentials
+          echo "aws_secret_access_key=${{ env.RESOURCES_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
 
     - name: copy docker-compose via ssh key
       uses: appleboy/scp-action@master
@@ -76,7 +89,7 @@ runs:
           ls -al
           cp ./application/config/env ./.env
           cp ./.htaccess.example ./.htaccess
-          aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin ${{ env.RESOURCES_AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+          aws ecr get-login-password --profile resources --region us-east-1 | sudo docker login --username AWS --password-stdin ${{ env.RESOURCES_AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
           sudo docker rm -f $(sudo docker ps -a -q) | true
           sudo docker rmi $(sudo docker images --all -q) | true
           export ENV_NAME=${{ env.ENV_NAME }}

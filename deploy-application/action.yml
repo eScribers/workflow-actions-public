@@ -421,7 +421,9 @@ runs:
         account-id: ${{ env.RESOURCE_AWS_ACCOUNT_ID }}
         default-region: ${{ env.AWS_DEFAULT_REGION }}
         tempenv-version: ${{ env.ENV_NAME }}
-        token: ${{ inputs.token }}  
+        token: ${{ inputs.token }}
+        resource-access-key: ${{ env.RESOURCE_AWS_ACCESS_KEY_ID }}
+        resource-secret-key: ${{ env.RESOURCE_AWS_SECRET_ACCESS_KEY }}
         
     - name: Execute Deploy Command №2
       uses: eScribers/workflow-actions-public/execute-deploy@split-resources
@@ -434,6 +436,8 @@ runs:
         default-region: ${{ env.AWS_DEFAULT_REGION }}
         tempenv-version: ${{ env.ENV_NAME }}
         token: ${{ inputs.token }}
+        resource-access-key: ${{ env.RESOURCE_AWS_ACCESS_KEY_ID }}
+        resource-secret-key: ${{ env.RESOURCE_AWS_SECRET_ACCESS_KEY }}
 
     - name: Execute Deploy Command №3
       uses: eScribers/workflow-actions-public/execute-deploy@split-resources
@@ -446,6 +450,8 @@ runs:
         default-region: ${{ env.AWS_DEFAULT_REGION }}
         tempenv-version: ${{ env.ENV_NAME }}
         token: ${{ inputs.token }}
+        resource-access-key: ${{ env.RESOURCE_AWS_ACCESS_KEY_ID }}
+        resource-secret-key: ${{ env.RESOURCE_AWS_SECRET_ACCESS_KEY }}
 
     - name: Execute Migration Commands
       uses: eScribers/workflow-actions-public/migrations@e2e-test-data
