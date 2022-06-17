@@ -244,6 +244,12 @@ runs:
         fi
       shell: bash
 
+    - name: docker get-login-password
+      run: |
+        aws ecr get-login-password --region ${{ env.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin 557734652023.dkr.ecr.${{ env.AWS_DEFAULT_REGION }}.amazonaws.com
+      shell: bash
+
+
     - name: "Create Docker image and push it to ECR repository"
       uses: "kciter/aws-ecr-action@v4"
       with:
