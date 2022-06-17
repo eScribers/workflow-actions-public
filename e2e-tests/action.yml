@@ -45,7 +45,7 @@ inputs:
 runs:
   using: "composite"
   steps: 
-    - name: Checkout devops infra repo
+    - name: Checkout tabula-automation-tests repo
       uses: actions/checkout@master
       with:
         repository: eScribers/tabula-automation-tests

@@ -14,9 +14,9 @@ inputs:
   default-region:
     description: 'AWS Default Region from secrets'
     required: true
-  account-id:
-    description: 'AWS Account ID for ECR  from secrets'
-    required: true
+  # account-id:
+  #   description: 'AWS Account ID for ECR  from secrets'
+  #   required: true
   oleksb-key:
     description: 'Public key for adding to server from secrets'
     required: true
@@ -35,7 +35,7 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.secret-key }}
         AWS_DEFAULT_REGION: ${{ inputs.default-region }}
-        RESOURCES_AWS_ACCOUNT_ID: ${{ inputs.account-id }}
+        # RESOURCES_AWS_ACCOUNT_ID: ${{ inputs.account-id }}
         ENV_NAME: ${{ inputs.tempenv-version }}
       with:
         host: ${{ inputs.host_ip }}
@@ -53,7 +53,7 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.secret-key }}
         AWS_DEFAULT_REGION: ${{ inputs.default-region }}
-        RESOURCES_AWS_ACCOUNT_ID: ${{ inputs.account-id }}
+        # RESOURCES_AWS_ACCOUNT_ID: ${{ inputs.account-id }}
         ENV_NAME: ${{ inputs.tempenv-version }}
       with:
         host: ${{ inputs.host_ip }}
@@ -72,7 +72,7 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.secret-key }}
         AWS_DEFAULT_REGION: ${{ inputs.default-region }}
-        RESOURCES_AWS_ACCOUNT_ID: ${{ inputs.account-id }}
+        # RESOURCES_AWS_ACCOUNT_ID: ${{ inputs.account-id }}
         ENV_NAME: ${{ inputs.tempenv-version }}
       with:
         host: ${{ inputs.host_ip }}
@@ -93,7 +93,7 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.secret-key }}
         AWS_DEFAULT_REGION: ${{ inputs.default-region }}
-        RESOURCES_AWS_ACCOUNT_ID: ${{ inputs.account-id }}
+        # RESOURCES_AWS_ACCOUNT_ID: ${{ inputs.account-id }}
         ENV_NAME: ${{ inputs.tempenv-version }}
       with:
         host: ${{ inputs.host_ip }}
