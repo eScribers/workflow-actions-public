@@ -51,7 +51,7 @@ runs:
     - name: copy docker-compose via ssh key
       uses: appleboy/scp-action@master
       with:
-        host: ${{ inputs.host_ip }} 
+        host: ${{ inputs.host_ip }}
         username: ubuntu
         port: 22
         key: ${{ inputs.oleksb-key }}
