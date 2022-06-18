@@ -203,6 +203,13 @@ runs:
         scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i private_key/private_key ubuntu@${{ env.VPN_SERVER_PUBLIC_IP }}:/home/ubuntu/client.ovpn ./client.ovpn
       shell: bash
 
+    - name: Add credentials to Amazon 
+      uses: "aws-actions/configure-aws-credentials@v1"
+      with:
+        aws-access-key-id: "${{ env.AWS_ACCESS_KEY_ID }}"
+        aws-region: "${{ env.AWS_DEFAULT_REGION }}"
+        aws-secret-access-key: "${{ env.AWS_SECRET_ACCESS_KEY }}"
+
     - name: Define variables depends on env
       run: |
         echo "RDS_INSTANCE_NAME=${{ env.TEMPENV_VERSION }}-tabula" >> $GITHUB_ENV
@@ -289,13 +296,6 @@ runs:
     - name: Wait for a VPN connection
       run: until ping -c1 "${{ env.VPN_SERVER_PRIVATE_IP }}"; do sleep 2; done
       shell: bash
-
-    - name: Add credentials to Amazon 
-      uses: "aws-actions/configure-aws-credentials@v1"
-      with:
-        aws-access-key-id: "${{ env.AWS_ACCESS_KEY_ID }}"
-        aws-region: "${{ env.AWS_DEFAULT_REGION }}"
-        aws-secret-access-key: "${{ env.AWS_SECRET_ACCESS_KEY }}"
 
     - name: Get instancesIDs
       run: echo "WORKER_INSTANCE_IDs=$(aws elb describe-load-balancers --load-balancer-names $ELB_NAME --output json --query "LoadBalancerDescriptions[*].Instances[*].InstanceId" | jq -r '. | map(.[])| @csv' | tr -d '"')" >> $GITHUB_ENV
