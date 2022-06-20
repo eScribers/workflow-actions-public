@@ -90,7 +90,7 @@ runs:
           cp ./application/config/env ./.env
           cp ./.htaccess.example ./.htaccess
           aws ecr get-login-password --profile resources --region us-east-1 | sudo docker login --username AWS --password-stdin ${{ env.RESOURCES_AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
-          sudo docker rm -f $(sudo docker ps -a -q) | true
+          sudo docker rm -f $(sudo docker ps -a | grep tabula_backend | awk '{print $1}') | true
           sudo docker rmi $(sudo docker images --all -q) | true
           export ENV_NAME=${{ env.ENV_NAME }}
           export RESOURCES_AWS_ACCOUNT_ID=${{ env.RESOURCES_AWS_ACCOUNT_ID }}
