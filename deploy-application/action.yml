@@ -105,7 +105,22 @@ inputs:
   sender-email-password:
     description: 'Git reference from where it should be deployed'
     default: ""
-
+  resource-access-key:
+    description: 'Resource AWS Access Key from secrets'
+    required: true
+    default: ""
+  resource-secret-key:
+    description: 'Resource AWS Secret Key from secrets'
+    required: true
+    default: ""
+  resource-default-region:
+    description: 'Resource AWS Default Region from secrets'
+    required: true
+    default: ""
+  resource-account-id:
+    description: 'Resource AWS Account ID for ECR  from secrets'
+    required: true
+    default: ""
 
 runs:
   using: "composite"
@@ -127,7 +142,11 @@ runs:
            echo "AWS_ACCESS_KEY_ID=${{ inputs.access-key }}" >> $GITHUB_ENV
            echo "AWS_SECRET_ACCESS_KEY=${{ inputs.secret-key }}" >> $GITHUB_ENV
            echo "AWS_DEFAULT_REGION=${{ inputs.default-region }}" >> $GITHUB_ENV
-           echo "RESOURCES_AWS_ACCOUNT_ID=${{ inputs.account-id }}" >> $GITHUB_ENV
+           echo "AWS_ACCOUNT_ID=${{ inputs.account-id }}" >> $GITHUB_ENV
+           echo "RESOURCE_AWS_ACCESS_KEY_ID=${{ inputs.resource-access-key }}" >> $GITHUB_ENV
+           echo "RESOURCE_AWS_SECRET_ACCESS_KEY=${{ inputs.resource-secret-key }}" >> $GITHUB_ENV
+           echo "RESOURCE_AWS_DEFAULT_REGION=${{ inputs.resource-default-region }}" >> $GITHUB_ENV
+           echo "RESOURCE_AWS_ACCOUNT_ID=${{ inputs.resource-account-id }}" >> $GITHUB_ENV
            echo "INF_LOGZIO_TOKEN=${{ inputs.inf-logzio-token }}" >> $GITHUB_ENV
            echo "TWILIO_SID=${{ inputs.twilio-sid }}" >> $GITHUB_ENV
            echo "TWILIO_TOKEN=${{ inputs.twilio-token }}" >> $GITHUB_ENV
@@ -193,20 +212,41 @@ runs:
 
     - name: Define variables depends on env
       run: |
-           echo "RDS_INSTANCE_NAME=${{ env.TEMPENV_VERSION }}-tabula" >> $GITHUB_ENV
-           echo "ELB_NAME=${{ env.TEMPENV_VERSION }}-elb-tabula" >> $GITHUB_ENV
-           echo "RESOURCES_DEFAULT_REGION=${{ env.AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
-           echo "DB_DEFAULT_PASSWORD=${{ env.SANDBOX_DB_PASSWORD }}" >> $GITHUB_ENV
-           echo "DB_READ_PASSWORD=${{ env.SANDBOX_DB_PASSWORD }}" >> $GITHUB_ENV
-           echo "DB_REP_PASSWORD=${{ env.SANDBOX_DB_PASSWORD }}" >> $GITHUB_ENV
-           echo "DB_DEFAULT_USER=${{ env.SANDBOX_DB_USER }}" >> $GITHUB_ENV
-           echo "DB_READ_USER=${{ env.SANDBOX_DB_USER }}" >> $GITHUB_ENV
-           echo "DB_REP_USER=${{ env.SANDBOX_DB_USER }}" >> $GITHUB_ENV
-           echo "DB_DEFAULT_DATABASE=${{ env.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
-           echo "DB_READ_DATABASE=${{ env.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
-           echo "DB_REP_DATABASE=${{ env.SANDBOX_DB_DATABASE }}" >> $GITHUB_ENV
-           echo "TAB_FRONTEND_URL=https://tabula-frontend-sandbox-aws-us-east-1.s3.amazonaws.com" >> $GITHUB_ENV
-           echo "Deploy to ${{ env.TEMPENV_VERSION }}"
+        echo "RDS_INSTANCE_NAME=${{ env.TEMPENV_VERSION }}-tabula" >> $GITHUB_ENV
+        echo "ELB_NAME=${{ env.TEMPENV_VERSION }}-elb-tabula" >> $GITHUB_ENV
+        echo "RESOURCES_DEFAULT_REGION=${{ env.AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
+        echo "DB_DEFAULT_PASSWORD=${{ env.SANDBOX_DB_PASSWORD }}" >> $GITHUB_ENV
+        echo "DB_READ_PASSWORD=${{ env.SANDBOX_DB_PASSWORD }}" >> $GITHUB_ENV
+        echo "DB_REP_PASSWORD=${{ env.SANDBOX_DB_PASSWORD }}" >> $GITHUB_ENV
+        echo "DB_DEFAULT_USER=${{ env.SANDBOX_DB_USER }}" >> $GITHUB_ENV
+        echo "DB_READ_USER=${{ env.SANDBOX_DB_USER }}" >> $GITHUB_ENV
+        echo "DB_REP_USER=${{ env.SANDBOX_DB_USER }}" >> $GITHUB_ENV
+        echo "TAB_FRONTEND_URL=https://tabula-frontend-sandbox-aws-us-east-1.s3.amazonaws.com" >> $GITHUB_ENV
+        echo "Deploy to ${{ env.TEMPENV_VERSION }}"
+        if [[ "${{ env.TEMPENV_VERSION }}" == prep-02* ]] || [[ "${{ env.TEMPENV_VERSION }}" == 'sandbox' ]] || [[ "${{ env.TEMPENV_VERSION }}" == 'prodution' ]]; then
+          echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
+          echo "DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
+          echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
+          echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier ${{ env.TEMPENV_VERSION }}-tabula --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
+          echo "Deploy to static envs"
+        elif [[ "${{ env.TEMPENV_VERSION }}" == testenv-e2e-2* ]] || [[ "${{ env.TEMPENV_VERSION }}" == e2e-* ]]; then
+          echo "DB_A_DEFAULT_DATABASE=${{ env.TEMPENV_VERSION }}-${{ inputs.db-database }}" >> $GITHUB_ENV
+          echo "DB_READ_DATABASE=${{ env.TEMPENV_VERSION }}-${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
+          echo "DB_REP_DATABASE=${{ env.TEMPENV_VERSION }}-${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
+          echo "RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com" >> $GITHUB_ENV
+          echo "Deploy to tempenvs "
+        else
+          echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
+          echo "DB_READ_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
+          echo "DB_REP_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
+          echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier ${{ env.TEMPENV_VERSION }}-tabula --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
+          echo "Deploy to nowhere "
+        fi
+      shell: bash
+
+    - name: DEBUG
+      run: |
+        echo "${{ env.DB_A_DEFAULT_DATABASE }}-"
       shell: bash
 
     - name: Define environment bucket depends on env
@@ -223,17 +263,25 @@ runs:
         fi
       shell: bash
 
+    - name: docker get-login-password
+      run: |
+        aws ecr get-login-password --region ${{ env.AWS_DEFAULT_REGION }} | docker login --username AWS --password-stdin 557734652023.dkr.ecr.${{ env.AWS_DEFAULT_REGION }}.amazonaws.com
+        sudo mkdir -p /github/home/.docker
+        sudo cp /home/runner/.docker/config.json /github/home/.docker/config.json.
+      shell: bash
+
+
     - name: "Create Docker image and push it to ECR repository"
       uses: "kciter/aws-ecr-action@v4"
       with:
-        access_key_id: "${{ env.AWS_ACCESS_KEY_ID }}"
-        secret_access_key: "${{ env.AWS_SECRET_ACCESS_KEY }}"
-        account_id: "${{ env.RESOURCES_AWS_ACCOUNT_ID }}"
-        create_repo: 'false'
+        access_key_id: "${{ env.RESOURCE_AWS_ACCESS_KEY_ID }}"
+        secret_access_key: "${{ env.RESOURCE_AWS_SECRET_ACCESS_KEY }}"
+        account_id: "${{ env.RESOURCE_AWS_ACCOUNT_ID }}"
+        create_repo: 'true'
         dockerfile: Dockerfile.deploy
         extra_build_args: ''
         path: ${{ inputs.docker-path }}
-        region: "${{ env.AWS_DEFAULT_REGION }}"
+        region: "${{ env.RESOURCE_AWS_DEFAULT_REGION }}"
         repo: "${{ env.ENVIRONMENT }}/tabula"
         tags: "latest,${{ github.sha }}"
 
@@ -257,28 +305,28 @@ runs:
       run: echo "WORKER_LIST_IPS=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=${{ env.TEMPENV_VERSION }}-Webserver-*" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' | jq -r '.| .[] |.[]|.[]' | grep -v null | paste -sd, -)" >> $GITHUB_ENV
       shell: bash
 
-    - name: Get RDS instance endpoint
-      run: echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier $RDS_INSTANCE_NAME --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')" >> $GITHUB_ENV
-      shell: bash
+    # - name: Get RDS instance endpoint
+    #   run: echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier $RDS_INSTANCE_NAME --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
+    #   shell: bash
 
-    - name: Define variables for DB for static envs
-      if: ${{ startsWith(inputs.tempenv-version, 'prep-02') || startsWith(inputs.tempenv-version, 'sandbox') || startsWith(inputs.tempenv-version, 'production') }}
-      run: |
-           echo "DB_DEFAULT_DATABASE=${{ env.DB_DEFAULT_DATABASE }}" >> $GITHUB_ENV
-           echo "DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
-           echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
-           echo "Deploy to static envs"
-      shell: bash
+    # - name: Define variables for DB for static envs
+    #   if: ${{ startsWith(inputs.tempenv-version, 'prep-02') || startsWith(inputs.tempenv-version, 'sandbox') || startsWith(inputs.tempenv-version, 'production') }}
+    #   run: |
+    #        echo "DB_DEFAULT_DATABASE=${{ env.DB_DEFAULT_DATABASE }}" >> $GITHUB_ENV
+    #        echo "DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
+    #        echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
+    #        echo "Deploy to static envs"
+    #   shell: bash
 
-    - name: Define variables for DB for tempenvs
-      if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') }}
-      run: |
-           echo "DB_DEFAULT_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_DEFAULT_DATABASE }}" >> $GITHUB_ENV
-           echo "DB_READ_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
-           echo "DB_REP_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
-           echo "RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com" >> $GITHUB_ENV
-           echo "Deploy to tempenvs "
-      shell: bash
+    # - name: Define variables for DB for tempenvs
+    #   if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') }}
+    #   run: |
+    #        echo "DB_DEFAULT_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_DEFAULT_DATABASE }}" >> $GITHUB_ENV
+    #        echo "DB_READ_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
+    #        echo "DB_REP_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
+    #        echo "RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com" >> $GITHUB_ENV
+    #        echo "Deploy to tempenvs "
+    #   shell: bash
 
 ####################
     - name: Setup create_db.php file
@@ -290,7 +338,7 @@ runs:
         variables: |
           DB_DEFAULT_PASSWORD=${{ env.DB_DEFAULT_PASSWORD }}
           DB_DEFAULT_USER=${{ env.DB_DEFAULT_USER }}
-          DB_DEFAULT_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_DEFAULT_DATABASE }}
+          DB_DEFAULT_DATABASE=${{ env.DB_A_DEFAULT_DATABASE }}
           RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com
 
     - name: Setup delete_db.php file
@@ -302,7 +350,7 @@ runs:
         variables: |
           DB_DEFAULT_PASSWORD=${{ env.DB_DEFAULT_PASSWORD }}
           DB_DEFAULT_USER=${{ env.DB_DEFAULT_USER }}
-          DB_DEFAULT_DATABASE=${{ env.ENV_NAME }}-${{ env.DB_DEFAULT_DATABASE }}
+          DB_DEFAULT_DATABASE=${{ env.DB_A_DEFAULT_DATABASE }}
           RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com
 
     - name: Setup env file
@@ -319,9 +367,9 @@ runs:
           DB_DEFAULT_USER=${{ env.DB_DEFAULT_USER }}
           DB_READ_USER=${{ env.DB_READ_USER }}
           DB_REP_USER=${{ env.DB_REP_USER }}
-          DB_DEFAULT_DATABASE=${{ env.DB_DEFAULT_DATABASE }}
-          DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}
-          DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}
+          DB_DEFAULT_DATABASE=${{ env.DB_A_DEFAULT_DATABASE }}
+          DB_READ_DATABASE=${{ env.DB_A_DEFAULT_DATABASE }}
+          DB_REP_DATABASE=${{ env.DB_A_DEFAULT_DATABASE }}
           INF_LOGZIO_TOKEN=${{ env.INF_LOGZIO_TOKEN }}
           ELB_DNS=tabula-${{ env.ENV_NAME }}-aws.escribers.io
           RDS_ENDPOINT=${{ env.RDS_ENDPOINT }}
@@ -343,7 +391,7 @@ runs:
           DOE_GOOGLE_SPREADSHEET_AR=${{ env.DOE_GOOGLE_SPREADSHEET_AR }}
           DOE_GOOGLE_SPREADSHEET_OA=${{ env.DOE_GOOGLE_SPREADSHEET_OA }}
           FRONTEND_URL=${{ env.TAB_FRONTEND_URL }}
-          AWS_ACCOUNT_ID=${{ env.RESOURCES_AWS_ACCOUNT_ID }}
+          AWS_ACCOUNT_ID=${{ env.AWS_ACCOUNT_ID }}
           ENV_NAME=${{ env.ENV_NAME }}
 
 
@@ -364,37 +412,55 @@ runs:
         limit: -1
 
     - name: Execute Deploy Command №1
-      uses: eScribers/workflow-actions-public/execute-deploy@master
+      uses: eScribers/workflow-actions-public/execute-deploy@split-resources
       with:
         host_ip: ${{ steps.split.outputs._0 }}
         oleksb-key: ${{ inputs.oleksb-key }}
         access-key: ${{ env.AWS_ACCESS_KEY_ID }}
         secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-        account-id: ${{ env.RESOURCES_AWS_ACCOUNT_ID }}
+        account-id: ${{ env.RESOURCE_AWS_ACCOUNT_ID }}
         default-region: ${{ env.AWS_DEFAULT_REGION }}
         tempenv-version: ${{ env.ENV_NAME }}
-        token: ${{ inputs.token }}  
+        token: ${{ inputs.token }}
+        resource-access-key: ${{ env.RESOURCE_AWS_ACCESS_KEY_ID }}
+        resource-secret-key: ${{ env.RESOURCE_AWS_SECRET_ACCESS_KEY }}
         
     - name: Execute Deploy Command №2
-      uses: eScribers/workflow-actions-public/execute-deploy@master
+      uses: eScribers/workflow-actions-public/execute-deploy@split-resources
       with:
         host_ip: ${{ steps.split.outputs._1 }}
         oleksb-key: ${{ inputs.oleksb-key }}
         access-key: ${{ env.AWS_ACCESS_KEY_ID }}
         secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-        account-id: ${{ env.RESOURCES_AWS_ACCOUNT_ID }}
+        account-id: ${{ env.RESOURCE_AWS_ACCOUNT_ID }}
         default-region: ${{ env.AWS_DEFAULT_REGION }}
         tempenv-version: ${{ env.ENV_NAME }}
         token: ${{ inputs.token }}
+        resource-access-key: ${{ env.RESOURCE_AWS_ACCESS_KEY_ID }}
+        resource-secret-key: ${{ env.RESOURCE_AWS_SECRET_ACCESS_KEY }}
 
     - name: Execute Deploy Command №3
-      uses: eScribers/workflow-actions-public/execute-deploy@master
+      uses: eScribers/workflow-actions-public/execute-deploy@split-resources
       with:
         host_ip: ${{ steps.split.outputs._2 }}
         oleksb-key: ${{ inputs.oleksb-key }}
         access-key: ${{ env.AWS_ACCESS_KEY_ID }}
         secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-        account-id: ${{ env.RESOURCES_AWS_ACCOUNT_ID }}
+        account-id: ${{ env.RESOURCE_AWS_ACCOUNT_ID }}
+        default-region: ${{ env.AWS_DEFAULT_REGION }}
+        tempenv-version: ${{ env.ENV_NAME }}
+        token: ${{ inputs.token }}
+        resource-access-key: ${{ env.RESOURCE_AWS_ACCESS_KEY_ID }}
+        resource-secret-key: ${{ env.RESOURCE_AWS_SECRET_ACCESS_KEY }}
+
+    - name: Execute Migration Commands
+      uses: eScribers/workflow-actions-public/migrations@e2e-test-data
+      with:
+        host_ip: ${{ steps.split.outputs._0 }}
+        oleksb-key: ${{ inputs.oleksb-key }}
+        access-key: ${{ env.AWS_ACCESS_KEY_ID }}
+        secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        account-id: ${{ env.AWS_ACCOUNT_ID }}
         default-region: ${{ env.AWS_DEFAULT_REGION }}
         tempenv-version: ${{ env.ENV_NAME }}
         token: ${{ inputs.token }}
@@ -404,7 +470,7 @@ runs:
       if: ${{ inputs.tempenv-version != 'production' }}
       # if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') }}
       with:
-        host: ${{ env.WORKER_LIST_IPS }}
+        host: ${{ steps.split.outputs._0 }}
         username: ubuntu
         key: ${{ inputs.oleksb-key }}
         port: 22

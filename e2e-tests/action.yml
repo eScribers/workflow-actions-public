@@ -45,7 +45,7 @@ inputs:
 runs:
   using: "composite"
   steps: 
-    - name: Checkout devops infra repo
+    - name: Checkout tabula-automation-tests repo
       uses: actions/checkout@master
       with:
         repository: eScribers/tabula-automation-tests
@@ -97,7 +97,7 @@ runs:
         wget --no-verbose https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_101.0.4951.64-1_amd64.deb
         ls -l 
         sudo dpkg -i google-chrome-stable_101.0.4951.64-1_amd64.deb
-        sudo apt-get install -f
+        sudo apt-get install -fy
         google-chrome --version 
         chromedriver --version
       shell: bash
@@ -111,6 +111,7 @@ runs:
       run: |
         google-chrome --version 
         chromedriver --version
+        echo "MAKE PAUSE BEFORE DATA WILL BE CACHED"
         ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/Smoke.xml
       shell: bash
 
