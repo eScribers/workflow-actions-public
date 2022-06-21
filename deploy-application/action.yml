@@ -412,7 +412,7 @@ runs:
         limit: -1
 
     - name: Execute Deploy Command №1
-      uses: eScribers/workflow-actions-public/execute-deploy@split-resources
+      uses: eScribers/workflow-actions-public/execute-deploy@master
       with:
         host_ip: ${{ steps.split.outputs._0 }}
         oleksb-key: ${{ inputs.oleksb-key }}
@@ -426,7 +426,7 @@ runs:
         resource-secret-key: ${{ env.RESOURCE_AWS_SECRET_ACCESS_KEY }}
         
     - name: Execute Deploy Command №2
-      uses: eScribers/workflow-actions-public/execute-deploy@split-resources
+      uses: eScribers/workflow-actions-public/execute-deploy@master
       with:
         host_ip: ${{ steps.split.outputs._1 }}
         oleksb-key: ${{ inputs.oleksb-key }}
@@ -440,7 +440,7 @@ runs:
         resource-secret-key: ${{ env.RESOURCE_AWS_SECRET_ACCESS_KEY }}
 
     - name: Execute Deploy Command №3
-      uses: eScribers/workflow-actions-public/execute-deploy@split-resources
+      uses: eScribers/workflow-actions-public/execute-deploy@master
       with:
         host_ip: ${{ steps.split.outputs._2 }}
         oleksb-key: ${{ inputs.oleksb-key }}
@@ -468,7 +468,7 @@ runs:
         shell: bash
 
     - name: Execute Migration Commands
-      uses: eScribers/workflow-actions-public/migrations@e2e-test-data
+      uses: eScribers/workflow-actions-public/migrations@master
       with:
         host_ip: ${{ steps.split.outputs._0 }}
         oleksb-key: ${{ inputs.oleksb-key }}
