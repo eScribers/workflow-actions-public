@@ -88,7 +88,7 @@ runs:
 
     - name: Run migrations for e2e tests on prep-02
       uses: appleboy/ssh-action@master
-      if: ${{ startsWith(inputs.tempenv-version, 'prep-02') }}
+      if: ${{ startsWith(inputs.tempenv-version, 'prep-02') || "${{ env.TEMPENV_VERSION }}" == 'sandbox' }}
       env:
         AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.secret-key }}
