@@ -223,13 +223,13 @@ runs:
         echo "DB_REP_USER=${{ env.SANDBOX_DB_USER }}" >> $GITHUB_ENV
         echo "TAB_FRONTEND_URL=https://tabula-frontend-sandbox-aws-us-east-1.s3.amazonaws.com" >> $GITHUB_ENV
         echo "Deploy to ${{ env.TEMPENV_VERSION }}"
-        if [[ "${{ env.TEMPENV_VERSION }}" == prep-02* ]] || [[ "${{ env.TEMPENV_VERSION }}" == 'sandbox' ]] || [[ "${{ env.TEMPENV_VERSION }}" == 'prodution' ]]; then
+        if [[ "${{ env.TEMPENV_VERSION }}" == prep-02* ]] || [[ "${{ env.TEMPENV_VERSION }}" == 'prodution' ]]; then
           echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
           echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
           echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier ${{ env.TEMPENV_VERSION }}-tabula --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
           echo "Deploy to static envs"
-        elif [[ "${{ env.TEMPENV_VERSION }}" == testenv-e2e-2* ]] || [[ "${{ env.TEMPENV_VERSION }}" == e2e-* ]]; then
+        elif [[ "${{ env.TEMPENV_VERSION }}" == testenv-e2e-2* ]] || [[ "${{ env.TEMPENV_VERSION }}" == 'sandbox' ]] || [[ "${{ env.TEMPENV_VERSION }}" == e2e-* ]]; then
           echo "DB_A_DEFAULT_DATABASE=${{ env.TEMPENV_VERSION }}-${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_READ_DATABASE=${{ env.TEMPENV_VERSION }}-${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
           echo "DB_REP_DATABASE=${{ env.TEMPENV_VERSION }}-${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
@@ -453,18 +453,6 @@ runs:
         resource-access-key: ${{ env.RESOURCE_AWS_ACCESS_KEY_ID }}
         resource-secret-key: ${{ env.RESOURCE_AWS_SECRET_ACCESS_KEY }}
 
-    - name: Execute Migration Commands
-      uses: eScribers/workflow-actions-public/migrations@e2e-test-data
-      with:
-        host_ip: ${{ steps.split.outputs._0 }}
-        oleksb-key: ${{ inputs.oleksb-key }}
-        access-key: ${{ env.AWS_ACCESS_KEY_ID }}
-        secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-        account-id: ${{ env.AWS_ACCOUNT_ID }}
-        default-region: ${{ env.AWS_DEFAULT_REGION }}
-        tempenv-version: ${{ env.ENV_NAME }}
-        token: ${{ inputs.token }}
-
     - name: Add Demo User
       uses: appleboy/ssh-action@master
       if: ${{ inputs.tempenv-version != 'production' }}
@@ -478,6 +466,18 @@ runs:
           whoami
           sudo docker exec tabula_backend php index.php dbSetup createManager ${{ inputs.tabula-login }} ${{ inputs.tabula-password }} test.test.com "Test User Manager"
         shell: bash
+
+    - name: Execute Migration Commands
+      uses: eScribers/workflow-actions-public/migrations@e2e-test-data
+      with:
+        host_ip: ${{ steps.split.outputs._0 }}
+        oleksb-key: ${{ inputs.oleksb-key }}
+        access-key: ${{ env.AWS_ACCESS_KEY_ID }}
+        secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+        account-id: ${{ env.AWS_ACCOUNT_ID }}
+        default-region: ${{ env.AWS_DEFAULT_REGION }}
+        tempenv-version: ${{ env.ENV_NAME }}
+        token: ${{ inputs.token }}
 
 ####################
 ##### RUN TESTS  ####
