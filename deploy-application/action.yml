@@ -453,20 +453,6 @@ runs:
         resource-access-key: ${{ env.RESOURCE_AWS_ACCESS_KEY_ID }}
         resource-secret-key: ${{ env.RESOURCE_AWS_SECRET_ACCESS_KEY }}
 
-    - name: Add Demo User
-      uses: appleboy/ssh-action@master
-      if: ${{ inputs.tempenv-version != 'production' }}
-      # if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') }}
-      with:
-        host: ${{ steps.split.outputs._0 }}
-        username: ubuntu
-        key: ${{ inputs.oleksb-key }}
-        port: 22
-        script: |
-          whoami
-          sudo docker exec tabula_backend php index.php dbSetup createManager ${{ inputs.tabula-login }} ${{ inputs.tabula-password }} test.test.com "Test User Manager"
-        shell: bash
-
     - name: Execute Migration Commands
       uses: eScribers/workflow-actions-public/migrations@master
       with:
@@ -478,6 +464,8 @@ runs:
         default-region: ${{ env.AWS_DEFAULT_REGION }}
         tempenv-version: ${{ env.ENV_NAME }}
         token: ${{ inputs.token }}
+        tabula-login: ${{ inputs.tabula-login }}
+        tabula-password: ${{ inputs.tabula-password }}
 
 ####################
 ##### RUN TESTS  ####
