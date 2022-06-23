@@ -53,20 +53,6 @@ runs:
           sudo docker exec tabula_backend php create_db.php
         shell: bash
 
-    - name: Add Demo User
-      uses: appleboy/ssh-action@master
-      if: ${{ inputs.tempenv-version != 'production' }}
-      # if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') }}
-      with:
-        host: ${{ inputs.host_ip }}
-        username: ubuntu
-        key: ${{ inputs.oleksb-key }}
-        port: 22
-        script: |
-          whoami
-          sudo docker exec tabula_backend php index.php dbSetup createManager ${{ inputs.tabula-login }} ${{ inputs.tabula-password }} test.test.com "Test User Manager"
-        shell: bash
-
     - name: Run default migration
       uses: appleboy/ssh-action@master
       env:
@@ -82,6 +68,20 @@ runs:
         port: 22
         script: |
           sudo docker exec tabula_backend php index.php migrate
+        shell: bash
+
+    - name: Add Demo User
+      uses: appleboy/ssh-action@master
+      if: ${{ inputs.tempenv-version != 'production' }}
+      # if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') }}
+      with:
+        host: ${{ inputs.host_ip }}
+        username: ubuntu
+        key: ${{ inputs.oleksb-key }}
+        port: 22
+        script: |
+          whoami
+          sudo docker exec tabula_backend php index.php dbSetup createManager ${{ inputs.tabula-login }} ${{ inputs.tabula-password }} test.test.com "Test User Manager"
         shell: bash
 
     - name: Run migrations
