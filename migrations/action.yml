@@ -70,7 +70,6 @@ runs:
         port: 22
         script: |
           sudo docker exec tabula_backend php index.php migrate version 1
-          sudo docker exec tabula_backend php index.php migrate initdata
           sudo docker exec tabula_backend php index.php migrate devdata
           sudo docker exec tabula_backend php index.php migrate testdata
           sudo docker exec tabula_backend php index.php migrate
