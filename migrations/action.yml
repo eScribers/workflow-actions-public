@@ -77,7 +77,7 @@ runs:
 
     - name: Add Demo User
       uses: appleboy/ssh-action@master
-      if: ${{ inputs.tempenv-version != 'production' }}
+      if: ${{ inputs.tempenv-version != 'prod' }}
       # if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') }}
       with:
         host: ${{ inputs.host_ip }}
