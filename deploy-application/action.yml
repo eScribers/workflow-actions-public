@@ -121,6 +121,12 @@ inputs:
     description: 'Resource AWS Account ID for ECR  from secrets'
     required: true
     default: ""
+  tabula-url:
+    description: 'Full URL to the tabula'
+    default: ""
+  website-url:
+    description: 'URL to gateway.escribers.net'
+    default: ""
 
 runs:
   using: "composite"
@@ -163,6 +169,8 @@ runs:
            echo "DOE_GOOGLE_SPREADSHEET_AR=${{ inputs.doe-google-spreadsheet-ar }}" >> $GITHUB_ENV
            echo "DOE_GOOGLE_SPREADSHEET_OA=${{ inputs.doe-google-spreadsheet-oa }}" >> $GITHUB_ENV
            echo "ENV_NAME=${{ inputs.tempenv-version }}" >> $GITHUB_ENV
+           echo "TABULA_URL=${{ inputs.tabula-url }}" >> $GITHUB_ENV
+           echo "WEBSITE_URL=${{ inputs.website-url }}" >> $GITHUB_ENV
            echo "COOKIE_DOMAIN=escribers.io" >> $GITHUB_ENV
       shell: bash
 
@@ -393,7 +401,8 @@ runs:
           FRONTEND_URL=${{ env.TAB_FRONTEND_URL }}
           AWS_ACCOUNT_ID=${{ env.AWS_ACCOUNT_ID }}
           ENV_NAME=${{ env.ENV_NAME }}
-
+          TABULA_URL=${{ env.TABULA_URL }}
+          WEBSITE_URL=${{ env.WEBSITE_URL }}
 
 
 ####################
