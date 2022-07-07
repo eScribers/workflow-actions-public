@@ -310,7 +310,7 @@ runs:
       shell: bash
 
     - name: Get instances IPs
-      run: echo "WORKER_LIST_IPS=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=${{ env.TEMPENV_VERSION }}-Webserver-*" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' | jq -r '.| .[] |.[]|.[]' | grep -v null | paste -sd, -)" >> $GITHUB_ENV
+      run: echo "WORKER_LIST_IPS=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=ec2${{ env.TEMPENV_VERSION }}-Webserver-*" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' | jq -r '.| .[] |.[]|.[]' | grep -v null | paste -sd, -)" >> $GITHUB_ENV
       shell: bash
 
     # - name: Get RDS instance endpoint
