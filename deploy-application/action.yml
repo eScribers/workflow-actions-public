@@ -259,10 +259,10 @@ runs:
 
     - name: Define environment bucket depends on env
       run: |
-        if [[ "${{ env.TEMPENV_VERSION }}" != 'production' ]]; then
+        if [[ "${{ env.TEMPENV_VERSION }}" != 'prod' ]]; then
            echo "ENVIRONMENT_BUCKET=${{ env.TEMPENV_VERSION }}-" >> $GITHUB_ENV
            echo "Deploy to noPRODUCTION"
-        elif [[ "${{ env.TEMPENV_VERSION }}" == 'production' ]]; then
+        elif [[ "${{ env.TEMPENV_VERSION }}" == 'prod' ]]; then
            echo "ENVIRONMENT_BUCKET=" >> $GITHUB_ENV
            echo "Deploy to PRODUCTION"
         else
