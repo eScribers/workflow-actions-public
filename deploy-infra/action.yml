@@ -16,7 +16,9 @@ inputs:
   token:
     description: 'Token to github'
     required: true
-
+  git-reference:
+    description: 'Git reference from where it should be deployed'
+    default: "refs/heads/master"
 
 
 runs:
@@ -36,7 +38,7 @@ runs:
       uses: actions/checkout@v3
       with:
         repository: eScribers/DEVOPS
-        ref: refs/heads/master
+        ref: ${{ inputs.git-reference }}
         token: ${{ inputs.token }}
 
 
