@@ -463,7 +463,7 @@ runs:
         resource-secret-key: ${{ env.RESOURCE_AWS_SECRET_ACCESS_KEY }}
 
     - name: Execute Migration Commands
-      uses: eScribers/workflow-actions-public/migrations@master
+      uses: eScribers/workflow-actions-public/migrations@switch-to-env-name-with-minus
       with:
         host_ip: ${{ steps.split.outputs._0 }}
         oleksb-key: ${{ inputs.oleksb-key }}
@@ -475,24 +475,6 @@ runs:
         token: ${{ inputs.token }}
         tabula-login: ${{ inputs.tabula-login }}
         tabula-password: ${{ inputs.tabula-password }}
-
-####################
-##### RUN TESTS  ####
-####################
-    # - name: Run tests
-    #   uses: eScribers/workflow-actions-public/e2e-tests@master
-    #   with:
-    #     backend-url: "https://${{ env.ELB_DNS }}"
-    #     tabula-login: ${{ inputs.tabula-login }}
-    #     tabula-password: ${{ inputs.tabula-password }}
-    #     access-key: ${{ env.AWS_ACCESS_KEY_ID }}
-    #     secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-    #     token: ${{ inputs.token }}
-    #     sender-email-address: ${{ inputs.sender-email-address }} #${{ secrets.SENDER_EMAIL_ADDRESS }}
-    #     sender-email-password: ${{ inputs.sender-email-password }} #${{ secrets.SENDER_EMAIL_PASSWORD }}
-    #     pr-number: ${{ inputs.pr-number }}
-    #     project-repo: ${{ inputs.project-repo }}
-    #     action-id: ${{ inputs.action-id }}
 
 ####################  
 
