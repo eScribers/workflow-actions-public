@@ -36,7 +36,7 @@ runs:
 
     - name: Recreate DB
       uses: appleboy/ssh-action@master
-      if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') }}
+      if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, '-e2e-') }}
       env:
         AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.secret-key }}
@@ -55,7 +55,7 @@ runs:
 
     - name: Run migrations
       uses: appleboy/ssh-action@master
-      if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') || startsWith(inputs.tempenv-version, 'sandbox') }}
+      if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, '-e2e-') || startsWith(inputs.tempenv-version, '-sandbox') }}
       env:
         AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.secret-key }}
@@ -91,7 +91,7 @@ runs:
 
     - name: Run migrations for e2e tests on prep-02
       uses: appleboy/ssh-action@master
-      if: ${{ startsWith(inputs.tempenv-version, 'prep-02') || startsWith(inputs.tempenv-version, 'sandbox') }}
+      if: ${{ startsWith(inputs.tempenv-version, '-prep-02') || startsWith(inputs.tempenv-version, '-sandbox') }}
       env:
         AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.secret-key }}
