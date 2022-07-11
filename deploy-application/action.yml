@@ -237,7 +237,7 @@ runs:
           echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
           echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier tabula${{ env.TEMPENV_VERSION }} --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
           echo "Deploy to static envs"
-        elif [[ "${{ env.TEMPENV_VERSION }}" == '-testenv-e2e-2*' ]] || [[ "${{ env.TEMPENV_VERSION }}" == '-sandbox' ]] || [[ "${{ env.TEMPENV_VERSION }}" == e2e-* ]]; then
+        elif [[ "${{ env.TEMPENV_VERSION }}" == '-testenv-e2e-2*' ]] || [[ "${{ env.TEMPENV_VERSION }}" == '-sandbox' ]] || [[ "${{ env.TEMPENV_VERSION }}" == -e2e-* ]]; then
           echo "DB_A_DEFAULT_DATABASE=${{ env.TEMPENV_VERSION }}-${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_READ_DATABASE=${{ env.TEMPENV_VERSION }}-${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
           echo "DB_REP_DATABASE=${{ env.TEMPENV_VERSION }}-${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
