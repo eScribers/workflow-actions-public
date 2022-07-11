@@ -310,7 +310,7 @@ runs:
         extra_build_args: ''
         path: ${{ inputs.docker-path }}
         region: "${{ env.RESOURCE_AWS_DEFAULT_REGION }}"
-        repo: "ecr-${{ env.ENVIRONMENT }}/tabula"
+        repo: "ecr${{ env.ENVIRONMENT }}/tabula"
         tags: "latest,${{ github.sha }}"
 
     - name: Install OpenVPN
