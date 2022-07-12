@@ -232,19 +232,19 @@ runs:
         echo "TAB_FRONTEND_URL=https://tabula-frontend-sandbox-aws-us-east-1.s3.amazonaws.com" >> $GITHUB_ENV
         echo "Deploy to ${{ env.TEMPENV_VERSION }}"
         if [[ "${{ env.TEMPENV_VERSION }}" == '-prep-02*' ]] || [[ "${{ env.TEMPENV_VERSION }}" == '-prod' ]]; then
-          echo "DB_A_DEFAULT_DATABASE=db${{ inputs.db-database }}" >> $GITHUB_ENV
+          echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
           echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
           echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier tabula${{ env.TEMPENV_VERSION }} --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
           echo "Deploy to static envs"
         elif [[ "${{ env.TEMPENV_VERSION }}" == '-testenv-e2e-2*' ]] || [[ "${{ env.TEMPENV_VERSION }}" == '-sandbox' ]] || [[ "${{ env.TEMPENV_VERSION }}" == -e2e-* ]]; then
-          echo "DB_A_DEFAULT_DATABASE=db${{ env.TEMPENV_VERSION }}-${{ inputs.db-database }}" >> $GITHUB_ENV
+          echo "DB_A_DEFAULT_DATABASE=${{ env.TEMPENV_VERSION }}-${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_READ_DATABASE=${{ env.TEMPENV_VERSION }}-${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
           echo "DB_REP_DATABASE=${{ env.TEMPENV_VERSION }}-${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
           echo "RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com" >> $GITHUB_ENV
           echo "Deploy to tempenvs "
         else
-          echo "DB_A_DEFAULT_DATABASE=db${{ inputs.db-database }}" >> $GITHUB_ENV
+          echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_READ_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_REP_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier tabula-${{ env.TEMPENV_VERSION }} --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
