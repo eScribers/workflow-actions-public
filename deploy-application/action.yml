@@ -265,7 +265,7 @@ runs:
       run: |
         echo "${{ env.DB_A_DEFAULT_DATABASE }}-"
       shell: bash
-# Keep -prod before migration
+# Keep -prod before migration. MIGRATION
     - name: Define environment bucket depends on env
       run: |
         if [[ "${{ env.ENV_NAME }}" != '-prod' ]]; then
