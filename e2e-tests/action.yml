@@ -41,6 +41,12 @@ inputs:
   token:
     description: 'Token to github'
     required: true
+  pr-title:
+    description: 'PR Title'
+    required: false
+  pr-creator:
+    description: 'PR Author'
+    required: false
 
 runs:
   using: "composite"
@@ -74,6 +80,8 @@ runs:
           PR_NUMBER=${{ inputs.pr-number }}
           PROJECT_REPO=${{ inputs.project-repo }}
           ACTION_ID=${{ inputs.action-id }}
+          PR_TITLE=${{ inputs.pr-title }}
+          PR_AUTHOR=${{ inputs.pr-creator }}
 
     - name: Show Authentication.xml
       run: |
