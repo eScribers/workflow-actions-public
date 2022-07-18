@@ -26,7 +26,7 @@ runs:
   steps: 
     - name: Define variables 
       run: |
-           echo "TEMPENV_VERSION=${{ inputs.tempenv-version }}" >> $GITHUB_ENV
+           echo "TEMPENV_VERSION=${{ inputs.tempenv-version }}" | sed -e 's/^-e2e/e2e/g' >> $GITHUB_ENV
            echo "AWS_ACCESS_KEY_ID=${{ inputs.access-key }}" >> $GITHUB_ENV
            echo "AWS_SECRET_ACCESS_KEY=${{ inputs.secret-key }}" >> $GITHUB_ENV
            echo "AWS_DEFAULT_REGION=${{ inputs.default-region }}" >> $GITHUB_ENV
