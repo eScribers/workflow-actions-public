@@ -52,7 +52,7 @@ runs:
   using: "composite"
   steps: 
     - name: Checkout tabula-automation-tests repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v2
       with:
         repository: eScribers/tabula-automation-tests
         ref: ${{ inputs.git-reference }}
