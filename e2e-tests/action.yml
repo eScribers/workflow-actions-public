@@ -86,6 +86,8 @@ runs:
     - name: Show Authentication.xml
       run: |
         cat ./common/TestSuites/SmokeE2E/Smoke.xml
+        echo ============
+        cat ./Automation.Tests/Authentication/Login.cs
       shell: bash
 
     - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
