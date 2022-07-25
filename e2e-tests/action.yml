@@ -65,11 +65,29 @@ runs:
            echo "TABULA_PASSWORD=${{ inputs.tabula-password }}" >> $GITHUB_ENV
       shell: bash
 
-    - name: Setup env file
+    - name: Setup Smoke.xml file
       uses: cuchi/jinja2-action@v1.2.0
       with:
         template: ./common/TestSuites/SmokeE2E/Smoke.xml.j2
         output_file: ./common/TestSuites/SmokeE2E/Smoke.xml
+        strict: true
+        variables: |
+          BACKEND_URL=${{ env.BACKEND_URL }}
+          TABULA_LOGIN=${{ env.TABULA_LOGIN }}
+          TABULA_PASSWORD=${{ env.TABULA_PASSWORD }}
+          SENDER_EMAIL_ADDRESS=${{ inputs.sender-email-address }}
+          SENDER_EMAIL_PASSWORD=${{ inputs.sender-email-password }}
+          PR_NUMBER=${{ inputs.pr-number }}
+          PROJECT_REPO=${{ inputs.project-repo }}
+          ACTION_ID=${{ inputs.action-id }}
+          PR_TITLE=${{ inputs.pr-title }}
+          PR_AUTHOR=${{ inputs.pr-creator }}
+
+    - name: Setup Smoke.xml file
+      uses: cuchi/jinja2-action@v1.2.0
+      with:
+        template: ./common/TestSuites/SmokeE2E/Login.xml.j2
+        output_file: ./common/TestSuites/SmokeE2E/Login.xml
         strict: true
         variables: |
           BACKEND_URL=${{ env.BACKEND_URL }}
@@ -117,11 +135,17 @@ runs:
         dotnet build 
       shell: bash
 
+    - name: Execute prelogin
+      run: |
+        google-chrome --version
+        chromedriver --version
+        ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/Login.xml
+      shell: bash
+
     - name: Run tests
       run: |
         google-chrome --version 
         chromedriver --version
-        echo "MAKE PAUSE BEFORE DATA WILL BE CACHED"
         ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/Smoke.xml
       shell: bash
 
