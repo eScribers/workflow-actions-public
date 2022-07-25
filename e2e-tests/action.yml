@@ -140,17 +140,19 @@ runs:
         ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/Login.xml
       shell: bash
 
-    - name: Sleep for 600 seconds
-      if: always()
-      run: sleep 600s
-      shell: bash
-
     - name: Run tests
-      if: always()
-      run: |
-        ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/Smoke.xml
-      shell: bash
+      uses: nick-fields/retry@v2
+      with:
+        timeout_minutes: 20
+        max_attempts: 3
+        shell: bash
+        command: ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/Smoke.xml
 
+    # - name: Run tests
+    #   if: always()
+    #   run: |
+    #     ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/Smoke.xml
+    #   shell: bash
 
     - name: Add credentials to Amazon 
       uses: "aws-actions/configure-aws-credentials@v1"
