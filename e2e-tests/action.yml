@@ -140,6 +140,10 @@ runs:
         ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/Login.xml
       shell: bash
 
+    - name: Sleep for 600 seconds
+      run: sleep 600s
+      shell: bash
+
     - name: Run tests
       if: always()
       run: |
