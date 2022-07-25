@@ -137,7 +137,7 @@ runs:
 
     - name: Execute prelogin
       run: |
-        ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/Login.xml
+        ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/Login.xml | true
       shell: bash
 
     - name: Sleep for 600 seconds
