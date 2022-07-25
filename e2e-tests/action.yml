@@ -141,6 +141,7 @@ runs:
       shell: bash
 
     - name: Sleep for 600 seconds
+      if: always()
       run: sleep 600s
       shell: bash
 
