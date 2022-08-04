@@ -61,7 +61,7 @@ runs:
 
     - name: Create DynamoDB lock table
       run: |
-        aws dynamodb create-table --table-name lock-dynamo$ENV_NAME-terraform-state \
+        aws dynamodb create-table --table-name lock-dynamo${{ env.TEMPENV_VERSION }}-terraform-state \
           --attribute-definitions \
             AttributeName=LockID,AttributeType=S \
           --provisioned-throughput \
@@ -80,8 +80,8 @@ runs:
         max_attempts: 2
         shell: bash
         command: |
-          terraform -chdir=./infrastructure init -backend-config="bucket=escribers-infra-tempenv-terraform-state" -backend-config="key=$TEMPENV_VERSION.tfstate" -backend-config="dynamodb_table=lock-dynamo$ENV_NAME-terraform-state"
-          terraform -chdir=./infrastructure apply -auto-approve 
+          terraform -chdir=./infrastructure init -backend-config="bucket=escribers-infra-tempenv-terraform-state" -backend-config="key=${{ env.TEMPENV_VERSION }}.tfstate" -backend-config="dynamodb_table=lock-dynamo${{ env.TEMPENV_VERSION }}-terraform-state"
+          terraform -chdir=./infrastructure apply -auto-approve -var 'aws_region=${{ env.AWS_DEFAULT_REGION }}' -var 'env_name=${{ env.TEMPENV_VERSION }}' -var 'aws_access_key=${{ env.AWS_ACCESS_KEY_ID }}' -var 'aws_secret_key=${{ env.AWS_SECRET_ACCESS_KEY }}'
           echo "VPN_SERVER_PRIVATE_IP=$(cat infrastructure/private_ip)" >> $GITHUB_ENV
           echo "VPN_SERVER_PUBLIC_IP=$(cat infrastructure/public_ip)" >> $GITHUB_ENV
       env:
@@ -90,9 +90,6 @@ runs:
         AWS_DEFAULT_REGION: "${{ env.AWS_DEFAULT_REGION }}"    
         TF_VAR_aws_region: "${{ env.AWS_DEFAULT_REGION }}" 
         TF_VAR_env_name: "${{ env.TEMPENV_VERSION }}"
-        TF_VAR_do_migration: "false"
-        TF_VAR_deletion_protection: "false"
-        TF_VAR_instance_count: "3"
         TEMPENV_VERSION: "${{ env.TEMPENV_VERSION }}"
 
 
