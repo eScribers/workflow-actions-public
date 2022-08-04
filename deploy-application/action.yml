@@ -140,8 +140,6 @@ runs:
 
     - name: Define variables 
       run: |
-           echo "TEMPENV_VERSION=${{ inputs.tempenv-version }}" >> $GITHUB_ENV
-           echo "ENVIRONMENT=${{ inputs.tempenv-version }}" >> $GITHUB_ENV
            echo "SANDBOX_DB_PASSWORD=${{ inputs.db-password }}" >> $GITHUB_ENV
            echo "SANDBOX_DB_USER=${{ inputs.db-user }}" >> $GITHUB_ENV
            echo "SANDBOX_DB_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
@@ -218,10 +216,21 @@ runs:
         aws-region: "${{ env.AWS_DEFAULT_REGION }}"
         aws-secret-access-key: "${{ env.AWS_SECRET_ACCESS_KEY }}"
 
+    - name: Define empty pron variable
+      run: |
+        if [[ "${{ env.ENV_NAME }}" == '-prod' ]]; then
+          echo "ENVIRONMENT_PREFIX=" >> $GITHUB_ENV
+          echo "Deploy to PROD"
+        else
+          echo "ENVIRONMENT_PREFIX=${{ env.ENV_NAME }}" >> $GITHUB_ENV
+          echo "Deploy to nowhere "
+        fi
+      shell: bash
+
     - name: Define variables depends on env
       run: |
-        echo "RDS_INSTANCE_NAME=${{ env.TEMPENV_VERSION }}-tabula" >> $GITHUB_ENV
-        echo "ELB_NAME=${{ env.TEMPENV_VERSION }}-elb-tabula" >> $GITHUB_ENV
+        echo "RDS_INSTANCE_NAME=${{ env.ENVIRONMENT_PREFIX }}-tabula" >> $GITHUB_ENV
+        echo "ELB_NAME=elb${{ env.ENVIRONMENT_PREFIX }}-elb-tabula" >> $GITHUB_ENV
         echo "RESOURCES_DEFAULT_REGION=${{ env.AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
         echo "DB_DEFAULT_PASSWORD=${{ env.SANDBOX_DB_PASSWORD }}" >> $GITHUB_ENV
         echo "DB_READ_PASSWORD=${{ env.SANDBOX_DB_PASSWORD }}" >> $GITHUB_ENV
@@ -230,24 +239,30 @@ runs:
         echo "DB_READ_USER=${{ env.SANDBOX_DB_USER }}" >> $GITHUB_ENV
         echo "DB_REP_USER=${{ env.SANDBOX_DB_USER }}" >> $GITHUB_ENV
         echo "TAB_FRONTEND_URL=https://tabula-frontend-sandbox-aws-us-east-1.s3.amazonaws.com" >> $GITHUB_ENV
-        echo "Deploy to ${{ env.TEMPENV_VERSION }}"
-        if [[ "${{ env.TEMPENV_VERSION }}" == prep-02* ]] || [[ "${{ env.TEMPENV_VERSION }}" == 'prodution' ]]; then
+        echo "Deploy to ${{ env.ENV_NAME }}"
+        if [[ "${{ env.ENV_NAME }}" == '-prep-02' ]] || [[ "${{ env.ENV_NAME }}" == '-prod' ]]; then
           echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
           echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
-          echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier ${{ env.TEMPENV_VERSION }}-tabula --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
+          echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier tabula${{ env.ENV_NAME }} --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
           echo "Deploy to static envs"
-        elif [[ "${{ env.TEMPENV_VERSION }}" == testenv-e2e-2* ]] || [[ "${{ env.TEMPENV_VERSION }}" == 'sandbox' ]] || [[ "${{ env.TEMPENV_VERSION }}" == e2e-* ]]; then
-          echo "DB_A_DEFAULT_DATABASE=${{ env.TEMPENV_VERSION }}-${{ inputs.db-database }}" >> $GITHUB_ENV
-          echo "DB_READ_DATABASE=${{ env.TEMPENV_VERSION }}-${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
-          echo "DB_REP_DATABASE=${{ env.TEMPENV_VERSION }}-${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
+        elif [[ "${{ env.ENV_NAME }}" == '-testenv-e2e-2*' ]] || [[ "${{ env.ENV_NAME }}" == -e2e-* ]]; then
+          echo "DB_A_DEFAULT_DATABASE=${{ env.ENVIRONMENT_PREFIX }}-${{ inputs.db-database }}" >> $GITHUB_ENV
+          echo "DB_READ_DATABASE=${{ env.ENVIRONMENT_PREFIX }}-${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
+          echo "DB_REP_DATABASE=${{ env.ENVIRONMENT_PREFIX }}-${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
           echo "RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com" >> $GITHUB_ENV
+          echo "Deploy to tempenvs "
+        elif [[ "${{ env.ENV_NAME }}" == '-sandbox' ]]; then
+          echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
+          echo "DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
+          echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
+          echo "RDS_ENDPOINT=sandbox-tabula.cxasnj3we6wl.us-east-1.rds.amazonaws.com" >> $GITHUB_ENV
           echo "Deploy to tempenvs "
         else
           echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_READ_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_REP_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
-          echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier ${{ env.TEMPENV_VERSION }}-tabula --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
+          echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier tabula-${{ env.ENV_NAME }} --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
           echo "Deploy to nowhere "
         fi
       shell: bash
@@ -256,14 +271,14 @@ runs:
       run: |
         echo "${{ env.DB_A_DEFAULT_DATABASE }}-"
       shell: bash
-
+# Keep -prod before migration. MIGRATION
     - name: Define environment bucket depends on env
       run: |
-        if [[ "${{ env.TEMPENV_VERSION }}" != 'production' ]]; then
-           echo "ENVIRONMENT_BUCKET=${{ env.TEMPENV_VERSION }}-" >> $GITHUB_ENV
+        if [[ "${{ env.ENV_NAME }}" != '-prod' ]]; then
+           echo "ENVIRONMENT_BUCKET=${{ env.ENV_NAME }}" >> $GITHUB_ENV
            echo "Deploy to noPRODUCTION"
-        elif [[ "${{ env.TEMPENV_VERSION }}" == 'production' ]]; then
-           echo "ENVIRONMENT_BUCKET=" >> $GITHUB_ENV
+        elif [[ "${{ env.ENV_NAME }}" == '-prod' ]]; then
+           echo "ENVIRONMENT_BUCKET=-prod" >> $GITHUB_ENV
            echo "Deploy to PRODUCTION"
         else
            echo "Nothing to deploy"
@@ -310,19 +325,11 @@ runs:
         extra_build_args: ''
         path: ${{ inputs.docker-path }}
         region: "${{ env.RESOURCE_AWS_DEFAULT_REGION }}"
-        repo: "${{ env.ENVIRONMENT }}/tabula"
+        repo: "ecr${{ env.ENVIRONMENT_PREFIX }}/tabula"
         tags: "latest,${{ github.sha }}"
 
     - name: Install OpenVPN
       run: sudo apt-cache policy  openvpn && sudo apt-get --fix-missing --assume-yes --no-install-recommends install openvpn=2.4.7-1ubuntu2
-      shell: bash
-
-    - name: Connect VPN
-      run: sudo openvpn --config "client.ovpn" --daemon
-      shell: bash
-
-    - name: Wait for a VPN connection
-      run: until ping -c1 "${{ env.VPN_SERVER_PRIVATE_IP }}"; do sleep 2; done
       shell: bash
 
     - name: Get instancesIDs
@@ -330,7 +337,7 @@ runs:
       shell: bash
 
     - name: Get instances IPs
-      run: echo "WORKER_LIST_IPS=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=${{ env.TEMPENV_VERSION }}-Webserver-*" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' | jq -r '.| .[] |.[]|.[]' | grep -v null | paste -sd, -)" >> $GITHUB_ENV
+      run: echo "WORKER_LIST_IPS=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=ec2${{ env.ENV_NAME }}-Webserver-*" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' | jq -r '.| .[] |.[]|.[]' | grep -v null | paste -sd, -)" >> $GITHUB_ENV
       shell: bash
 
     # - name: Get RDS instance endpoint
@@ -399,7 +406,7 @@ runs:
           DB_READ_DATABASE=${{ env.DB_A_DEFAULT_DATABASE }}
           DB_REP_DATABASE=${{ env.DB_A_DEFAULT_DATABASE }}
           INF_LOGZIO_TOKEN=${{ env.INF_LOGZIO_TOKEN }}
-          ELB_DNS=tabula-${{ env.ENV_NAME }}-aws.escribers.io
+          ELB_DNS=tabula-${{ env.ENVIRONMENT_PREFIX }}-aws.escribers.io
           RDS_ENDPOINT=${{ env.RDS_ENDPOINT }}
           TWILIO_SID=${{ env.TWILIO_SID }}
           TWILIO_TOKEN=${{ env.TWILIO_TOKEN }}
@@ -421,6 +428,7 @@ runs:
           FRONTEND_URL=${{ env.TAB_FRONTEND_URL }}
           AWS_ACCOUNT_ID=${{ env.AWS_ACCOUNT_ID }}
           ENV_NAME=${{ env.ENV_NAME }}
+          ENVIRONMENT_PREFIX=${{ env.ENVIRONMENT_PREFIX }}
           TABULA_URL=${{ env.TABULA_URL }}
           WEBSITE_URL=${{ env.WEBSITE_URL }}
 
@@ -439,6 +447,14 @@ runs:
         string: "${{ env.WORKER_LIST_IPS }}"
         separator: ','
         limit: -1
+
+    - name: Connect VPN
+      run: sudo openvpn --config "client.ovpn" --daemon
+      shell: bash
+
+    - name: Wait for a VPN connection
+      run: until ping -c1 "${{ env.VPN_SERVER_PRIVATE_IP }}"; do sleep 2; done
+      shell: bash
 
     - name: Execute Deploy Command №1
       uses: eScribers/workflow-actions-public/execute-deploy@master
@@ -483,7 +499,7 @@ runs:
         resource-secret-key: ${{ env.RESOURCE_AWS_SECRET_ACCESS_KEY }}
 
     - name: Execute Migration Commands
-      uses: eScribers/workflow-actions-public/migrations@master
+      uses: eScribers/workflow-actions-public/migrations@switch-to-env-name-with-minus
       with:
         host_ip: ${{ steps.split.outputs._0 }}
         oleksb-key: ${{ inputs.oleksb-key }}
@@ -496,24 +512,6 @@ runs:
         tabula-login: ${{ inputs.tabula-login }}
         tabula-password: ${{ inputs.tabula-password }}
 
-####################
-##### RUN TESTS  ####
-####################
-    # - name: Run tests
-    #   uses: eScribers/workflow-actions-public/e2e-tests@master
-    #   with:
-    #     backend-url: "https://${{ env.ELB_DNS }}"
-    #     tabula-login: ${{ inputs.tabula-login }}
-    #     tabula-password: ${{ inputs.tabula-password }}
-    #     access-key: ${{ env.AWS_ACCESS_KEY_ID }}
-    #     secret-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-    #     token: ${{ inputs.token }}
-    #     sender-email-address: ${{ inputs.sender-email-address }} #${{ secrets.SENDER_EMAIL_ADDRESS }}
-    #     sender-email-password: ${{ inputs.sender-email-password }} #${{ secrets.SENDER_EMAIL_PASSWORD }}
-    #     pr-number: ${{ inputs.pr-number }}
-    #     project-repo: ${{ inputs.project-repo }}
-    #     action-id: ${{ inputs.action-id }}
-
 ####################  
 
     - name: Output credentials
@@ -522,13 +520,13 @@ runs:
         cat ./client.ovpn || true
         echo "=============================="
         echo "===Show URL profile==="
-        echo "tabula-${{ env.ENV_NAME }}-aws.escribers.io"
+        echo "tabula-${{ env.ENVIRONMENT_PREFIX }}.escribers.io"
         echo "=============================="
         echo "===Show Server IPs==="
         echo "$WORKER_LIST_IPS"
         echo "=============================="
       env:
-        ENV_NAME: "${{ env.ENV_NAME }}"
+        ENVIRONMENT_PREFIX: "${{ env.ENVIRONMENT_PREFIX }}"
         WORKER_LIST_IPS: "${{ env.WORKER_LIST_IPS }}"
       shell: bash
 
