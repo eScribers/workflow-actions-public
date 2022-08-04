@@ -332,14 +332,6 @@ runs:
       run: sudo apt-cache policy  openvpn && sudo apt-get --fix-missing --assume-yes --no-install-recommends install openvpn=2.4.7-1ubuntu2
       shell: bash
 
-    - name: Connect VPN
-      run: sudo openvpn --config "client.ovpn" --daemon
-      shell: bash
-
-    - name: Wait for a VPN connection
-      run: until ping -c1 "${{ env.VPN_SERVER_PRIVATE_IP }}"; do sleep 2; done
-      shell: bash
-
     - name: Get instancesIDs
       run: echo "WORKER_INSTANCE_IDs=$(aws elb describe-load-balancers --load-balancer-names $ELB_NAME --output json --query "LoadBalancerDescriptions[*].Instances[*].InstanceId" | jq -r '. | map(.[])| @csv' | tr -d '"')" >> $GITHUB_ENV
       shell: bash
@@ -455,6 +447,14 @@ runs:
         string: "${{ env.WORKER_LIST_IPS }}"
         separator: ','
         limit: -1
+
+    - name: Connect VPN
+      run: sudo openvpn --config "client.ovpn" --daemon
+      shell: bash
+
+    - name: Wait for a VPN connection
+      run: until ping -c1 "${{ env.VPN_SERVER_PRIVATE_IP }}"; do sleep 2; done
+      shell: bash
 
     - name: Execute Deploy Command №1
       uses: eScribers/workflow-actions-public/execute-deploy@master
