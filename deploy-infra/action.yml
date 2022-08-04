@@ -72,9 +72,14 @@ runs:
         TEMPENV_VERSION: "${{ env.TEMPENV_VERSION }}"
       shell: bash
 
+
     - name: Deploy infrastructure
-      # if: always()
-      run: |
+      uses: nick-fields/retry@v2
+      with:
+        timeout_minutes: 20
+        max_attempts: 2
+        shell: bash
+        command: |
         terraform -chdir=./infrastructure init -backend-config="bucket=escribers-infra-tempenv-terraform-state" -backend-config="key=$TEMPENV_VERSION.tfstate" -backend-config="dynamodb_table=lock-dynamo$ENV_NAME-terraform-state"
         terraform -chdir=./infrastructure apply -auto-approve 
         echo "VPN_SERVER_PRIVATE_IP=$(cat infrastructure/private_ip)" >> $GITHUB_ENV
@@ -89,7 +94,26 @@ runs:
         TF_VAR_deletion_protection: "false"
         TF_VAR_instance_count: "3"
         TEMPENV_VERSION: "${{ env.TEMPENV_VERSION }}"
-      shell: bash
+
+
+    # - name: Deploy infrastructure
+    #   # if: always()
+    #   run: |
+    #     terraform -chdir=./infrastructure init -backend-config="bucket=escribers-infra-tempenv-terraform-state" -backend-config="key=$TEMPENV_VERSION.tfstate" -backend-config="dynamodb_table=lock-dynamo$ENV_NAME-terraform-state"
+    #     terraform -chdir=./infrastructure apply -auto-approve 
+    #     echo "VPN_SERVER_PRIVATE_IP=$(cat infrastructure/private_ip)" >> $GITHUB_ENV
+    #     echo "VPN_SERVER_PUBLIC_IP=$(cat infrastructure/public_ip)" >> $GITHUB_ENV
+    #   env:
+    #     AWS_ACCESS_KEY_ID: "${{ env.AWS_ACCESS_KEY_ID }}"
+    #     AWS_SECRET_ACCESS_KEY: "${{ env.AWS_SECRET_ACCESS_KEY }}"
+    #     AWS_DEFAULT_REGION: "${{ env.AWS_DEFAULT_REGION }}"    
+    #     TF_VAR_aws_region: "${{ env.AWS_DEFAULT_REGION }}" 
+    #     TF_VAR_env_name: "${{ env.TEMPENV_VERSION }}"
+    #     TF_VAR_do_migration: "false"
+    #     TF_VAR_deletion_protection: "false"
+    #     TF_VAR_instance_count: "3"
+    #     TEMPENV_VERSION: "${{ env.TEMPENV_VERSION }}"
+    #   shell: bash
 
     - name: Define variables for VPN servers
       run: |
