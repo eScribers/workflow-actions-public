@@ -80,7 +80,7 @@ runs:
         max_attempts: 2
         shell: bash
         command: |
-          terraform -chdir=./infrastructure init -backend-config="bucket=escribers-infra-tempenv-terraform-state" -backend-config="key=${{ env.TEMPENV_VERSION }}.tfstate" -backend-config="dynamodb_table=lock-dynamo${{ env.TEMPENV_VERSION }}-terraform-state"
+          terraform -chdir=./infrastructure init -backend-config="bucket=escribers-infra-tempenv-terraform-state" -backend-config="key=state${{ env.TEMPENV_VERSION }}.tfstate" -backend-config="dynamodb_table=lock-dynamo${{ env.TEMPENV_VERSION }}-terraform-state"
           terraform -chdir=./infrastructure apply -auto-approve -var 'aws_region=${{ env.AWS_DEFAULT_REGION }}' -var 'env_name=${{ env.TEMPENV_VERSION }}' -var 'aws_access_key=${{ env.AWS_ACCESS_KEY_ID }}' -var 'aws_secret_key=${{ env.AWS_SECRET_ACCESS_KEY }}'
           echo "VPN_SERVER_PRIVATE_IP=$(cat infrastructure/private_ip)" >> $GITHUB_ENV
           echo "VPN_SERVER_PUBLIC_IP=$(cat infrastructure/public_ip)" >> $GITHUB_ENV
