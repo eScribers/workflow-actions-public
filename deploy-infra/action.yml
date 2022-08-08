@@ -46,7 +46,6 @@ runs:
     - name: Intall terraform
       run: |
         which terraform
-        sudo dpkg --list
         sudo rm /usr/local/bin/terraform
         curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
         sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
@@ -72,45 +71,26 @@ runs:
         TEMPENV_VERSION: "${{ env.TEMPENV_VERSION }}"
       shell: bash
 
-
+ # For some reason teraform not seeing spot instance in first run (even after pause). It should be running second time to refresh state and get information about spot resource 
     - name: Deploy infrastructure
-      uses: nick-fields/retry@v2
-      with:
-        timeout_minutes: 20
-        max_attempts: 2
-        shell: bash
-        command: |
-          terraform -chdir=./infrastructure init -backend-config="bucket=escribers-infra-tempenv-terraform-state" -backend-config="key=state${{ env.TEMPENV_VERSION }}.tfstate" -backend-config="dynamodb_table=lock-dynamo${{ env.TEMPENV_VERSION }}-terraform-state"
-          terraform -chdir=./infrastructure apply -auto-approve -var 'aws_region=${{ env.AWS_DEFAULT_REGION }}' -var 'env_name=${{ env.TEMPENV_VERSION }}' -var 'aws_access_key=${{ env.AWS_ACCESS_KEY_ID }}' -var 'aws_secret_key=${{ env.AWS_SECRET_ACCESS_KEY }}'
-          echo "VPN_SERVER_PRIVATE_IP=$(cat infrastructure/private_ip)" >> $GITHUB_ENV
-          echo "VPN_SERVER_PUBLIC_IP=$(cat infrastructure/public_ip)" >> $GITHUB_ENV
+      # if: always()
+      run: |
+        terraform -chdir=./infrastructure init -backend-config="bucket=escribers-infra-tempenv-terraform-state" -backend-config="key=state$TEMPENV_VERSION.tfstate" -backend-config="dynamodb_table=lock-dynamo$ENV_NAME-terraform-state"
+        terraform -chdir=./infrastructure apply -auto-approve || true
+        terraform -chdir=./infrastructure apply -auto-approve
+        echo "VPN_SERVER_PRIVATE_IP=$(cat infrastructure/private_ip)" >> $GITHUB_ENV
+        echo "VPN_SERVER_PUBLIC_IP=$(cat infrastructure/public_ip)" >> $GITHUB_ENV
       env:
         AWS_ACCESS_KEY_ID: "${{ env.AWS_ACCESS_KEY_ID }}"
         AWS_SECRET_ACCESS_KEY: "${{ env.AWS_SECRET_ACCESS_KEY }}"
         AWS_DEFAULT_REGION: "${{ env.AWS_DEFAULT_REGION }}"    
         TF_VAR_aws_region: "${{ env.AWS_DEFAULT_REGION }}" 
         TF_VAR_env_name: "${{ env.TEMPENV_VERSION }}"
+        TF_VAR_do_migration: "false"
+        TF_VAR_deletion_protection: "false"
+        TF_VAR_instance_count: "3"
         TEMPENV_VERSION: "${{ env.TEMPENV_VERSION }}"
-
-
-    # - name: Deploy infrastructure
-    #   # if: always()
-    #   run: |
-    #     terraform -chdir=./infrastructure init -backend-config="bucket=escribers-infra-tempenv-terraform-state" -backend-config="key=$TEMPENV_VERSION.tfstate" -backend-config="dynamodb_table=lock-dynamo$ENV_NAME-terraform-state"
-    #     terraform -chdir=./infrastructure apply -auto-approve 
-    #     echo "VPN_SERVER_PRIVATE_IP=$(cat infrastructure/private_ip)" >> $GITHUB_ENV
-    #     echo "VPN_SERVER_PUBLIC_IP=$(cat infrastructure/public_ip)" >> $GITHUB_ENV
-    #   env:
-    #     AWS_ACCESS_KEY_ID: "${{ env.AWS_ACCESS_KEY_ID }}"
-    #     AWS_SECRET_ACCESS_KEY: "${{ env.AWS_SECRET_ACCESS_KEY }}"
-    #     AWS_DEFAULT_REGION: "${{ env.AWS_DEFAULT_REGION }}"    
-    #     TF_VAR_aws_region: "${{ env.AWS_DEFAULT_REGION }}" 
-    #     TF_VAR_env_name: "${{ env.TEMPENV_VERSION }}"
-    #     TF_VAR_do_migration: "false"
-    #     TF_VAR_deletion_protection: "false"
-    #     TF_VAR_instance_count: "3"
-    #     TEMPENV_VERSION: "${{ env.TEMPENV_VERSION }}"
-    #   shell: bash
+      shell: bash
 
     - name: Define variables for VPN servers
       run: |
