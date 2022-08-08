@@ -499,7 +499,7 @@ runs:
         resource-secret-key: ${{ env.RESOURCE_AWS_SECRET_ACCESS_KEY }}
 
     - name: Execute Migration Commands
-      uses: eScribers/workflow-actions-public/migrations@switch-to-env-name-with-minus
+      uses: eScribers/workflow-actions-public/migrations@master
       with:
         host_ip: ${{ steps.split.outputs._0 }}
         oleksb-key: ${{ inputs.oleksb-key }}
