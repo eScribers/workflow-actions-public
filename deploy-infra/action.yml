@@ -92,12 +92,13 @@ runs:
     #     TF_VAR_env_name: "${{ env.TEMPENV_VERSION }}"
     #     TEMPENV_VERSION: "${{ env.TEMPENV_VERSION }}"
 
-
+ # For some reason teraform not seeing spot instance in first run (even after pause). It should be running second time to refresh state and get information about spot resource 
     - name: Deploy infrastructure
       # if: always()
       run: |
         terraform -chdir=./infrastructure init -backend-config="bucket=escribers-infra-tempenv-terraform-state" -backend-config="key=state$TEMPENV_VERSION.tfstate" -backend-config="dynamodb_table=lock-dynamo$ENV_NAME-terraform-state"
-        terraform -chdir=./infrastructure apply -auto-approve 
+        terraform -chdir=./infrastructure apply -auto-approve || true
+        terraform -chdir=./infrastructure apply -auto-approve
         echo "VPN_SERVER_PRIVATE_IP=$(cat infrastructure/private_ip)" >> $GITHUB_ENV
         echo "VPN_SERVER_PUBLIC_IP=$(cat infrastructure/public_ip)" >> $GITHUB_ENV
       env:
