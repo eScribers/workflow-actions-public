@@ -77,6 +77,7 @@ runs:
       run: |
         terraform -chdir=./infrastructure init -backend-config="bucket=escribers-infra-tempenv-terraform-state" -backend-config="key=state$TEMPENV_VERSION.tfstate" -backend-config="dynamodb_table=lock-dynamo-state$ENV_NAME-terraform-state"
         terraform -chdir=./infrastructure apply -auto-approve || true
+        sleep 30
         terraform -chdir=./infrastructure apply -auto-approve
         echo "VPN_SERVER_PRIVATE_IP=$(cat infrastructure/private_ip)" >> $GITHUB_ENV
         echo "VPN_SERVER_PUBLIC_IP=$(cat infrastructure/public_ip)" >> $GITHUB_ENV
