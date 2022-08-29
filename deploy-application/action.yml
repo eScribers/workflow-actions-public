@@ -246,7 +246,7 @@ runs:
           echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
           echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier tabula${{ env.ENV_NAME }} --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
           echo "Deploy to static envs"
-        elif [[ "${{ env.ENV_NAME }}" == '-testenv-e2e-2*' ]] || [[ "${{ env.ENV_NAME }}" == -e2e-* ]]; then
+        elif [[ "${{ env.ENV_NAME }}" == '-testenv-e2e-2' ]] || [[ "${{ env.ENV_NAME }}" == -e2e-* ]]; then
           echo "DB_A_DEFAULT_DATABASE=${{ env.ENVIRONMENT_PREFIX }}-${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_READ_DATABASE=${{ env.ENVIRONMENT_PREFIX }}-${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
           echo "DB_REP_DATABASE=${{ env.ENVIRONMENT_PREFIX }}-${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
