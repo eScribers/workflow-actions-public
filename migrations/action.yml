@@ -109,6 +109,7 @@ runs:
 
     - name: Run default migration
       uses: appleboy/ssh-action@master
+      if: ${{ inputs.tempenv-version != '-prod' }}
       env:
         AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.secret-key }}
