@@ -258,6 +258,12 @@ runs:
           echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
           echo "RDS_ENDPOINT=sandbox-tabula.cxasnj3we6wl.us-east-1.rds.amazonaws.com" >> $GITHUB_ENV
           echo "Deploy to tempenvs "
+        elif [[ "${{ env.ENV_NAME }}" == '-prod' ]]; then
+          echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
+          echo "DB_READ_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
+          echo "DB_REP_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
+          echo "RDS_ENDPOINT=tabula.clkejays2pxx.us-east-1.rds.amazonaws.com"  >> $GITHUB_ENV
+          echo "Deploy to Prod "
         else
           echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_READ_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
