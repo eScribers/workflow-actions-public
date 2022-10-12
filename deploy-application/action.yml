@@ -240,7 +240,7 @@ runs:
         echo "DB_REP_USER=${{ env.SANDBOX_DB_USER }}" >> $GITHUB_ENV
         echo "TAB_FRONTEND_URL=https://tabula-frontend-sandbox-aws-us-east-1.s3.amazonaws.com" >> $GITHUB_ENV
         echo "Deploy to ${{ env.ENV_NAME }}"
-        if [[ "${{ env.ENV_NAME }}" == '-prep-02' ]] || [[ "${{ env.ENV_NAME }}" == '-prod' ]]; then
+        if [[ "${{ env.ENV_NAME }}" == '-prep-02' ]]; then
           echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
           echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
