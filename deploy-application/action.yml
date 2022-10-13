@@ -262,7 +262,7 @@ runs:
           echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_READ_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_REP_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
-          echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier tabula-${{ env.ENV_NAME }} --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
+          echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier tabula${{ env.ENV_NAME }} --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
           echo "Deploy to Prod "
         else
           echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
