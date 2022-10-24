@@ -127,6 +127,9 @@ inputs:
   website-url:
     description: 'URL to gateway.escribers.net'
     default: ""
+  memcached-hosts:
+    description: 'URL to gateway.escribers.net'
+    default: "memcached.dev"
 
 runs:
   using: "composite"
@@ -169,6 +172,7 @@ runs:
            echo "ENV_NAME=${{ inputs.tempenv-version }}" >> $GITHUB_ENV
            echo "TABULA_URL=${{ inputs.tabula-url }}" >> $GITHUB_ENV
            echo "WEBSITE_URL=${{ inputs.website-url }}" >> $GITHUB_ENV
+           echo "MEMCACHED_HOSTS=${{ inputs.memcached-hosts }}" >> $GITHUB_ENV
            echo "COOKIE_DOMAIN=escribers.io" >> $GITHUB_ENV
       shell: bash
 
@@ -437,6 +441,7 @@ runs:
           ENVIRONMENT_PREFIX=${{ env.ENVIRONMENT_PREFIX }}
           TABULA_URL=${{ env.TABULA_URL }}
           WEBSITE_URL=${{ env.WEBSITE_URL }}
+          MEMCACHED_HOSTS=${{ env.MEMCACHED_HOSTS }}
 
 
 ####################
