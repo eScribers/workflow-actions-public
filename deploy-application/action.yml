@@ -133,6 +133,9 @@ inputs:
   sess_table_name:
     description: 'URL to gateway.escribers.net'
     default: ""
+  frontend_url:
+    description: 'URL to get frontend'
+    default: ""
 
 runs:
   using: "composite"
@@ -246,7 +249,6 @@ runs:
         echo "DB_DEFAULT_USER=${{ env.SANDBOX_DB_USER }}" >> $GITHUB_ENV
         echo "DB_READ_USER=${{ env.SANDBOX_DB_USER }}" >> $GITHUB_ENV
         echo "DB_REP_USER=${{ env.SANDBOX_DB_USER }}" >> $GITHUB_ENV
-        echo "TAB_FRONTEND_URL=https://tabula-frontend-sandbox-aws-us-east-1.s3.amazonaws.com" >> $GITHUB_ENV
         echo "Deploy to ${{ env.ENV_NAME }}"
         if [[ "${{ env.ENV_NAME }}" == '-prep-02' ]]; then
           echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
@@ -439,7 +441,7 @@ runs:
           DOE_GOOGLE_SPREADSHEET_HO=${{ env.DOE_GOOGLE_SPREADSHEET_HO }}
           DOE_GOOGLE_SPREADSHEET_AR=${{ env.DOE_GOOGLE_SPREADSHEET_AR }}
           DOE_GOOGLE_SPREADSHEET_OA=${{ env.DOE_GOOGLE_SPREADSHEET_OA }}
-          FRONTEND_URL=${{ env.TAB_FRONTEND_URL }}
+          FRONTEND_URL=${{ inputs.frontend_url }}
           AWS_ACCOUNT_ID=${{ env.AWS_ACCOUNT_ID }}
           ENV_NAME=${{ env.ENV_NAME }}
           ENVIRONMENT_PREFIX=${{ env.ENVIRONMENT_PREFIX }}
