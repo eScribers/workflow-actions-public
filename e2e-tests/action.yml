@@ -50,7 +50,7 @@ inputs:
   test-suite:
     description: 'Overwrite test suite file'
     default: 'Smoke.xml'
-    required: true
+    required: false
 
 runs:
   using: "composite"
