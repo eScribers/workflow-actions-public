@@ -105,12 +105,12 @@ runs:
           PR_TITLE=${{ inputs.pr-title }}
           PR_AUTHOR=${{ inputs.pr-creator }}
 
-    # - name: Show Authentication.xml
-    #   run: |
-    #     cat ./common/TestSuites/SmokeE2E/Smoke.xml
-    #     echo ============
-    #     cat ./Automation.Tests/Authentication/Login.cs
-    #   shell: bash
+    - name: Show Authentication.xml
+      run: |
+        cat ./common/TestSuites/SmokeE2E/${{ inputs.test-suite }} || true
+        echo ============
+    #     cat ./Automation.Tests/Authentication/Login.cs || true
+      shell: bash
 
     - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
       uses: actions/setup-dotnet@v1.7.2
