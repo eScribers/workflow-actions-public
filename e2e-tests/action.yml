@@ -69,11 +69,11 @@ runs:
            echo "TABULA_PASSWORD=${{ inputs.tabula-password }}" >> $GITHUB_ENV
       shell: bash
 
-    - name: Setup Smoke.xml file
+    - name: Setup ${{ inputs.test-suite }} file
       uses: cuchi/jinja2-action@v1.2.0
       with:
-        template: ./common/TestSuites/SmokeE2E/Smoke.xml.j2
-        output_file: ./common/TestSuites/SmokeE2E/Smoke.xml
+        template: ./common/TestSuites/SmokeE2E/${{ inputs.test-suite }}.j2
+        output_file: ./common/TestSuites/SmokeE2E/${{ inputs.test-suite }}
         strict: true
         variables: |
           BACKEND_URL=${{ env.BACKEND_URL }}
@@ -87,7 +87,7 @@ runs:
           PR_TITLE=${{ inputs.pr-title }}
           PR_AUTHOR=${{ inputs.pr-creator }}
 
-    - name: Setup Smoke.xml file
+    - name: Setup Login.xml file
       uses: cuchi/jinja2-action@v1.2.0
       with:
         template: ./common/TestSuites/SmokeE2E/Login.xml.j2
