@@ -150,12 +150,12 @@ runs:
         timeout_minutes: 20
         max_attempts: 3
         shell: bash
-        command: |
-          google-chrome --version 
-          chromedriver --version
-          whereis chromedriver
-          ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/Smoke.xml
-        # command: ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/${{ inputs.test-suite }}
+        # command: |
+        #   google-chrome --version 
+        #   chromedriver --version
+        #   whereis chromedriver
+        #   ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/Smoke.xml
+        command: ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/${{ inputs.test-suite }}
 
     - name: Add credentials to Amazon 
       uses: "aws-actions/configure-aws-credentials@v1"
