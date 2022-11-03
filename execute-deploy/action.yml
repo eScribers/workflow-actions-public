@@ -79,6 +79,7 @@ runs:
         AWS_DEFAULT_REGION: ${{ inputs.default-region }}
         RESOURCES_AWS_ACCOUNT_ID: ${{ inputs.account-id }}
         ENV_NAME: ${{ inputs.tempenv-version }}
+        GIT_TAG: ${{ github.sha }}
       with:
         host: ${{ inputs.host_ip }}
         username: ubuntu
@@ -97,3 +98,8 @@ runs:
           docker-compose -f ./deploy/docker-compose.yaml.template config > ./deploy/docker-compose.yaml
           sudo docker-compose -f ./deploy/docker-compose.yaml up -d
         shell: bash
+
+    - name: Sleep for 30 seconds
+      uses: jakejarvis/wait-action@master
+      with:
+        time: '30s'
