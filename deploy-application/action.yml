@@ -227,7 +227,7 @@ runs:
         aws-region: "${{ env.AWS_DEFAULT_REGION }}"
         aws-secret-access-key: "${{ env.AWS_SECRET_ACCESS_KEY }}"
 
-    - name: Define empty pron variable
+    - name: Define empty prod variable
       run: |
         if [[ "${{ env.ENV_NAME }}" == '-prod' ]]; then
           echo "ENVIRONMENT_PREFIX=" >> $GITHUB_ENV
@@ -341,7 +341,7 @@ runs:
         extra_build_args: ''
         path: ${{ inputs.docker-path }}
         region: "${{ env.RESOURCE_AWS_DEFAULT_REGION }}"
-        repo: "ecr${{ env.ENVIRONMENT_PREFIX }}/tabula"
+        repo: "ecr-${{ env.ENV_NAME }}/tabula"
         tags: "latest,${{ github.sha }}"
 
     - name: Install OpenVPN
