@@ -180,7 +180,7 @@ runs:
            echo "WEBSITE_URL=${{ inputs.website-url }}" >> $GITHUB_ENV
            echo "MEMCACHED_HOSTS=${{ inputs.memcached-hosts }}" >> $GITHUB_ENV
            echo "SESS_TABLE_NAME=${{ inputs.sess_table_name }}" >> $GITHUB_ENV
-           echo "COOKIE_DOMAIN=escribers.io" >> $GITHUB_ENV
+           echo "COOKIE_DOMAIN=escribers.net" >> $GITHUB_ENV
       shell: bash
 
     - name: Download private_ip
