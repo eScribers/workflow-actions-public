@@ -138,7 +138,7 @@ inputs:
     default: ""
   cookie_domain:
     description: 'cookie domain for env configuration'
-    default: "escribers.net"
+    default: "escribers.io"
 
 runs:
   using: "composite"
