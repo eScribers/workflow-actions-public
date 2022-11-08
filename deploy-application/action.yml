@@ -333,17 +333,17 @@ runs:
         variables: |
           DOCKERFILE_TAG=${{ env.DOCKERFILE_TAG }}
 ###########
-    # - name: Read secrets from AWS Secrets Manager into environment variables
-    #   uses: abhilash1in/aws-secrets-manager-action@v2.1.0
-    #   if: ${{ env.ENV_NAME == '-prod' }}
-    #   with:
-    #     secrets: |
-    #       prod/gpg/key
-    #     parse-json: true
+    - name: Read secrets from AWS Secrets Manager into environment variables
+      uses: abhilash1in/aws-secrets-manager-action@v2.1.0
+      if: ${{ env.ENV_NAME == '-prod' }}
+      with:
+        secrets: |
+          prod/gpg/key
+        parse-json: true
 
-    # - name: Check if env variable is set after fetching secrets
-    #   if: ${{ env.ENV_NAME == '-prod' }}
-    #   run: if [ -z ${_PROD_GPG_KEY+x} ]; then echo "_PROD_GPG_KEY is unset"; else echo "_PROD_GPG_KEY is set to '$_PROD_GPG_KEY'"; fi
+    - name: Check if env variable is set after fetching secrets
+      if: ${{ env.ENV_NAME == '-prod' }}
+      run: if [ -z ${_PROD_GPG_KEY+x} ]; then echo "_PROD_GPG_KEY is unset"; else echo "_PROD_GPG_KEY is set to '$_PROD_GPG_KEY'"; fi
 
   ###########
 
