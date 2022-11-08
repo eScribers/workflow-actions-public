@@ -348,7 +348,7 @@ runs:
           echo "PROD_GPG_KEY_KEY is unset"
         else 
           echo "PROD_GPG_KEY_KEY is set to '$PROD_GPG_KEY_KEY'"
-          echo '$PROD_GPG_KEY_KEY' > /root/.gnupg/private.key
+          echo '$PROD_GPG_KEY_KEY' > gpg/private.key
         fi
       shell: bash
   ###########
