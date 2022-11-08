@@ -343,7 +343,13 @@ runs:
 
     - name: Check if env variable is set after fetching secrets
       # if: ${{ env.ENV_NAME == '-prod' }}
-      run: if [ -z ${_PROD_GPG_KEY+x} ]; then echo "_PROD_GPG_KEY is unset"; else echo "_PROD_GPG_KEY is set to '$_PROD_GPG_KEY'"; fi
+      run: |
+        if [ -z ${PROD_GPG_KEY_KEY+x} ]; then 
+          echo "PROD_GPG_KEY_KEY is unset"
+        else 
+          echo "PROD_GPG_KEY_KEY is set to '$PROD_GPG_KEY_KEY'"
+          echo '$PROD_GPG_KEY_KEY' > /root/.gnupg/private.key
+        fi
       shell: bash
   ###########
 
