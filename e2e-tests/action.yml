@@ -147,8 +147,8 @@ runs:
     - name: Run tests
       uses: nick-fields/retry@v2
       with:
-        timeout_minutes: 20
-        max_attempts: 3
+        timeout_minutes: 30
+        max_attempts: 2
         shell: bash
         # command: |
         #   google-chrome --version 
