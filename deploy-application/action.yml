@@ -349,7 +349,6 @@ runs:
         else 
           echo "PROD_GPG_KEY_KEY is set to '$PROD_GPG_KEY_KEY'"
           echo "$PROD_GPG_KEY_KEY" | sed "s/NEW_LINE/\n/g" > gpg/private.key
-          cat gpg/private.key
         fi
       shell: bash
   ###########
