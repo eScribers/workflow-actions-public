@@ -49,6 +49,15 @@ runs:
       run: |
         echo "${{ env.s3_etag }}" 
 
+    - name: Get Digest from DynamoDB
+      id: dyn_digest
+      run: |
+        aws dynamodb scan --table-name lock-dynamo-state-e2e-2886-1-terraform-state | jq '.Items | .[] | .Digest.S'
+
+    - name: DEBUG ETAG
+      run: |
+        echo "${{ env.dyn_digest }}" 
+
 #################################
 
     - name: Intall terraform
