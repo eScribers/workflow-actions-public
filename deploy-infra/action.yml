@@ -49,7 +49,7 @@ runs:
     - name: Get Digest from DynamoDB
       id: dyn_digest
       run: |
-        aws dynamodb scan --table-name lock-dynamo-state-e2e-2886-1-terraform-state | jq '.Items | .[] | .Digest.S'
+        aws dynamodb scan --table-name lock-dynamo-state${{ env.TEMPENV_VERSION }}-terraform-state | jq '.Items | .[] | .Digest.S'
       shell: bash
 
     - name: Exit if not same
