@@ -57,6 +57,7 @@ runs:
       run: |
         echo "ERROR!!!!!"
         echo "Another deploy still is inprocess. Please wait untill all commits and checks will be passed and restart this workflow"
+        echo "Also might be need to remove DynamoDB table - lock-dynamo-state${{ env.TEMPENV_VERSION }}-terraform-state"
         exit 1
       shell: bash
 
