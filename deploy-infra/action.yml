@@ -31,9 +31,7 @@ runs:
            echo "AWS_SECRET_ACCESS_KEY=${{ inputs.secret-key }}" >> $GITHUB_ENV
            echo "AWS_DEFAULT_REGION=${{ inputs.default-region }}" >> $GITHUB_ENV
       shell: bash
-#############################
 
-#############################
     - name: Checkout devops infra repo
       uses: actions/checkout@v3
       with:
@@ -41,7 +39,17 @@ runs:
         ref: ${{ inputs.git-reference }}
         token: ${{ inputs.token }}
 
+####### Check for paralel execution #############
+    - name: Get Etag from S3
+      id: s3_etag
+      run: |
+        aws s3api head-object --bucket escribers-infra-tempenv-terraform-state --key state${{ env.TEMPENV_VERSION }}.tfstate --query ETag --output text
 
+    - name: DEBUG ETAG
+      run: |
+        echo "${{ env.s3_etag }}" 
+
+#################################
 
     - name: Intall terraform
       run: |
