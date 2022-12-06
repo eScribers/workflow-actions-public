@@ -46,24 +46,14 @@ runs:
         aws s3api head-object --bucket escribers-infra-tempenv-terraform-state --key state${{ env.TEMPENV_VERSION }}.tfstate --query ETag --output text
       shell: bash
 
-    - name: DEBUG ETAG
-      run: |
-        echo "${{ env.s3_etag }}" 
-      shell: bash
-
     - name: Get Digest from DynamoDB
       id: dyn_digest
       run: |
         aws dynamodb scan --table-name lock-dynamo-state-e2e-2886-1-terraform-state | jq '.Items | .[] | .Digest.S'
       shell: bash
 
-    - name: DEBUG ETAG
-      run: |
-        echo "${{ env.dyn_digest }}"
-      shell: bash
-
     - name: Exit if not same
-      if: env.dyn_digest == env.s3_etag
+      if: env.dyn_digest != env.s3_etag
       run: |
         echo "ERROR!!!!!"
         echo "Another deploy still is inprocess. Please wait untill all commits and checks will be passed and restart this workflow"
