@@ -53,7 +53,7 @@ runs:
       shell: bash
 
     - name: Exit if not same
-      if: ${{ env.DYN_DIGEST == env.S3_ETAG }}
+      if: ${{ env.DYN_DIGEST != env.S3_ETAG }}
       run: |
         echo "ERROR!!!!!"
         echo "Another deploy still is inprocess. Please wait untill all commits and checks will be passed and restart this workflow"
