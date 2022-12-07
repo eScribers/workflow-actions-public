@@ -56,6 +56,7 @@ runs:
       if: ${{ env.DYN_DIGEST != env.S3_ETAG }}
       run: |
         echo "ERROR!!!!!"
+        echo "Etag in state file not same as digest in DynamoDB table"
         echo "Another deploy still is inprocess. Please wait untill all commits and checks will be passed and restart this workflow"
         echo "Also might be need to remove DynamoDB table - lock-dynamo-state${{ env.TEMPENV_VERSION }}-terraform-state"
         exit 1
