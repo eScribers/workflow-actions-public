@@ -37,7 +37,7 @@ runs:
   steps: 
 
     - name: Create AWS credentials file
-      uses: appleboy/ssh-action@master
+      uses: appleboy/ssh-action@v0.1.4
       env:
         AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.secret-key }}
@@ -72,7 +72,7 @@ runs:
         target: "/home/ubuntu"
 
     - name: Start docker-compose
-      uses: appleboy/ssh-action@master
+      uses: appleboy/ssh-action@v0.1.4
       env:
         AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.secret-key }}

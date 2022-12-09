@@ -35,7 +35,7 @@ runs:
   steps: 
 
     - name: Recreate DB
-      uses: appleboy/ssh-action@master
+      uses: appleboy/ssh-action@v0.1.4
       if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, '-testenv-') || startsWith(inputs.tempenv-version, '-e2e-') }}
       env:
         AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
@@ -54,7 +54,7 @@ runs:
         shell: bash
 
     - name: Run migrations
-      uses: appleboy/ssh-action@master
+      uses: appleboy/ssh-action@v0.1.4
       if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, '-testenv-') || startsWith(inputs.tempenv-version, '-e2e-') }}
       env:
         AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
@@ -75,7 +75,7 @@ runs:
         shell: bash
 
     - name: Add Demo User
-      uses: appleboy/ssh-action@master
+      uses: appleboy/ssh-action@v0.1.4
       if: ${{ inputs.tempenv-version != '-prod' }}
       # if: ${{ inputs.tempenv-version == 'testenv-e2e-2' || startsWith(inputs.tempenv-version, 'e2e-') }}
       with:
@@ -90,7 +90,7 @@ runs:
         shell: bash
 
     - name: Run migrations for e2e tests on prep-02
-      uses: appleboy/ssh-action@master
+      uses: appleboy/ssh-action@v0.1.4
       if: ${{ startsWith(inputs.tempenv-version, '-prep-02') || startsWith(inputs.tempenv-version, '-sandbox') }}
       env:
         AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
@@ -108,7 +108,7 @@ runs:
         shell: bash
 
     - name: Run default migration
-      uses: appleboy/ssh-action@master
+      uses: appleboy/ssh-action@v0.1.4
       if: ${{ inputs.tempenv-version != '-prod' }}
       env:
         AWS_ACCESS_KEY_ID: ${{ inputs.access-key }}
