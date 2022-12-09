@@ -363,7 +363,7 @@ runs:
         tags: "latest,${{ github.sha }}"
 
     - name: Install OpenVPN
-      run: sudo apt-cache policy  openvpn && sudo apt-get --fix-missing --assume-yes --no-install-recommends install openvpn=2.4.7-1ubuntu2
+      run: wget -O - https://swupdate.openvpn.net/repos/repo-public.gpg|apt-key add - && sudo apt-cache policy  openvpn && sudo apt-get --fix-missing --assume-yes --no-install-recommends install openvpn=2.4.7-1ubuntu2
       shell: bash
 
     - name: Get instancesIDs
