@@ -90,7 +90,7 @@ runs:
       run: |
         echo DYN_DIGEST-${{ env.DYN_DIGEST }}
         echo S3_ETAG-${{ env.S3_ETAG }}
-        if [[ ${{ env.DYN_DIGEST != env.S3_ETAG }} ]]; then
+        if [[ ${{ env.DYN_DIGEST }} != ${{ env.S3_ETAG }} ]]; then
           echo "ERROR!!!!!"
           echo "Etag in state file not same as digest in DynamoDB table"
           echo "Another deploy still is inprocess. Please wait untill all commits and checks will be passed and restart this workflow"
