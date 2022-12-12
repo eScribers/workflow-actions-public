@@ -60,7 +60,7 @@ runs:
 
     - name: DEBUG Etag from S3
       run: |
-        echo ${{ env.S3_ETAG }} 
+        echo =${{ env.S3_ETAG }}=
       shell: bash
 
     - name: Get Digest from DynamoDB
