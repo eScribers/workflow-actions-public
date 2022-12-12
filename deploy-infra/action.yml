@@ -46,10 +46,20 @@ runs:
         echo "S3_ETAG=$(aws s3api head-object --bucket escribers-infra-tempenv-terraform-state --key state${{ env.TEMPENV_VERSION }}.tfstate --query ETag --output text)" >> $GITHUB_ENV
       shell: bash
 
+    - name: DEBUG Etag from S3
+      run: |
+        ${{ env.S3_ETAG }} 
+      shell: bash
+
     - name: Get Digest from DynamoDB
       id: dyn_digest
       run: |
         echo "DYN_DIGEST=$(aws dynamodb scan --table-name lock-dynamo-state${{ env.TEMPENV_VERSION }}-terraform-state | jq '.Items | .[] | select(.Digest.S != null) | .Digest.S' && echo ${{ env.S3_ETAG }} | grep DYN_DIGEST)" >> $GITHUB_ENV
+      shell: bash
+
+    - name: DEBUG Digest from DynamoDB
+      run: |
+        ${{ env.DYN_DIGEST }} 
       shell: bash
 
     - name: Exit if not same
