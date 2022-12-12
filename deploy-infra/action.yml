@@ -88,11 +88,17 @@ runs:
     - name: Exit if not same
       if: ${{ env.DYN_DIGEST != env.S3_ETAG }}
       run: |
-        echo "ERROR!!!!!"
-        echo "Etag in state file not same as digest in DynamoDB table"
-        echo "Another deploy still is inprocess. Please wait untill all commits and checks will be passed and restart this workflow"
-        echo "Also might be need to remove DynamoDB table - lock-dynamo-state${{ env.TEMPENV_VERSION }}-terraform-state"
-        exit 1
+        echo DYN_DIGEST-${{ env.DYN_DIGEST }}
+        echo S3_ETAG-${{ env.S3_ETAG }}
+        if [[ ${{ env.DYN_DIGEST != env.S3_ETAG }} ]]; then
+          echo "ERROR!!!!!"
+          echo "Etag in state file not same as digest in DynamoDB table"
+          echo "Another deploy still is inprocess. Please wait untill all commits and checks will be passed and restart this workflow"
+          echo "Also might be need to remove DynamoDB table - lock-dynamo-state${{ env.TEMPENV_VERSION }}-terraform-state"
+          exit 1
+        elif
+          echo DEPLOY
+        fi
       shell: bash
 
 #################################
