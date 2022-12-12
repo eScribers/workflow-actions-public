@@ -75,7 +75,7 @@ runs:
       shell: bash
 
     - name: Replace empty DYN_DIGEST
-      if: ${{ env.DYN_DIGEST == "" }}
+      if: ${{ env.DYN_DIGEST == '' }}
       run: |
         echo "DYN_DIGEST=${{ env.S3_ETAG }}" >> $GITHUB_ENV
       shell: bash
