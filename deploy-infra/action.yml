@@ -71,7 +71,7 @@ runs:
 
     - name: DEBUG Etag from S3
       run: |
-        echo ${{ env.DYN_DIGEST }} 
+        echo (${{ env.DYN_DIGEST }}) 
       shell: bash
 
     - name: Replace empty DYN_DIGEST
@@ -82,7 +82,7 @@ runs:
 
     - name: DEBUG Etag from S3
       run: |
-        echo ${{ env.DYN_DIGEST }} 
+        echo (${{ env.DYN_DIGEST }}) 
       shell: bash
 
     - name: Exit if not same
