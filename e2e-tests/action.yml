@@ -140,6 +140,7 @@ runs:
       shell: bash
 
     - name: Execute prelogin
+      if: ${{ inputs.test-suite == 'Smoke.xml' }}
       run: |
         ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/Login.xml
       shell: bash
@@ -150,11 +151,6 @@ runs:
         timeout_minutes: 30
         max_attempts: 2
         shell: bash
-        # command: |
-        #   google-chrome --version 
-        #   chromedriver --version
-        #   whereis chromedriver
-        #   ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/Smoke.xml
         command: ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/${{ inputs.test-suite }}
 
     - name: Add credentials to Amazon 
