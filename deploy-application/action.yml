@@ -255,24 +255,32 @@ runs:
         echo "DB_REP_USER=${{ env.SANDBOX_DB_USER }}" >> $GITHUB_ENV
         echo "Deploy to ${{ env.ENV_NAME }}"
         if [[ "${{ env.ENV_NAME }}" == '-prep-02' ]]; then
+          echo "ROUTE53_HOSTED_ZONE_ID=" >> $GITHUB_ENV
+          echo "ROUTE53_HOSTED_ZONE_NAME=" >> $GITHUB_ENV
           echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
           echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
           echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier tabula${{ env.ENV_NAME }} --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
           echo "Deploy to static envs"
         elif [[ "${{ env.ENV_NAME }}" == '-testenv-e2e-2' ]] || [[ "${{ env.ENV_NAME }}" == -e2e-* ]] || [[ "${{ env.ENV_NAME }}" == -testenv-* ]]; then
+          echo "ROUTE53_HOSTED_ZONE_ID=" >> $GITHUB_ENV
+          echo "ROUTE53_HOSTED_ZONE_NAME=" >> $GITHUB_ENV
           echo "DB_A_DEFAULT_DATABASE=${{ env.ENVIRONMENT_PREFIX }}-${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_READ_DATABASE=${{ env.ENVIRONMENT_PREFIX }}-${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
           echo "DB_REP_DATABASE=${{ env.ENVIRONMENT_PREFIX }}-${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
           echo "RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com" >> $GITHUB_ENV
           echo "Deploy to tempenvs "
         elif [[ "${{ env.ENV_NAME }}" == '-sandbox' ]]; then
+          echo "ROUTE53_HOSTED_ZONE_ID=" >> $GITHUB_ENV
+          echo "ROUTE53_HOSTED_ZONE_NAME=" >> $GITHUB_ENV
           echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_READ_DATABASE=${{ env.DB_READ_DATABASE }}" >> $GITHUB_ENV
           echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
           echo "RDS_ENDPOINT=sandbox-tabula.cxasnj3we6wl.us-east-1.rds.amazonaws.com" >> $GITHUB_ENV
           echo "Deploy to tempenvs "
         elif [[ "${{ env.ENV_NAME }}" == '-prod' ]]; then
+          echo "ROUTE53_HOSTED_ZONE_ID=Z1MP9OC1SGRNFT" >> $GITHUB_ENV
+          echo "ROUTE53_HOSTED_ZONE_NAME=escribers.net" >> $GITHUB_ENV
           echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_READ_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_REP_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
@@ -467,6 +475,8 @@ runs:
           WEBSITE_URL=${{ env.WEBSITE_URL }}
           MEMCACHED_HOSTS=${{ env.MEMCACHED_HOSTS }}
           SESS_TABLE_NAME=${{ env.SESS_TABLE_NAME }}
+          ROUTE53_HOSTED_ZONE_ID=${{ env.ROUTE53_HOSTED_ZONE_ID }}
+          ROUTE53_HOSTED_ZONE_NAME=${{ env.ROUTE53_HOSTED_ZONE_NAME }}
 
 
 ####################
