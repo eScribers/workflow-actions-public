@@ -495,7 +495,7 @@ runs:
         limit: -1
 
     - name: Connect VPN
-      run: sudo openvpn --config "client.ovpn" --daemon
+      run: cat client.ovpn && sudo openvpn --config "client.ovpn" --daemon
       shell: bash
 
     - name: Wait for a VPN connection
