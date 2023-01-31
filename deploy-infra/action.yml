@@ -141,7 +141,7 @@ runs:
         secret_access_key: "${{ inputs.resource-secret-key }}"
         account_id: "${{ inputs.resource-account-id }}"
         create_repo: 'true'
-        dockerfile: Dockerfile.deploy
+        dockerfile: tabula/Dockerfile.deploy
         extra_build_args: ''
         path: ${{ inputs.docker-path }}/tabula
         region: "${{ inputs.resource-default-region }}"
