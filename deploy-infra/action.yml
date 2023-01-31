@@ -54,6 +54,19 @@ runs:
         ref: ${{ inputs.git-reference }}
         token: ${{ inputs.token }}
 
+    - name: Checkout tabula infra repo
+      uses: actions/checkout@v3
+      with:
+        repository: eScribers/tabula
+        ref: ${{ inputs.git-reference }}
+        path: tabula
+        token: ${{ inputs.token }}
+
+    - name: DEBUG Etag from S3
+      run: |
+        ls -l ./*
+      shell: bash
+
     - name: Create DynamoDB lock table
       run: |
         aws dynamodb create-table --table-name lock-dynamo-state${{ env.TEMPENV_VERSION }}-terraform-state \
@@ -99,25 +112,7 @@ runs:
       run: |
         echo =${{ env.DYN_DIGEST }}=
       shell: bash
-
-    # - name: Exit if not same
-    #   if: ${{ env.DYN_DIGEST != env.S3_ETAG }}
-    #   run: |
-    #     echo DYN_DIGEST-${{ env.DYN_DIGEST }}
-    #     echo S3_ETAG-${{ env.S3_ETAG }}
-    #     if [[ ${{ env.DYN_DIGEST }} != ${{ env.S3_ETAG }} ]]; then
-    #       echo "ERROR!!!!!"
-    #       echo "Etag in state file not same as digest in DynamoDB table"
-    #       echo "Another deploy still is inprocess. Please wait untill all commits and checks will be passed and restart this workflow"
-    #       echo "Also might be need to remove DynamoDB table - lock-dynamo-state${{ env.TEMPENV_VERSION }}-terraform-state"
-    #       exit 1
-    #     else
-    #       echo DEPLOY
-    #     fi
-    #   shell: bash
-
-#################################
-
+      
     - name: "Create Docker image and push it to ECR repository"
       uses: "kciter/aws-ecr-action@v4"
       with:
@@ -125,7 +120,7 @@ runs:
         secret_access_key: "${{ inputs.resource-secret-key }}"
         account_id: "${{ inputs.resource-account-id }}"
         create_repo: 'true'
-        dockerfile: Dockerfile.deploy
+        dockerfile: tabula/Dockerfile.deploy
         extra_build_args: ''
         path: ${{ inputs.docker-path }}
         region: "${{ inputs.resource-default-region }}"
