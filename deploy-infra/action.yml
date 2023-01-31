@@ -19,7 +19,22 @@ inputs:
   git-reference:
     description: 'Git reference from where it should be deployed'
     default: "refs/heads/master"
-
+  resource-access-key:
+    description: 'Resource AWS Access Key from secrets'
+    required: true
+    default: ""
+  resource-secret-key:
+    description: 'Resource AWS Secret Key from secrets'
+    required: true
+    default: ""
+  resource-default-region:
+    description: 'Resource AWS Default Region from secrets'
+    required: true
+    default: ""
+  resource-account-id:
+    description: 'Resource AWS Account ID for ECR  from secrets'
+    required: true
+    default: ""
 
 runs:
   using: "composite"
@@ -102,6 +117,20 @@ runs:
     #   shell: bash
 
 #################################
+
+    - name: "Create Docker image and push it to ECR repository"
+      uses: "kciter/aws-ecr-action@v4"
+      with:
+        access_key_id: "${{ inputs.resource-access-key }}"
+        secret_access_key: "${{ inputs.resource-secret-key }}"
+        account_id: "${{ inputs.resource-account-id }}"
+        create_repo: 'true'
+        dockerfile: Dockerfile.deploy
+        extra_build_args: ''
+        path: ${{ inputs.docker-path }}
+        region: "${{ inputs.resource-default-region }}"
+        repo: "ecr${{ env.TEMPENV_VERSION }}/tabula"
+        tags: "${{ github.sha }}"
 
     - name: Intall terraform
       run: |
