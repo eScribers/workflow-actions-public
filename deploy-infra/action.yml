@@ -186,7 +186,7 @@ runs:
         TF_VAR_deletion_protection: "false"
         TF_VAR_instance_count: "3"
         TF_VAR_image_tag: "${{ github.sha }}"
-        TF_VAR_image: "ecr${{ env.TEMPENV_VERSION }}/tabula"
+        TF_VAR_image: "${{ inputs.resource-account-id }}.dkr.ecr.${{ inputs.resource-default-region }}.amazonaws.com/ecr${{ env.TEMPENV_VERSION }}/tabula"
         TEMPENV_VERSION: "${{ env.TEMPENV_VERSION }}"
       shell: bash
 
