@@ -306,7 +306,7 @@ runs:
            echo "ENVIRONMENT_BUCKET=${{ env.ENV_NAME }}" >> $GITHUB_ENV
            echo "Deploy to noPRODUCTION"
         elif [[ "${{ env.ENV_NAME }}" == '-prod' ]]; then
-           echo "ENVIRONMENT_BUCKET=-prod" >> $GITHUB_ENV
+           echo "ENVIRONMENT_BUCKET=" >> $GITHUB_ENV
            echo "Deploy to PRODUCTION"
         else
            echo "Nothing to deploy"
