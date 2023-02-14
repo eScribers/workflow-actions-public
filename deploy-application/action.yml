@@ -498,7 +498,7 @@ runs:
           NS_HOST=${{ inputs.ns-host }}
           NS_ACCOUNT=${{ inputs.ns-account }}
           NS_CONSUMER_KEY=${{ inputs.ns-consumer-key }}
-          NS_CONSUMER_SECRET=${{ inputs.consumer-secret }}
+          NS_CONSUMER_SECRET=${{ inputs.ns-consumer-secret }}
           NS_TOKEN=${{ inputs.ns-token }}
           NS_TOKEN_SECRET=${{ inputs.ns-token-secret }}
 
