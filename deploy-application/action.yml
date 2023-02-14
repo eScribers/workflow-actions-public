@@ -139,6 +139,24 @@ inputs:
   cookie_domain:
     description: 'cookie domain for env configuration'
     default: "escribers.io"
+  ns-host:
+    description: 'ns-host'
+    default: ""
+  ns-account:
+    description: 'ns-account'
+    default: ""
+  ns-consumer-key:
+    description: 'ns-consumer-key'
+    default: ""
+  ns-consumer-secret:
+    description: 'ns-consumer-secret'
+    default: ""
+  ns-token:
+    description: 'ns-token'
+    default: ""
+  ns-token-secret:
+    description: 'ns-token-secret'
+    default: ""
 
 runs:
   using: "composite"
@@ -477,6 +495,12 @@ runs:
           SESS_TABLE_NAME=${{ env.SESS_TABLE_NAME }}
           ROUTE53_HOSTED_ZONE_ID=${{ env.ROUTE53_HOSTED_ZONE_ID }}
           ROUTE53_HOSTED_ZONE_NAME=${{ env.ROUTE53_HOSTED_ZONE_NAME }}
+          NS_HOST=${{ inputs.ns-host }}
+          NS_ACCOUNT={{ inputs.ns-account }}
+          NS_CONSUMER_KEY={{ inputs.ns-consumer-key }}
+          NS_CONSUMER_SECRET={{ inputs.consumer-secret }}
+          NS_TOKEN={{ inputs.ns-token }}
+          NS_TOKEN_SECRET={{ inputs.ns-token-secret }}
 
 
 ####################
