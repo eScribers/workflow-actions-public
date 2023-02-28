@@ -157,6 +157,12 @@ inputs:
   ns-token-secret:
     description: 'ns-token-secret'
     default: ""
+  log-threshold:
+    description: 'log-threshold'
+    default: "100"
+  tab-environment:
+    description: 'tab-environment'
+    default: "intg-01"
 
 runs:
   using: "composite"
@@ -501,6 +507,8 @@ runs:
           NS_CONSUMER_SECRET=${{ inputs.ns-consumer-secret }}
           NS_TOKEN=${{ inputs.ns-token }}
           NS_TOKEN_SECRET=${{ inputs.ns-token-secret }}
+          TAB_LOG_THRESHOLD=${{ inputs.log-threshold }}
+          TAB_ENVIRONMENT=${{ inputs.tab-environment }}
 
 
 ####################
