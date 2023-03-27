@@ -35,6 +35,9 @@ inputs:
     description: 'Resource AWS Account ID for ECR  from secrets'
     required: true
     default: ""
+  ci_env:
+    description: 'Env type'
+    default: "development"
 
 runs:
   using: "composite"
@@ -186,6 +189,7 @@ runs:
         TF_VAR_image_tag: "${{ github.sha }}"
         TF_VAR_image: "${{ inputs.resource-account-id }}.dkr.ecr.${{ inputs.resource-default-region }}.amazonaws.com/ecr${{ env.TEMPENV_VERSION }}/tabula"
         TEMPENV_VERSION: "${{ env.TEMPENV_VERSION }}"
+        TF_VAR_ci_env: "${{ inputs.ci_env }}"
       shell: bash
 
     - name: Define variables for VPN servers
