@@ -139,6 +139,9 @@ inputs:
   cookie_domain:
     description: 'cookie domain for env configuration'
     default: "escribers.io"
+  netsuite-sqs-url:
+    description: 'netsuite url  for sqs'
+    default: ""
 
 runs:
   using: "composite"
@@ -477,6 +480,7 @@ runs:
           SESS_TABLE_NAME=${{ env.SESS_TABLE_NAME }}
           ROUTE53_HOSTED_ZONE_ID=${{ env.ROUTE53_HOSTED_ZONE_ID }}
           ROUTE53_HOSTED_ZONE_NAME=${{ env.ROUTE53_HOSTED_ZONE_NAME }}
+          NETSUITE_SQS_URL=${{ inputs.netsuite-sqs-url }}
 
 
 ####################
