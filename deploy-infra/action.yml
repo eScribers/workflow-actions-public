@@ -35,9 +35,18 @@ inputs:
     description: 'Resource AWS Account ID for ECR  from secrets'
     required: true
     default: ""
-  ci_env:
+  ci-env:
     description: 'Env type'
     default: "development"
+  tabula-url:
+    description: 'tabula url'
+    default: ""
+  website-url:
+    description: 'website url'
+    default: ""
+  memcached-hosts:
+    description: 'memcached hosts'
+    default: ""
 
 runs:
   using: "composite"
@@ -189,7 +198,10 @@ runs:
         TF_VAR_image_tag: "${{ github.sha }}"
         TF_VAR_image: "${{ inputs.resource-account-id }}.dkr.ecr.${{ inputs.resource-default-region }}.amazonaws.com/ecr${{ env.TEMPENV_VERSION }}/tabula"
         TEMPENV_VERSION: "${{ env.TEMPENV_VERSION }}"
-        TF_VAR_ci_env: "${{ inputs.ci_env }}"
+        TF_VAR_ci_env: "${{ inputs.ci-env }}"
+        TF_VAR_tabula_url: "${{ inputs.tabula-url }}"
+        TF_VAR_website_url: "${{ inputs.website-url }}"
+        TF_VAR_memcached_hosts: "${{ inputs.memcached-hosts }}"
       shell: bash
 
     - name: Define variables for VPN servers
