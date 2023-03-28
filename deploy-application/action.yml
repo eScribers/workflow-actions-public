@@ -163,6 +163,9 @@ inputs:
   tab-environment:
     description: 'tab-environment'
     default: "intg-01"
+  netsuite-sqs-url:
+    description: 'netsuite url of sqs'
+    default: ""
 
 runs:
   using: "composite"
@@ -509,7 +512,7 @@ runs:
           NS_TOKEN_SECRET=${{ inputs.ns-token-secret }}
           TAB_LOG_THRESHOLD=${{ inputs.log-threshold }}
           TAB_ENVIRONMENT=${{ inputs.tab-environment }}
-
+          NETSUITE_SQS_URL=${{ inputs.netsuite-sqs-url }}
 
 ####################
 ##### Execute Deploy Command  ####
