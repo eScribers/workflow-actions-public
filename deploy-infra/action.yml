@@ -50,6 +50,9 @@ inputs:
   cluster-name:
     description: 'ECS Cluster name'
     default: ""
+  netsuite-sqs-url:
+    description: 'netsuite-sqs-url'
+    default: ""
 
 runs:
   using: "composite"
@@ -206,6 +209,8 @@ runs:
         TF_VAR_website_url: "${{ inputs.website-url }}"
         TF_VAR_memcached_hosts: "${{ inputs.memcached-hosts }}"
         TF_VAR_cluster_name: "${{ inputs.cluster-name }}"
+        TF_VAR_netsuite_sqs_url: "${{ inputs.netsuite-sqs-url }}"
+        
       shell: bash
 
     - name: Define variables for VPN servers
