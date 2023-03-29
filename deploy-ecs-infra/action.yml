@@ -19,7 +19,40 @@ inputs:
   git-reference:
     description: 'Git reference from where it should be deployed'
     default: "refs/heads/master"
-
+  resource-access-key:
+    description: 'Resource AWS Access Key from secrets'
+    required: true
+    default: ""
+  resource-secret-key:
+    description: 'Resource AWS Secret Key from secrets'
+    required: true
+    default: ""
+  resource-default-region:
+    description: 'Resource AWS Default Region from secrets'
+    required: true
+    default: ""
+  resource-account-id:
+    description: 'Resource AWS Account ID for ECR  from secrets'
+    required: true
+    default: ""
+  ci-env:
+    description: 'Env type'
+    default: "development"
+  tabula-url:
+    description: 'tabula url'
+    default: ""
+  website-url:
+    description: 'website url'
+    default: ""
+  memcached-hosts:
+    description: 'memcached hosts'
+    default: ""
+  cluster-name:
+    description: 'ECS Cluster name'
+    default: ""
+  netsuite-sqs-url:
+    description: 'netsuite-sqs-url'
+    default: ""
 
 runs:
   using: "composite"
@@ -38,6 +71,40 @@ runs:
         repository: eScribers/DEVOPS
         ref: ${{ inputs.git-reference }}
         token: ${{ inputs.token }}
+
+    - name: Checkout tabula infra repo
+      uses: actions/checkout@v3
+      with:
+        repository: eScribers/tabula
+        ref: "ecs-cluster"
+        path: tabula
+        token: ${{ inputs.token }}
+
+    - name: Define environment DOCKERFILE_TAG
+      run: |
+        echo DOCKERFILE_TAG=$(cksum tabula/Dockerfile.base | awk {'print $1'}) >> $GITHUB_ENV
+      shell: bash
+
+    - name: Check file existence
+      id: check_files
+      uses: andstor/file-existence-action@v1
+      with:
+        files: "./tabula/Dockerfile.deploy.j2"
+
+    - name: configure Dockerfile.deploy
+      if: steps.check_files.outputs.files_exists == 'true'
+      uses: cuchi/jinja2-action@v1.2.0
+      with:
+        template: ./tabula/Dockerfile.deploy.j2
+        output_file: ./tabula/Dockerfile.deploy
+        strict: true
+        variables: |
+          DOCKERFILE_TAG=${{ env.DOCKERFILE_TAG }}
+
+    - name: DEBUG Etag from S3
+      run: |
+        ls -l ./*
+      shell: bash
 
     - name: Create DynamoDB lock table
       run: |
@@ -84,24 +151,20 @@ runs:
       run: |
         echo =${{ env.DYN_DIGEST }}=
       shell: bash
-
-    # - name: Exit if not same
-    #   if: ${{ env.DYN_DIGEST != env.S3_ETAG }}
-    #   run: |
-    #     echo DYN_DIGEST-${{ env.DYN_DIGEST }}
-    #     echo S3_ETAG-${{ env.S3_ETAG }}
-    #     if [[ ${{ env.DYN_DIGEST }} != ${{ env.S3_ETAG }} ]]; then
-    #       echo "ERROR!!!!!"
-    #       echo "Etag in state file not same as digest in DynamoDB table"
-    #       echo "Another deploy still is inprocess. Please wait untill all commits and checks will be passed and restart this workflow"
-    #       echo "Also might be need to remove DynamoDB table - lock-dynamo-state${{ env.TEMPENV_VERSION }}-terraform-state"
-    #       exit 1
-    #     else
-    #       echo DEPLOY
-    #     fi
-    #   shell: bash
-
-#################################
+      
+    - name: "Create Docker image and push it to ECR repository"
+      uses: "kciter/aws-ecr-action@v4"
+      with:
+        access_key_id: "${{ inputs.resource-access-key }}"
+        secret_access_key: "${{ inputs.resource-secret-key }}"
+        account_id: "${{ inputs.resource-account-id }}"
+        create_repo: 'true'
+        dockerfile: tabula/Dockerfile.deploy
+        extra_build_args: ''
+        path: ${{ inputs.docker-path }}/tabula
+        region: "${{ inputs.resource-default-region }}"
+        repo: "ecr${{ env.TEMPENV_VERSION }}/tabula"
+        tags: "${{ github.sha }}"
 
     - name: Intall terraform
       run: |
@@ -125,10 +188,8 @@ runs:
       run: |
         mv ./infrastructure/instances-spot.tf.off ./infrastructure/instances-spot.tf
         terraform -chdir=./infrastructure init -backend-config="bucket=escribers-infra-tempenv-terraform-state" -backend-config="key=state$TEMPENV_VERSION.tfstate" -backend-config="dynamodb_table=lock-dynamo-state$ENV_NAME-terraform-state"
-        terraform -chdir=./infrastructure apply -auto-approve || true
+        terraform -chdir=./infrastructure apply -auto-approve 
         echo "Wait for 30 seconds"
-        sleep 30
-        terraform -chdir=./infrastructure apply -auto-approve
         echo "VPN_SERVER_PRIVATE_IP=$(cat infrastructure/private_ip)" >> $GITHUB_ENV
         echo "VPN_SERVER_PUBLIC_IP=$(cat infrastructure/public_ip)" >> $GITHUB_ENV
       env:
@@ -140,7 +201,16 @@ runs:
         TF_VAR_do_migration: "false"
         TF_VAR_deletion_protection: "false"
         TF_VAR_instance_count: "3"
+        TF_VAR_image_tag: "${{ github.sha }}"
+        TF_VAR_image: "${{ inputs.resource-account-id }}.dkr.ecr.${{ inputs.resource-default-region }}.amazonaws.com/ecr${{ env.TEMPENV_VERSION }}/tabula"
         TEMPENV_VERSION: "${{ env.TEMPENV_VERSION }}"
+        TF_VAR_ci_env: "${{ inputs.ci-env }}"
+        TF_VAR_tabula_url: "${{ inputs.tabula-url }}"
+        TF_VAR_website_url: "${{ inputs.website-url }}"
+        TF_VAR_memcached_hosts: "${{ inputs.memcached-hosts }}"
+        TF_VAR_cluster_name: "${{ inputs.cluster-name }}"
+        TF_VAR_netsuite_sqs_url: "${{ inputs.netsuite-sqs-url }}"
+        
       shell: bash
 
     - name: Define variables for VPN servers
@@ -170,3 +240,6 @@ runs:
       with:
         name: public_ip
         path: infrastructure/public_ip
+
+
+
