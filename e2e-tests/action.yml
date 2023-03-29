@@ -16,6 +16,9 @@ inputs:
   sender-email-password:
     description: 'Git reference from where it should be deployed'
     default: ""
+  postmark-api:
+    description: 'Api key for Postmark'
+    default: ""
   git-reference:
     description: 'Git reference from where it should be deployed'
     default: "refs/heads/master"
@@ -86,6 +89,7 @@ runs:
           ACTION_ID=${{ inputs.action-id }}
           PR_TITLE=${{ inputs.pr-title }}
           PR_AUTHOR=${{ inputs.pr-creator }}
+          POSTMARK_API_KEY=${{ inputs.postmark-api }}
 
     - name: Setup Login.xml file
       uses: cuchi/jinja2-action@v1.2.0
@@ -104,6 +108,7 @@ runs:
           ACTION_ID=${{ inputs.action-id }}
           PR_TITLE=${{ inputs.pr-title }}
           PR_AUTHOR=${{ inputs.pr-creator }}
+          POSTMARK_API_KEY=${{ inputs.postmark-api }}
 
     - name: Show Authentication.xml
       run: |
@@ -148,8 +153,8 @@ runs:
     - name: Run tests
       uses: nick-fields/retry@v2
       with:
-        timeout_minutes: 30
-        max_attempts: 2
+        timeout_minutes: 120
+        # max_attempts: 2
         shell: bash
         command: ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/${{ inputs.test-suite }}
 

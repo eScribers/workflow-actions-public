@@ -139,8 +139,32 @@ inputs:
   cookie_domain:
     description: 'cookie domain for env configuration'
     default: "escribers.io"
+  ns-host:
+    description: 'ns-host'
+    default: ""
+  ns-account:
+    description: 'ns-account'
+    default: ""
+  ns-consumer-key:
+    description: 'ns-consumer-key'
+    default: ""
+  ns-consumer-secret:
+    description: 'ns-consumer-secret'
+    default: ""
+  ns-token:
+    description: 'ns-token'
+    default: ""
+  ns-token-secret:
+    description: 'ns-token-secret'
+    default: ""
+  log-threshold:
+    description: 'log-threshold'
+    default: "100"
+  tab-environment:
+    description: 'tab-environment'
+    default: "intg-01"
   netsuite-sqs-url:
-    description: 'netsuite url  for sqs'
+    description: 'netsuite url of sqs'
     default: ""
 
 runs:
@@ -287,7 +311,7 @@ runs:
           echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_READ_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
           echo "DB_REP_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
-          echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier tabula-prod --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
+          echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier tabula --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
           echo "Deploy to Prod "
         else
           echo "DB_A_DEFAULT_DATABASE=${{ inputs.db-database }}" >> $GITHUB_ENV
@@ -309,7 +333,7 @@ runs:
            echo "ENVIRONMENT_BUCKET=${{ env.ENV_NAME }}" >> $GITHUB_ENV
            echo "Deploy to noPRODUCTION"
         elif [[ "${{ env.ENV_NAME }}" == '-prod' ]]; then
-           echo "ENVIRONMENT_BUCKET=-prod" >> $GITHUB_ENV
+           echo "ENVIRONMENT_BUCKET=" >> $GITHUB_ENV
            echo "Deploy to PRODUCTION"
         else
            echo "Nothing to deploy"
@@ -480,6 +504,14 @@ runs:
           SESS_TABLE_NAME=${{ env.SESS_TABLE_NAME }}
           ROUTE53_HOSTED_ZONE_ID=${{ env.ROUTE53_HOSTED_ZONE_ID }}
           ROUTE53_HOSTED_ZONE_NAME=${{ env.ROUTE53_HOSTED_ZONE_NAME }}
+          NS_HOST=${{ inputs.ns-host }}
+          NS_ACCOUNT=${{ inputs.ns-account }}
+          NS_CONSUMER_KEY=${{ inputs.ns-consumer-key }}
+          NS_CONSUMER_SECRET=${{ inputs.ns-consumer-secret }}
+          NS_TOKEN=${{ inputs.ns-token }}
+          NS_TOKEN_SECRET=${{ inputs.ns-token-secret }}
+          TAB_LOG_THRESHOLD=${{ inputs.log-threshold }}
+          TAB_ENVIRONMENT=${{ inputs.tab-environment }}
           NETSUITE_SQS_URL=${{ inputs.netsuite-sqs-url }}
 
 
