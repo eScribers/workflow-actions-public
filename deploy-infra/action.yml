@@ -47,6 +47,9 @@ inputs:
   memcached-hosts:
     description: 'memcached hosts'
     default: ""
+  cluster-name:
+    description: 'ECS Cluster name'
+    default: ""
 
 runs:
   using: "composite"
@@ -202,6 +205,7 @@ runs:
         TF_VAR_tabula_url: "${{ inputs.tabula-url }}"
         TF_VAR_website_url: "${{ inputs.website-url }}"
         TF_VAR_memcached_hosts: "${{ inputs.memcached-hosts }}"
+        TF_VAR_cluster_name: "${{ inputs.cluster-name }}"
       shell: bash
 
     - name: Define variables for VPN servers
