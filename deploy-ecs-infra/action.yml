@@ -161,20 +161,6 @@ runs:
            pwd
       shell: bash
 
-    - name: "Create Docker image and push it to ECR repository"
-      uses: "kciter/aws-ecr-action@v4"
-      with:
-        access_key_id: "${{ inputs.resource-access-key }}"
-        secret_access_key: "${{ inputs.resource-secret-key }}"
-        account_id: "${{ inputs.resource-account-id }}"
-        create_repo: 'true'
-        dockerfile: tabula/Dockerfile.deploy
-        extra_build_args: ''
-        path: ${{ inputs.docker-path }}/tabula
-        region: "${{ inputs.resource-default-region }}"
-        repo: "ecr${{ env.TEMPENV_VERSION }}/tabula"
-        tags: "${{ github.sha }}"
-
     - name: Intall terraform
       run: |
         which terraform
