@@ -106,7 +106,7 @@ runs:
 
     - name: DEBUG Etag from S3
       run: |
-        ls -l ./*
+        ls -l ./tabula/*
       shell: bash
 
     - name: Create DynamoDB lock table
