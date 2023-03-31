@@ -159,6 +159,7 @@ runs:
       run: |
            ls -l ./tabula/*
            pwd
+      shell: bash
 
     - name: "Create Docker image and push it to ECR repository"
       uses: "kciter/aws-ecr-action@v4"
