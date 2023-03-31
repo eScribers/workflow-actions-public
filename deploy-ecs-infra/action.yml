@@ -19,6 +19,9 @@ inputs:
   git-reference:
     description: 'Git reference from where it should be deployed'
     default: "refs/heads/master"
+  tabula-git-reference:
+    description: 'Git reference from where it should be deployed'
+    default: "refs/heads/master"
   resource-access-key:
     description: 'Resource AWS Access Key from secrets'
     required: true
@@ -76,7 +79,7 @@ runs:
       uses: actions/checkout@v3
       with:
         repository: eScribers/tabula
-        ref: "ecs-cluster"
+        ref: ${{ inputs.tabula-git-reference }}
         path: tabula
         token: ${{ inputs.token }}
 
@@ -103,7 +106,7 @@ runs:
 
     - name: DEBUG Etag from S3
       run: |
-        ls -l ./*
+        ls -l ./tabula/*
       shell: bash
 
     - name: Create DynamoDB lock table
@@ -151,7 +154,12 @@ runs:
       run: |
         echo =${{ env.DYN_DIGEST }}=
       shell: bash
-      
+
+    - name: DEBUG
+      run: |
+           ls -l ./tabula/*
+           pwd
+
     - name: "Create Docker image and push it to ECR repository"
       uses: "kciter/aws-ecr-action@v4"
       with:
