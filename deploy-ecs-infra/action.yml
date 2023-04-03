@@ -249,7 +249,6 @@ runs:
         TF_VAR_cluster_name: "${{ inputs.cluster-name }}"
         TF_VAR_netsuite_sqs_url: "${{ inputs.netsuite-sqs-url }}"
         TF_VAR_tab_database: "${{ env.DB_DEFAULT_DATABASE }}"
-        
       shell: bash
 
     - name: Define variables for VPN servers
