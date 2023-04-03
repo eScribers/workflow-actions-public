@@ -168,8 +168,8 @@ runs:
     - name: Setup create_db.php file
       uses: cuchi/jinja2-action@v1.2.0
       with:
-        template: ./.github/scripts/create_db.php
-        output_file: ./create_db.php
+        template: ./tabula/.github/scripts/create_db.php
+        output_file: ./tabula/create_db.php
         strict: true
         variables: |
           DB_DEFAULT_PASSWORD=${{ env.DB_DEFAULT_PASSWORD }}
@@ -180,8 +180,8 @@ runs:
     - name: Setup delete_db.php file
       uses: cuchi/jinja2-action@v1.2.0
       with:
-        template: ./.github/scripts/delete_db.php
-        output_file: ./delete_db.php
+        template: ./tabula/.github/scripts/delete_db.php
+        output_file: ./tabula/delete_db.php
         strict: true
         variables: |
           DB_DEFAULT_PASSWORD=${{ env.DB_DEFAULT_PASSWORD }}
