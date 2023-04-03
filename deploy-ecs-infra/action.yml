@@ -109,10 +109,10 @@ runs:
         variables: |
           DOCKERFILE_TAG=${{ env.DOCKERFILE_TAG }}
 
-    - name: DEBUG Etag from S3
-      run: |
-        ls -l ./tabula/*
-      shell: bash
+    # - name: DEBUG Etag from S3
+    #   run: |
+    #     ls -l ./tabula/*
+    #   shell: bash
 
     - name: Create DynamoDB lock table
       run: |
@@ -160,11 +160,11 @@ runs:
         echo =${{ env.DYN_DIGEST }}=
       shell: bash
 
-    - name: DEBUG
-      run: |
-           ls -l ./tabula/*
-           pwd
-      shell: bash
+    # - name: DEBUG
+    #   run: |
+    #        ls -l ./tabula/*
+    #        pwd
+    #   shell: bash
 
     - name: Setup create_db.php file
       uses: cuchi/jinja2-action@v1.2.0
