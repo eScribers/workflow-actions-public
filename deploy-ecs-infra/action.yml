@@ -60,6 +60,9 @@ inputs:
     description: 'Path where dockerfile located'
     default: "/home/runner/work/tabula-automation-tests/tabula-automation-tests/"
     required: true
+  environment-bucket:
+    description: 'Bucket to upload files'
+    default: ""
 
 runs:
   using: "composite"
@@ -248,6 +251,7 @@ runs:
         TF_VAR_cluster_name: "${{ inputs.cluster-name }}"
         TF_VAR_netsuite_sqs_url: "${{ inputs.netsuite-sqs-url }}"
         TF_VAR_tab_database: "${{ env.DB_DEFAULT_DATABASE }}"
+        TF_VAR_environment_bucket: "${{ inputs.environment-bucket }}"
       shell: bash
 
     # - name: Define variables for VPN servers
