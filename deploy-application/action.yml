@@ -289,7 +289,7 @@ runs:
           echo "DB_REP_DATABASE=${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
           echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier tabula${{ env.ENV_NAME }} --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
           echo "Deploy to static envs"
-        elif [[ "${{ env.ENV_NAME }}" == '-testenv-e2e-2' ]] || [[ "${{ env.ENV_NAME }}" == -e2e-* ]] || [[ "${{ env.ENV_NAME }}" == -testenv-* ]]; then
+        elif [[ "${{ env.ENV_NAME }}" == '-testenv-e2e-2' ]] || [[ "${{ env.ENV_NAME }}" == -e2e-* ]] || [[ "${{ env.ENV_NAME }}" == -tenv-* ]]; then
           echo "ROUTE53_HOSTED_ZONE_ID=" >> $GITHUB_ENV
           echo "ROUTE53_HOSTED_ZONE_NAME=" >> $GITHUB_ENV
           echo "DB_A_DEFAULT_DATABASE=${{ env.ENVIRONMENT_PREFIX }}-${{ inputs.db-database }}" >> $GITHUB_ENV
