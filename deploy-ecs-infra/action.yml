@@ -111,6 +111,7 @@ runs:
         strict: true
         variables: |
           DOCKERFILE_TAG=${{ env.DOCKERFILE_TAG }}
+          AWS_DEFAULT_REGION=${{ env.AWS_DEFAULT_REGION }}
 
     # - name: DEBUG Etag from S3
     #   run: |
