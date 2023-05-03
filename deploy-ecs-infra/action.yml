@@ -229,12 +229,12 @@ runs:
       # if: always()
       run: |
         mv ./infrastructure/instances-spot.tf.off ./infrastructure/instances-spot.tf
-        terraform -chdir=./infrastructure init -backend-config="bucket=escribers-infra-tempenv-terraform-state" -backend-config="region=$AWS_DEFAULT_REGION" -backend-config="key=state$TEMPENV_VERSION.tfstate" -backend-config="dynamodb_table=lock-dynamo-state$ENV_NAME-terraform-state"
+        terraform -chdir=./infrastructure init -backend-config="bucket=escribers-infra-tempenv-terraform-state" -backend-config="region=us-east-1" -backend-config="key=state$TEMPENV_VERSION.tfstate" -backend-config="dynamodb_table=lock-dynamo-state$ENV_NAME-terraform-state"
         terraform -chdir=./infrastructure apply -auto-approve 
       env:
         AWS_ACCESS_KEY_ID: "${{ env.AWS_ACCESS_KEY_ID }}"
         AWS_SECRET_ACCESS_KEY: "${{ env.AWS_SECRET_ACCESS_KEY }}"
-        AWS_DEFAULT_REGION: "us-east-1"
+        AWS_DEFAULT_REGION: "${{ env.AWS_DEFAULT_REGION }}"
         TF_VAR_aws_access_key: "${{ env.AWS_ACCESS_KEY_ID }}"
         TF_VAR_aws_secret_key: "${{ env.AWS_SECRET_ACCESS_KEY }}" 
         TF_VAR_aws_region: "${{ env.AWS_DEFAULT_REGION }}" 
