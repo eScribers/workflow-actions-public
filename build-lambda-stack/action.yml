@@ -1,0 +1,98 @@
+name: "Build Stack Lambda "
+description: "Build lambda stack with SAM"
+inputs:
+  git-reference:
+    description: 'Git reference from where it should be deployed'
+    default: "refs/heads/master"
+  git-repository:
+    description: 'Repository for lambda function'
+    required: true
+  token:
+    description: 'Token to github'
+    required: true
+  lambda-function-name:
+    description: 'Name for lambda function stack'
+    required: true
+  region:
+    description: 'AWS Default Region'
+    default: "us-east-1"
+
+runs:
+  using: "composite"
+  steps: 
+    - name: Checkout tabula infra repo
+      uses: actions/checkout@v3
+      with:
+        repository: ${{ inputs.git-repository }}
+        ref: ${{ inputs.git-reference }}
+        token: ${{ inputs.token }}
+
+      - name: Define variables depends on env
+        run: |
+          if [[ "${{ inputs.git-reference || 'default' }}" == 'refs/heads/sandbox' ]]; then
+             echo "AWS_ACCESS_KEY_ID=${{ secrets.SANDBOX_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
+             echo "AWS_SECRET_ACCESS_KEY=${{ secrets.SANDBOX_AWS_SECRET_KEY }}" >> $GITHUB_ENV
+             echo "AWS_DEFAULT_REGION=${{ secrets.SANDBOX_AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
+             echo "Deploy to SANDBOX"
+          elif [[ "${{ inputs.git-reference || 'default' }}" == 'refs/heads/main' ]]; then
+             echo "AWS_ACCESS_KEY_ID=${{ secrets.SANDBOX_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
+             echo "AWS_SECRET_ACCESS_KEY=${{ secrets.SANDBOX_AWS_SECRET_KEY }}" >> $GITHUB_ENV
+             echo "AWS_DEFAULT_REGION=${{ secrets.SANDBOX_AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
+             echo "Deploy to PREP_02"
+          elif [[ "${{ inputs.git-reference || 'default' }}" =~ ^refs\/pull\/[0-9]+\/merge ]]; then
+             echo "It's a Pull Request."
+             echo "AWS_ACCESS_KEY_ID=${{ secrets.SANDBOX_AWS_ACCESS_KEY }}" >> $GITHUB_ENV
+             echo "AWS_SECRET_ACCESS_KEY=${{ secrets.SANDBOX_AWS_SECRET_KEY }}" >> $GITHUB_ENV
+             echo "AWS_DEFAULT_REGION=${{ secrets.SANDBOX_AWS_DEFAULT_REGION }}" >> $GITHUB_ENV
+             exit 0
+          else
+             echo "Nothing to deploy"
+             exit 1
+          fi
+
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install AWS CLI
+        run: |
+          pip install --upgrade pip
+          pip install awscli
+
+      # - name: Create release
+      #   id: create_release
+      #   uses: actions/create-release@v1
+      #   with:
+      #     tag_name: ${{ github.ref }}
+      #     release_name: ${{ github.ref }}
+      #     body: |
+      #       Release ${{ github.ref }}
+      #     draft: false
+      #     prerelease: false
+
+      - name: DEBUG
+        run: |
+          ls -l 
+          ls -l $(pwd)
+
+      - name: Build and package Lambda function
+        run: |
+          sam build
+          echo "============="
+          ls -l
+          echo "============="
+          sam package --output-template-file packaged.yaml --s3-bucket lambda-devops --region ${input.region}
+          echo "============="
+          ls -l
+          echo "============="
+          sam deploy --template-file ./packaged.yaml --stack-name ${input.lambda-function-name}-stack --region ${input.region} --no-fail-on-empty-changeset
+          echo "====END======"
