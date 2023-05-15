@@ -233,8 +233,6 @@ runs:
         echo "Wait for 30 seconds"
         sleep 30
         terraform -chdir=./infrastructure apply -auto-approve
-        echo "VPN_SERVER_PRIVATE_IP=$(cat infrastructure/private_ip)" >> $GITHUB_ENV
-        echo "VPN_SERVER_PUBLIC_IP=$(cat infrastructure/public_ip)" >> $GITHUB_ENV
       env:
         AWS_ACCESS_KEY_ID: "${{ env.AWS_ACCESS_KEY_ID }}"
         AWS_SECRET_ACCESS_KEY: "${{ env.AWS_SECRET_ACCESS_KEY }}"
