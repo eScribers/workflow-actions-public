@@ -56,7 +56,9 @@ runs:
         aws lambda get-function --function-name destroy-tempenv-stack-DestroyTempenvFunction-KpWOPUFuPp4A --query 'Code.Location'
         echo "========="
         wget -O myfunction.zip "$(aws lambda get-function --function-name destroy-tempenv-stack-DestroyTempenvFunction-KpWOPUFuPp4A --query 'Code.Location' | tr -d '"')"
+      shell: bash
 
     - name: LS
       run: |
-        ls -l   
+        ls -l
+      shell: bash
