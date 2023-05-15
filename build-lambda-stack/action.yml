@@ -74,10 +74,10 @@ runs:
         echo "============="
         ls -l
         echo "============="
-        sam package --output-template-file packaged.yaml --s3-bucket lambda-devops --region ${input.aws-region}
+        sam package --output-template-file packaged.yaml --s3-bucket lambda-devops --region ${{ inputs.aws-region }}
         echo "============="
         ls -l
         echo "============="
-        sam deploy --template-file ./packaged.yaml --stack-name ${input.lambda-function-name}-stack --region ${input.aws-region} --no-fail-on-empty-changeset
+        sam deploy --template-file ./packaged.yaml --stack-name ${{ inputs.lambda-function-name }}-stack --region ${{ inputs.aws-region }} --no-fail-on-empty-changeset
         echo "====END======"
       shell: bash
