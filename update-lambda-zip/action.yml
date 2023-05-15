@@ -1,5 +1,5 @@
-name: "Build Stack Lambda "
-description: "Build lambda stack with SAM"
+name: "Update lambda code "
+description: "update lambda code file"
 inputs:
   git-reference:
     description: 'Git reference from where it should be deployed'
@@ -51,22 +51,12 @@ runs:
         pip install awscli
       shell: bash
 
-    - name: DEBUG
+    - name: Download lambda function
       run: |
-        ls -l 
-        ls -l $(pwd)
-      shell: bash
+        aws lambda get-function --function-name destroy-tempenv-stack-DestroyTempenvFunction-KpWOPUFuPp4A --query 'Code.Location'
+        echo "========="
+        wget -O myfunction.zip "$(aws lambda get-function --function-name destroy-tempenv-stack-DestroyTempenvFunction-KpWOPUFuPp4A --query 'Code.Location' | tr -d '"')"
 
-    - name: Build and package Lambda function
+    - name: LS
       run: |
-        sam build
-        echo "============="
-        ls -l
-        echo "============="
-        sam package --output-template-file packaged.yaml --s3-bucket lambda-devops --region ${{ inputs.aws-region }}
-        echo "============="
-        ls -l
-        echo "============="
-        sam deploy --template-file ./packaged.yaml --stack-name ${{ inputs.lambda-function-name }}-stack --region ${{ inputs.aws-region }} --no-fail-on-empty-changeset
-        echo "====END======"
-      shell: bash
+        ls -l   
