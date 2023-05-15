@@ -33,29 +33,29 @@ runs:
         ref: ${{ inputs.git-reference }}
         token: ${{ inputs.token }}
 
-      - name: Define variables depends on env
-        run: |
-          if [[ "${{ inputs.git-reference || 'default' }}" == 'refs/heads/sandbox' ]]; then
-             echo "AWS_ACCESS_KEY_ID=${{ inputs.aws-access-key }}" >> $GITHUB_ENV
-             echo "AWS_SECRET_ACCESS_KEY=${{ inputs.aws-secret-key }}" >> $GITHUB_ENV
-             echo "AWS_DEFAULT_REGION=${{ inputs.aws-region }}" >> $GITHUB_ENV
-             echo "Deploy to SANDBOX"
-          elif [[ "${{ inputs.git-reference || 'default' }}" == 'refs/heads/main' ]]; then
-             echo "AWS_ACCESS_KEY_ID=${{ inputs.aws-access-key }}" >> $GITHUB_ENV
-             echo "AWS_SECRET_ACCESS_KEY=${{ inputs.aws-secret-key }}" >> $GITHUB_ENV
-             echo "AWS_DEFAULT_REGION=${{ inputs.aws-region }}" >> $GITHUB_ENV
-             echo "Deploy to PREP_02"
-          elif [[ "${{ inputs.git-reference || 'default' }}" =~ ^refs\/pull\/[0-9]+\/merge ]]; then
-             echo "It's a Pull Request."
-             echo "AWS_ACCESS_KEY_ID=${{ inputs.aws-access-key }}" >> $GITHUB_ENV
-             echo "AWS_SECRET_ACCESS_KEY=${{ inputs.aws-secret-key }}" >> $GITHUB_ENV
-             echo "AWS_DEFAULT_REGION=${{ inputs.aws-region }}" >> $GITHUB_ENV
-             exit 0
-          else
-             echo "Nothing to deploy"
-             exit 1
-          fi
-        shell: bash
+      # - name: Define variables depends on env
+      #   run: |
+      #     if [[ "${{ inputs.git-reference || 'default' }}" == 'refs/heads/sandbox' ]]; then
+      #        echo "AWS_ACCESS_KEY_ID=${{ inputs.aws-access-key }}" >> $GITHUB_ENV
+      #        echo "AWS_SECRET_ACCESS_KEY=${{ inputs.aws-secret-key }}" >> $GITHUB_ENV
+      #        echo "AWS_DEFAULT_REGION=${{ inputs.aws-region }}" >> $GITHUB_ENV
+      #        echo "Deploy to SANDBOX"
+      #     elif [[ "${{ inputs.git-reference || 'default' }}" == 'refs/heads/main' ]]; then
+      #        echo "AWS_ACCESS_KEY_ID=${{ inputs.aws-access-key }}" >> $GITHUB_ENV
+      #        echo "AWS_SECRET_ACCESS_KEY=${{ inputs.aws-secret-key }}" >> $GITHUB_ENV
+      #        echo "AWS_DEFAULT_REGION=${{ inputs.aws-region }}" >> $GITHUB_ENV
+      #        echo "Deploy to PREP_02"
+      #     elif [[ "${{ inputs.git-reference || 'default' }}" =~ ^refs\/pull\/[0-9]+\/merge ]]; then
+      #        echo "It's a Pull Request."
+      #        echo "AWS_ACCESS_KEY_ID=${{ inputs.aws-access-key }}" >> $GITHUB_ENV
+      #        echo "AWS_SECRET_ACCESS_KEY=${{ inputs.aws-secret-key }}" >> $GITHUB_ENV
+      #        echo "AWS_DEFAULT_REGION=${{ inputs.aws-region }}" >> $GITHUB_ENV
+      #        exit 0
+      #     else
+      #        echo "Nothing to deploy"
+      #        exit 1
+      #     fi
+      #   shell: bash
 
 
       - name: Configure AWS Credentials
