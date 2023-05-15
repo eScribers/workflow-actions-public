@@ -49,6 +49,7 @@ runs:
              echo "Nothing to deploy"
              exit 1
           fi
+        shell: bash
 
 
       - name: Configure AWS Credentials
@@ -67,6 +68,7 @@ runs:
         run: |
           pip install --upgrade pip
           pip install awscli
+        shell: bash
 
       # - name: Create release
       #   id: create_release
@@ -83,6 +85,7 @@ runs:
         run: |
           ls -l 
           ls -l $(pwd)
+        shell: bash
 
       - name: Build and package Lambda function
         run: |
@@ -96,3 +99,4 @@ runs:
           echo "============="
           sam deploy --template-file ./packaged.yaml --stack-name ${input.lambda-function-name}-stack --region ${input.region} --no-fail-on-empty-changeset
           echo "====END======"
+        shell: bash
