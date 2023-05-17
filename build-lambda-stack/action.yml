@@ -10,7 +10,7 @@ inputs:
   token:
     description: 'Token to github'
     required: true
-  lambda-function-name:
+  lambda-stack-name:
     description: 'Name for lambda function stack'
     required: true
   aws-region:
@@ -67,6 +67,6 @@ runs:
         echo "============="
         ls -l
         echo "============="
-        sam deploy --template-file ./packaged.yaml --stack-name ${{ inputs.lambda-function-name }}-stack --region ${{ inputs.aws-region }} --no-fail-on-empty-changeset
+        sam deploy --template-file ./packaged.yaml --stack-name ${{ inputs.lambda-stack-name }}-stack --region ${{ inputs.aws-region }} --no-fail-on-empty-changeset
         echo "====END======"
       shell: bash

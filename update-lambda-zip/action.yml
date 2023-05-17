@@ -13,6 +13,9 @@ inputs:
   lambda-function-name:
     description: 'Name for lambda function stack'
     required: true
+  lambda-stack-name:
+    description: 'Name for lambda function stack'
+    required: true
   aws-region:
     description: 'AWS Default Region'
     default: "us-east-1"
@@ -51,11 +54,14 @@ runs:
         pip install awscli
       shell: bash
 
+    - name: Get Lambda Function Name
+      run: echo "FUNCTION_NAME=$(sam list stack-outputs --config-file samconfig.toml --stack-name $ {{ inputs.lambda-stack-name }} --output json | jq '.[] | select(.OutputKey=="${{ inputs.lambda-function-name }}") | .OutputValue' | tr -d '\"')" >> $GITHUB_ENV
+
     - name: Download lambda function
       run: |
-        aws lambda get-function --function-name destroy-tempenv-stack-DestroyTempenvFunction-KpWOPUFuPp4A --query 'Code.Location'
+        aws lambda get-function --function-name ${{ env.FUNCTION_NAME }} --query 'Code.Location'
         echo "========="
-        wget -O myfunction.zip "$(aws lambda get-function --function-name destroy-tempenv-stack-DestroyTempenvFunction-KpWOPUFuPp4A --query 'Code.Location' | tr -d '"')"
+        wget -O myfunction.zip "$(aws lambda get-function --function-name ${{ env.FUNCTION_NAME }} --query 'Code.Location' | tr -d '"')"
       shell: bash
 
     - name: LS
