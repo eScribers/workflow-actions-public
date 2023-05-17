@@ -10,9 +10,9 @@ inputs:
   token:
     description: 'Token to github'
     required: true
-  lambda-stack-name:
-    description: 'Name for lambda function stack'
-    required: true
+  # lambda-stack-name:
+  #   description: 'Name for lambda function stack'
+  #   required: true
   aws-region:
     description: 'AWS Default Region'
     default: "us-east-1"
@@ -57,6 +57,15 @@ runs:
         ls -l $(pwd)
       shell: bash
 
+    - name: get stack name
+      run: echo "STACK_NAME=$(grep  stack_name samconfig.toml |  awk -F '=' '{print $2}' | tr -d ' ' | tr -d '\"')" >> $GITHUB_ENV
+      shell: bash
+
+    # - name: lambda-function-name
+    #   run: echo "LAMBDA_FUNCTION_NAME=$(sam list stack-outputs --config-file samconfig.toml --stack-name ${{ env.STACK_NAME }} --output json | jq '.[] | select(.OutputKey=="${{ env.FUNCTION_NAME }}") | .OutputValue'" >> $GITHUB_ENV
+    #   shell: bash
+
+
     - name: Build and package Lambda function
       run: |
         sam build
@@ -67,6 +76,6 @@ runs:
         echo "============="
         ls -l
         echo "============="
-        sam deploy --template-file ./packaged.yaml --stack-name ${{ inputs.lambda-stack-name }}-stack --region ${{ inputs.aws-region }} --no-fail-on-empty-changeset
+        sam deploy --template-file ./packaged.yaml --stack-name ${{ env.STACK_NAME }}-stack --region ${{ inputs.aws-region }} --no-fail-on-empty-changeset
         echo "====END======"
       shell: bash
