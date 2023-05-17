@@ -76,6 +76,6 @@ runs:
         echo "============="
         ls -l
         echo "============="
-        sam deploy --template-file ./packaged.yaml --stack-name ${{ env.STACK_NAME }}-stack --region ${{ inputs.aws-region }} --no-fail-on-empty-changeset
+        sam deploy --template-file lambda-destroy-tmpenv/packaged.yaml --stack-name ${{ env.STACK_NAME }}-stack --region ${{ inputs.aws-region }} --no-fail-on-empty-changeset
         echo "====END======"
       shell: bash
