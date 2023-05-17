@@ -75,6 +75,10 @@ runs:
         zip -r myfunction.zip $(grep CodeUri template.yaml | awk -F ':' '{print $2}' | tr -d ' ' | tr -d '//')/app.py
       shell: bash
 
+    - name: Update lambda
+      run: |
+        aws lambda update-function-code --function-name ${{ env.FUNCTION_NAME }} --zip-file fileb://myfunction.zip
+
     - name: LS
       run: |
         ls -l
