@@ -56,6 +56,7 @@ runs:
 
     - name: Get Lambda Function Name
       run: echo "FUNCTION_NAME=$(sam list stack-outputs --config-file samconfig.toml --stack-name $ {{ inputs.lambda-stack-name }} --output json | jq '.[] | select(.OutputKey=="${{ inputs.lambda-function-name }}") | .OutputValue' | tr -d '\"')" >> $GITHUB_ENV
+      shell: bash
 
     - name: Download lambda function
       run: |
