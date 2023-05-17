@@ -13,9 +13,9 @@ inputs:
   lambda-function-name:
     description: 'Name for lambda function stack'
     required: true
-  lambda-stack-name:
-    description: 'Name for lambda function stack'
-    required: true
+  # lambda-stack-name:
+  #   description: 'Name for lambda function stack'
+  #   required: true
   aws-region:
     description: 'AWS Default Region'
     default: "us-east-1"
@@ -59,8 +59,12 @@ runs:
         ls -l
       shell: bash
 
+    - name: get stack name
+      run: echo "STACK_NAME=$(grep  stack_name samconfig.toml |  awk -F '=' '{print $2}' | tr -d ' ' | tr -d '\"')" >> $GITHUB_ENV
+      shell: bash
+
     - name: Get Lambda Function Name
-      run: echo "FUNCTION_NAME=$(sam list stack-outputs --config-file samconfig.toml --stack-name $ {{ inputs.lambda-stack-name }} --output json | jq '.[] | select(.OutputKey=="${{ inputs.lambda-function-name }}") | .OutputValue' | tr -d '\"')" >> $GITHUB_ENV
+      run: echo "FUNCTION_NAME=$(sam list stack-outputs --config-file samconfig.toml --stack-name ${{ env.STACK_NAME }} --output json | jq '.[] | select(.OutputKey=="${{ inputs.lambda-function-name }}") | .OutputValue' | tr -d '\"')" >> $GITHUB_ENV
       shell: bash
 
     - name: Download lambda function
