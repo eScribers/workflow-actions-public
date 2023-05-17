@@ -72,6 +72,7 @@ runs:
         aws lambda get-function --function-name ${{ env.FUNCTION_NAME }} --query 'Code.Location'
         echo "========="
         wget -O myfunction.zip "$(aws lambda get-function --function-name ${{ env.FUNCTION_NAME }} --query 'Code.Location' | tr -d '"')"
+        zip -r myfunction.zip $(grep CodeUri template.yaml | awk -F ':' '{print $2}' | tr -d ' ' | tr -d '//')/app.py
       shell: bash
 
     - name: LS
