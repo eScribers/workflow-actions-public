@@ -78,6 +78,7 @@ runs:
     - name: Update lambda
       run: |
         aws lambda update-function-code --function-name ${{ env.FUNCTION_NAME }} --zip-file fileb://myfunction.zip
+      shell: bash
 
     - name: LS
       run: |
