@@ -70,7 +70,7 @@ runs:
 
     - name: Download lambda zip
       run: |
-        for FUNCTION_NAME in $(echo $FUNCTION_NAMES_ARRAY); \
+        for FUNCTION_NAME in $(echo $FUNCTION_NAMES_ARRAY); do\
           aws lambda get-function --function-name $FUNCTION_NAME --query 'Code.Location' | tr -d '"' \
           wget -O $FUNCTION_NAME.zip "$(aws lambda get-function --function-name $FUNCTION_NAME --query 'Code.Location' | tr -d '"')"; \
         done
