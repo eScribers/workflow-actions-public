@@ -63,24 +63,39 @@ runs:
       run: echo "STACK_NAME=$(grep  stack_name samconfig.toml |  awk -F '=' '{print $2}' | tr -d ' ' | tr -d '\"')" >> $GITHUB_ENV
       shell: bash
 
-    - name: Get Lambda Function Name
-      run: echo "FUNCTION_NAME=$(sam list stack-outputs --config-file samconfig.toml --stack-name ${{ env.STACK_NAME }} --output json | jq '.[] | select(.OutputKey=="${{ inputs.lambda-function-name }}") | .OutputValue' | tr -d '\"')" >> $GITHUB_ENV
+########################
+    - name: Get Function names array
+      run: echo "FUNCTION_NAMES_ARRAY=$(yq ' .Resources | keys'  template.yaml | tr -d " "| sed 's/^.//')" >> $GITHUB_ENV
       shell: bash
 
-    - name: Download lambda function
+    - name: Download lambda zip
       run: |
-        aws lambda get-function --function-name ${{ env.FUNCTION_NAME }} --query 'Code.Location'
-        echo "========="
-        wget -O myfunction.zip "$(aws lambda get-function --function-name ${{ env.FUNCTION_NAME }} --query 'Code.Location' | tr -d '"')"
-        cp $(grep CodeUri template.yaml | awk -F ':' '{print $2}' | tr -d ' ' | tr -d '//')/app.py app.py
-        zip -r myfunction.zip ./app.py
+        for FUNCTION_NAME in $(echo $FUNCTION_NAMES_ARRAY); \
+          wget -O $FUNCTION_NAME.zip "$(aws lambda get-function --function-name $FUNCTION_NAME --query 'Code.Location' | tr -d '"')"; \
+        done
       shell: bash
+########################
+#-----------------------
 
-    - name: Update lambda
-      run: |
-        aws lambda update-function-code --function-name ${{ env.FUNCTION_NAME }} --zip-file fileb://myfunction.zip
-      shell: bash
+    # - name: Get Lambda Function Name
+    #   run: echo "FUNCTION_NAME=$(sam list stack-outputs --config-file samconfig.toml --stack-name ${{ env.STACK_NAME }} --output json | jq '.[] | select(.OutputKey=="${{ inputs.lambda-function-name }}") | .OutputValue' | tr -d '\"')" >> $GITHUB_ENV
+    #   shell: bash
 
+    # - name: Download lambda function
+    #   run: |
+    #     aws lambda get-function --function-name ${{ env.FUNCTION_NAME }} --query 'Code.Location'
+    #     echo "========="
+    #     wget -O myfunction.zip "$(aws lambda get-function --function-name ${{ env.FUNCTION_NAME }} --query 'Code.Location' | tr -d '"')"
+    #     cp $(grep CodeUri template.yaml | awk -F ':' '{print $2}' | tr -d ' ' | tr -d '//')/app.py app.py
+    #     zip -r myfunction.zip ./app.py
+    #   shell: bash
+
+    # - name: Update lambda
+    #   run: |
+    #     aws lambda update-function-code --function-name ${{ env.FUNCTION_NAME }} --zip-file fileb://myfunction.zip
+    #   shell: bash
+
+#-----------------------
     - name: LS
       run: |
         ls -l
