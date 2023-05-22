@@ -78,7 +78,9 @@ runs:
           FUNCTION_NAME=$(aws lambda list-functions --query 'Functions[*].FunctionName' | tr -d ' ' | tr -d '\"' |  tr -d ',' | grep ${{ env.STACK_NAME }}-$TEMPLATE_FUNCTION_NAME) && \
           aws lambda get-function --function-name $FUNCTION_NAME --query 'Code.Location' | tr -d '"' && \
           wget -O $FUNCTION_NAME.zip "$(aws lambda get-function --function-name $FUNCTION_NAME --query 'Code.Location' | tr -d '"')" && \
-          zip -r $FUNCTION_NAME.zip ./$(yq ' .Resources[${{ env.TEMPLATE_FUNCTION_NAME }}].Properties.CodeUri'  template.yaml )/* && echo "TEST"; done
+          FUNCTION_URI=$(yq ' .Resources[${{ env.TEMPLATE_FUNCTION_NAME }}].Properties.CodeUri'  template.yaml ) && \
+          zip -r $FUNCTION_NAME.zip ./$FUNCTION_URI/* && \ 
+          aws lambda update-function-code --function-name $FUNCTION_NAME --zip-file fileb://$FUNCTION_NAME.zip; done
       shell: bash
 
 
