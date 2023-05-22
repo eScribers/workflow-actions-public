@@ -71,13 +71,13 @@ runs:
     - name: Download lambda zip
       run: |
         for TEMPLATE_FUNCTION_NAME in $(echo $FUNCTION_NAMES_ARRAY); do\
-          echo TEMPLATE_FUNCTION_NAME - $TEMPLATE_FUNCTION_NAME \
-          FUNCTION_NAME=$(aws lambda list-functions --query 'Functions[*].FunctionName' | tr -d ' ' | tr -d '\"' |  tr -d ',' | grep ${{ env.STACK_NAME }}-$TEMPLATE_FUNCTION_NAME) \
-          echo TEMPLATE_FUNCTION_NAME - $TEMPLATE_FUNCTION_NAME \
-          aws lambda get-function --function-name $FUNCTION_NAME --query 'Code.Location' | tr -d '"' \
-          echo ======= \
-          wget -O $FUNCTION_NAME.zip "$(aws lambda get-function --function-name $FUNCTION_NAME --query 'Code.Location' | tr -d '"')"; \
-          ls -l \
+          echo TEMPLATE_FUNCTION_NAME - $TEMPLATE_FUNCTION_NAME && \
+          FUNCTION_NAME=$(aws lambda list-functions --query 'Functions[*].FunctionName' | tr -d ' ' | tr -d '\"' |  tr -d ',' | grep ${{ env.STACK_NAME }}-$TEMPLATE_FUNCTION_NAME) && \
+          echo TEMPLATE_FUNCTION_NAME - $TEMPLATE_FUNCTION_NAME && \
+          aws lambda get-function --function-name $FUNCTION_NAME --query 'Code.Location' | tr -d '"' && \
+          echo ======= && \
+          wget -O $FUNCTION_NAME.zip "$(aws lambda get-function --function-name $FUNCTION_NAME --query 'Code.Location' | tr -d '"')"; && \
+          ls -l; \
         done
       shell: bash
 ########################
