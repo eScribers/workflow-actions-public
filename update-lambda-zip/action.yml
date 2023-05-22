@@ -78,6 +78,7 @@ runs:
           echo ======= && \
           wget -O $FUNCTION_NAME.zip "$(aws lambda get-function --function-name $FUNCTION_NAME --query 'Code.Location' | tr -d '"')" && \
           FUNCTION_URI=$(yq ' .Resources["$TEMPLATE_FUNCTION_NAME"].Properties.CodeUri'  template.yaml ) && \
+          echo =$FUNCTION_NAME==$FUNCTION_URI==== && \
           zip -r $FUNCTION_NAME.zip ./$FUNCTION_URI/*
           ls -l; \
         done
