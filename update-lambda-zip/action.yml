@@ -79,7 +79,7 @@ runs:
           wget -O $FUNCTION_NAME.zip "$(aws lambda get-function --function-name $FUNCTION_NAME --query 'Code.Location' | tr -d '"')" && \
           cat template.yaml && \
           echo =====++++++++++========= && \
-          yq ' .Resources["$TEMPLATE_FUNCTION_NAME"].Properties.CodeUri'  template.yaml && \
+          yq ' .Resources["DestroyTempenvFunction"].Properties.CodeUri'  template.yaml && \
           echo ===$TEMPLATE_FUNCTION_NAME====$FUNCTION_NAME===== && \
           FUNCTION_URI=$(yq ' .Resources["$TEMPLATE_FUNCTION_NAME"].Properties.CodeUri'  template.yaml ) && \
           echo ===$TEMPLATE_FUNCTION_NAME====$FUNCTION_NAME==$FUNCTION_URI==== && \
