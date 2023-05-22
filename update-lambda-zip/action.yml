@@ -70,6 +70,8 @@ runs:
 
     - name: Download lambda zip
       run: |
+        me=`basename "$0"`
+        echo $me
         for TEMPLATE_FUNCTION_NAME in $(echo $FUNCTION_NAMES_ARRAY); do \
           FUNCTION_NAME=$(aws lambda list-functions --query 'Functions[*].FunctionName' | tr -d ' ' | tr -d '\"' |  tr -d ',' | grep ${{ env.STACK_NAME }}-$TEMPLATE_FUNCTION_NAME) && \
           aws lambda get-function --function-name $FUNCTION_NAME --query 'Code.Location' | tr -d '"' && \
