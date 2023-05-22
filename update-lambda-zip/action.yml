@@ -79,8 +79,7 @@ runs:
           aws lambda get-function --function-name $FUNCTION_NAME --query 'Code.Location' | tr -d '"' && \
           wget -O $FUNCTION_NAME.zip "$(aws lambda get-function --function-name $FUNCTION_NAME --query 'Code.Location' | tr -d '"')" && \
           zip -r $FUNCTION_NAME.zip ./$(yq ' .Resources[${{ env.TEMPLATE_FUNCTION_NAME }}].Properties.CodeUri'  template.yaml )/* && \ 
-          echo "TEST"; \
-        done
+          echo "TEST"; done
       shell: bash
 
 
