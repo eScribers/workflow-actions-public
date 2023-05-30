@@ -166,6 +166,9 @@ inputs:
   netsuite-sqs-url:
     description: 'netsuite url of sqs'
     default: ""
+  auth0-client-secret:
+    description: 'Secret for auth0'
+    default: ""
 
 runs:
   using: "composite"
@@ -534,6 +537,7 @@ runs:
           TAB_LOG_THRESHOLD=${{ inputs.log-threshold }}
           TAB_ENVIRONMENT=${{ inputs.tab-environment }}
           NETSUITE_SQS_URL=${{ inputs.netsuite-sqs-url }}
+          AUTH0_CLIENT_SECRET=${{ inputs.auth0-client-secret }}
 
 
 ####################
