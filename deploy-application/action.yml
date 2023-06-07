@@ -612,6 +612,7 @@ runs:
 
     - name: Execute Migration Commands
       uses: eScribers/workflow-actions-public/migrations@master
+      if: ${{ !startsWith(inputs.tempenv-version, '-tenvdb-') }}
       with:
         host_ip: ${{ steps.split.outputs._0 }}
         oleksb-key: ${{ inputs.oleksb-key }}
