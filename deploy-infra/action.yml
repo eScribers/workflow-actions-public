@@ -19,6 +19,9 @@ inputs:
   git-reference:
     description: 'Git reference from where it should be deployed'
     default: "refs/heads/master"
+  tenvdb:
+    description: 'Define that resource should be created'
+    default: "false"
 
 
 runs:
@@ -85,24 +88,6 @@ runs:
         echo =${{ env.DYN_DIGEST }}=
       shell: bash
 
-    # - name: Exit if not same
-    #   if: ${{ env.DYN_DIGEST != env.S3_ETAG }}
-    #   run: |
-    #     echo DYN_DIGEST-${{ env.DYN_DIGEST }}
-    #     echo S3_ETAG-${{ env.S3_ETAG }}
-    #     if [[ ${{ env.DYN_DIGEST }} != ${{ env.S3_ETAG }} ]]; then
-    #       echo "ERROR!!!!!"
-    #       echo "Etag in state file not same as digest in DynamoDB table"
-    #       echo "Another deploy still is inprocess. Please wait untill all commits and checks will be passed and restart this workflow"
-    #       echo "Also might be need to remove DynamoDB table - lock-dynamo-state${{ env.TEMPENV_VERSION }}-terraform-state"
-    #       exit 1
-    #     else
-    #       echo DEPLOY
-    #     fi
-    #   shell: bash
-
-#################################
-
     - name: Intall terraform
       run: |
         which terraform
@@ -126,9 +111,11 @@ runs:
         mv ./infrastructure/instances-spot.tf.off ./infrastructure/instances-spot.tf
         terraform -chdir=./infrastructure init -backend-config="bucket=escribers-infra-tempenv-terraform-state" -backend-config="key=state$TEMPENV_VERSION.tfstate" -backend-config="dynamodb_table=lock-dynamo-state$ENV_NAME-terraform-state"
         terraform -chdir=./infrastructure apply -auto-approve || true
-        echo "Wait for 30 seconds"
-        sleep 30
-        terraform -chdir=./infrastructure apply -auto-approve
+        if [[ "${{ inputs.tenvdb }}" != 'true' ]]; then
+          echo "Wait for 30 seconds"
+          sleep 30
+          terraform -chdir=./infrastructure apply -auto-approve
+        fi
         echo "VPN_SERVER_PRIVATE_IP=$(cat infrastructure/private_ip)" >> $GITHUB_ENV
         echo "VPN_SERVER_PUBLIC_IP=$(cat infrastructure/public_ip)" >> $GITHUB_ENV
       env:
@@ -142,6 +129,7 @@ runs:
         TF_VAR_do_migration: "false"
         TF_VAR_deletion_protection: "false"
         TF_VAR_instance_count: "3"
+        TF_VAR_tenvdb: "${{ inputs.tenvdb }}"
         TEMPENV_VERSION: "${{ env.TEMPENV_VERSION }}"
       shell: bash
 

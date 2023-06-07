@@ -256,34 +256,3 @@ runs:
         TF_VAR_tab_database: "${{ env.DB_DEFAULT_DATABASE }}"
         TF_VAR_environment_bucket: "${{ inputs.environment-bucket }}"
       shell: bash
-
-    # - name: Define variables for VPN servers
-    #   run: |
-    #     echo "VPN_SERVER_PRIVATE_IP=$(cat infrastructure/private_ip)" >> $GITHUB_ENV
-    #     echo "VPN_SERVER_PUBLIC_IP=$(cat infrastructure/public_ip)" >> $GITHUB_ENV
-    #   shell: bash
-
-    # - name: Get VPN Profile
-    #   run: |
-    #     echo $VPN_SERVER_PUBLIC_IP
-    #     echo =====================================
-    #     echo $VPN_SERVER_PRIVATE_IP
-    #   env:
-    #     VPN_SERVER_PRIVATE_IP: "${{ env.VPN_SERVER_PRIVATE_IP }}" 
-    #     VPN_SERVER_PUBLIC_IP: "${{ env.VPN_SERVER_PUBLIC_IP }}" 
-    #   shell: bash
-
-    # - name: Upload private_ip
-    #   uses: actions/upload-artifact@v1
-    #   with:
-    #     name: private_ip
-    #     path: infrastructure/private_ip
-          
-    # - name: Upload public_ip
-    #   uses: actions/upload-artifact@v1
-    #   with:
-    #     name: public_ip
-    #     path: infrastructure/public_ip
-
-
-

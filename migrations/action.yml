@@ -67,6 +67,7 @@ runs:
         username: ubuntu
         key: ${{ inputs.oleksb-key }}
         port: 22
+        command_timeout: 200m
         script: |
           sudo docker exec tabula_backend php index.php migrate version 1
           sudo docker exec tabula_backend php index.php migrate devdata
@@ -83,6 +84,7 @@ runs:
         username: ubuntu
         key: ${{ inputs.oleksb-key }}
         port: 22
+        command_timeout: 200m
         script: |
           whoami
           echo ${{ inputs.tempenv-version }}
@@ -103,6 +105,7 @@ runs:
         username: ubuntu
         key: ${{ inputs.oleksb-key }}
         port: 22
+        command_timeout: 200m
         script: |
           sudo docker exec tabula_backend php index.php migrate testdata
         shell: bash
@@ -121,6 +124,7 @@ runs:
         username: ubuntu
         key: ${{ inputs.oleksb-key }}
         port: 22
+        command_timeout: 200m
         script: |
           sudo docker exec tabula_backend php index.php migrate
         shell: bash

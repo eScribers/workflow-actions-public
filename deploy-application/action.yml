@@ -302,6 +302,15 @@ runs:
           echo "DB_REP_DATABASE=${{ env.ENVIRONMENT_PREFIX }}-${{ env.DB_REP_DATABASE }}" >> $GITHUB_ENV
           echo "RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com" >> $GITHUB_ENV
           echo "Deploy to tempenvs "
+        elif [[ "${{ env.ENV_NAME }}" =~ ^-tenvdb.* ]]; then
+          echo "CI_ENV=development" >> $GITHUB_ENV
+          echo "ROUTE53_HOSTED_ZONE_ID=" >> $GITHUB_ENV
+          echo "ROUTE53_HOSTED_ZONE_NAME=" >> $GITHUB_ENV
+          echo "DB_A_DEFAULT_DATABASE=tabservices" >> $GITHUB_ENV
+          echo "DB_READ_DATABASE=tabservices" >> $GITHUB_ENV
+          echo "DB_REP_DATABASE=tabservices" >> $GITHUB_ENV
+          echo "RDS_ENDPOINT=$(aws rds describe-db-instances --db-instance-identifier tenvdb${{ env.ENV_NAME }} --query 'DBInstances[*].Endpoint.Address' | jq -r '.[]')"  >> $GITHUB_ENV
+          echo "Deploy to tempenvs with Prod data"
         elif [[ "${{ env.ENV_NAME }}" == '-sandbox' ]]; then
           echo "CI_ENV=development" >> $GITHUB_ENV
           echo "ROUTE53_HOSTED_ZONE_ID=" >> $GITHUB_ENV
@@ -607,6 +616,7 @@ runs:
 
     - name: Execute Migration Commands
       uses: eScribers/workflow-actions-public/migrations@master
+      if: ${{ !startsWith(inputs.tempenv-version, '-tenvdb-') }}
       with:
         host_ip: ${{ steps.split.outputs._0 }}
         oleksb-key: ${{ inputs.oleksb-key }}
