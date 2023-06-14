@@ -54,6 +54,10 @@ inputs:
     description: 'Overwrite test suite file'
     default: 'Smoke.xml'
     required: false
+  teams-webhook-url:
+    description: 'Webhook for sending notifications to teams'
+    required: false
+    default: ""
 
 runs:
   using: "composite"
@@ -90,6 +94,7 @@ runs:
           PR_TITLE=${{ inputs.pr-title }}
           PR_AUTHOR=${{ inputs.pr-creator }}
           POSTMARK_API_KEY=${{ inputs.postmark-api }}
+          TEAMS_WEBHOOK_URL==${{ inputs.teams-webhook-url }}
 
     - name: Setup Login.xml file
       uses: cuchi/jinja2-action@v1.2.0
