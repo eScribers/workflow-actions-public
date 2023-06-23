@@ -63,6 +63,9 @@ inputs:
   environment-bucket:
     description: 'Bucket to upload files'
     default: ""
+  frontend_url:
+    description: 'frontend_url'
+    default: "https://tabula-frontend-prep-02-aws-us-east-1.s3.amazonaws.com"
 
 runs:
   using: "composite"
@@ -255,4 +258,5 @@ runs:
         TF_VAR_netsuite_sqs_url: "${{ inputs.netsuite-sqs-url }}"
         TF_VAR_tab_database: "${{ env.DB_DEFAULT_DATABASE }}"
         TF_VAR_environment_bucket: "${{ inputs.environment-bucket }}"
+        TF_VAR_frontend_url: "${{ inputs.frontend_url }}"
       shell: bash
