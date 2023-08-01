@@ -169,11 +169,8 @@ inputs:
   auth0-client-secret:
     description: 'Secret for auth0'
     default: ""
-  postmarkapp_processor:
-    description: 'postmarkapp_processor'
-    default: ""
-  postmarkapp_sqs:
-    description: 'postmarkapp_sqs URL'
+  postmarkapp-processor:
+    description: 'postmarkapp-processor'
     default: ""
 
 runs:
@@ -540,8 +537,7 @@ runs:
           TAB_ENVIRONMENT=${{ inputs.tab-environment }}
           NETSUITE_SQS_URL=${{ inputs.netsuite-sqs-url }}
           AUTH0_CLIENT_SECRET=${{ inputs.auth0-client-secret }}
-          TAB_POSTMARKAPP_PROCESSOR=${{ inputs.postmarkapp_processor }}
-          TAB_POSTMARKAPP_SQS=${{ inputs.postmarkapp_sqs }}
+          TAB_POSTMARKAPP_PROCESSOR=${{ inputs.postmarkapp-processor }}
 
 
     ####################
