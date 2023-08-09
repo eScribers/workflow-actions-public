@@ -31,7 +31,10 @@ inputs:
     description: 'Resource AWS Secret Key from secrets'
     required: true
     default: ""
-    
+  sender-email-password:        # TO_REMOVE
+    description: 'Git reference from where it should be deployed'       # TO_REMOVE
+    default: ""             # TO_REMOVE
+
 runs:
   using: "composite"
   steps: 
@@ -60,7 +63,8 @@ runs:
           echo "[resources]" >> ~/.aws/credentials
           echo "aws_access_key_id=${{ env.RESOURCES_ACCESS_KEY_ID }}" >> ~/.aws/credentials
           echo "aws_secret_access_key=${{ env.RESOURCES_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
-
+          echo "${{ inputs.sender-email-password }}" > ~/sender-email-password
+# TO_REMOVE
     - name: copy docker-compose via ssh key
       uses: appleboy/scp-action@master
       with:

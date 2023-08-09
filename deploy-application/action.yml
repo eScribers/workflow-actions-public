@@ -172,6 +172,9 @@ inputs:
   postmarkapp-processor:
     description: 'postmarkapp-processor'
     default: ""
+  sender-email-password:                # TO_REMOVE
+    description: 'Git reference from where it should be deployed'       # TO_REMOVE
+    default: ""                         # TO_REMOVE
 
 runs:
   using: "composite"
@@ -576,6 +579,7 @@ runs:
         token: ${{ inputs.token }}
         resource-access-key: ${{ env.RESOURCE_AWS_ACCESS_KEY_ID }}
         resource-secret-key: ${{ env.RESOURCE_AWS_SECRET_ACCESS_KEY }}
+        sender-email-password: ${{ inputs.sender-email-password }}        # TO_REMOVE
         
     - name: Execute Deploy Command №2
       uses: eScribers/workflow-actions-public/execute-deploy@master
@@ -590,6 +594,7 @@ runs:
         token: ${{ inputs.token }}
         resource-access-key: ${{ env.RESOURCE_AWS_ACCESS_KEY_ID }}
         resource-secret-key: ${{ env.RESOURCE_AWS_SECRET_ACCESS_KEY }}
+        sender-email-password: ${{ inputs.sender-email-password }}      # TO_REMOVE
 
     - name: Execute Deploy Command №3
       uses: eScribers/workflow-actions-public/execute-deploy@master
@@ -604,6 +609,7 @@ runs:
         token: ${{ inputs.token }}
         resource-access-key: ${{ env.RESOURCE_AWS_ACCESS_KEY_ID }}
         resource-secret-key: ${{ env.RESOURCE_AWS_SECRET_ACCESS_KEY }}
+        sender-email-password: ${{ inputs.sender-email-password }}      # TO_REMOVE
 
     - name: Execute Migration Commands
       uses: eScribers/workflow-actions-public/migrations@master
