@@ -172,9 +172,6 @@ inputs:
   postmarkapp-processor:
     description: 'postmarkapp-processor'
     default: ""
-  sender-email-password:                # TO_REMOVE
-    description: 'Git reference from where it should be deployed'       # TO_REMOVE
-    default: ""                         # TO_REMOVE
 
 runs:
   using: "composite"
