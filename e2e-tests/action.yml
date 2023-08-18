@@ -58,6 +58,14 @@ inputs:
     description: 'Webhook for sending notifications to teams'
     required: false
     default: ""
+  registration-email-address:
+    description: 'Email address for registration'
+    required: false
+    default: ""
+  registration-email-password:
+    description: 'Email password  for registration email'
+    required: false
+    default: ""
 
 runs:
   using: "composite"
@@ -95,7 +103,8 @@ runs:
           PR_AUTHOR=${{ inputs.pr-creator }}
           POSTMARK_API_KEY=${{ inputs.postmark-api }}
           TEAMS_WEBHOOK_URL=${{ inputs.teams-webhook-url }}
-          REGISTRATION_EMAIL_ADDRESS=${{ vars.REGISTRATION_EMAIL_ADDRESS }}
+          REGISTRATION_EMAIL_ADDRESS=${{ inputs.registration-email-address }}
+          REGISTRATION_EMAIL_PASSWORD=${{ inputs.registration-email-password }}
 
     - name: Setup Login.xml file
       uses: cuchi/jinja2-action@v1.2.0
