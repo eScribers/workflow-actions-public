@@ -95,6 +95,7 @@ runs:
           PR_AUTHOR=${{ inputs.pr-creator }}
           POSTMARK_API_KEY=${{ inputs.postmark-api }}
           TEAMS_WEBHOOK_URL=${{ inputs.teams-webhook-url }}
+          REGISTRATION_EMAIL_ADDRESS=${{ vars.REGISTRATION_EMAIL_ADDRESS }}
 
     - name: Setup Login.xml file
       uses: cuchi/jinja2-action@v1.2.0
