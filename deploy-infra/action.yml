@@ -58,7 +58,7 @@ runs:
     - name: Get Etag from S3
       id: s3_etag
       run: |
-        echo "S3_ETAG=$(aws s3api head-object --bucket escribers-infra-tempenv-terraform-state --key state${{ env.TEMPENV_VERSION }}.tfstate --query ETag --output text | tr -d \")" >> $GITHUB_ENV
+        echo "S3_ETAG=$(aws s3api head-object --bucket escribers-infra-tempenv-terraform-state --key state${{ env.TEMPENV_VERSION }}.tfstate --query ETag --output text | tr -d \" || echo "node")" >> $GITHUB_ENV
       shell: bash
 
     - name: DEBUG Etag from S3
