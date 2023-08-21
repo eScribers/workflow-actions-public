@@ -4,6 +4,10 @@ inputs:
   tempenv-version:
     description: 'Verstion of temp env (tag)'
     required: true
+  env-type:
+    description: 'Type for environment. tempenv or sandbox'
+    required: false
+    default: "tempenv"
   access-key:
     description: 'AWS Access Key'
     required: true
@@ -233,7 +237,7 @@ runs:
  # For some reason teraform not seeing route table during first execution. It should be running second time to refresh state and get information about route table resource 
     - name: Deploy infrastructure
       run: |
-        terraform -chdir=./infrastructure init -backend-config="bucket=escribers-infra-tempenv-terraform-state" -backend-config="key=state$TEMPENV_VERSION.tfstate" -backend-config="dynamodb_table=lock-dynamo-state$ENV_NAME-terraform-state"
+        terraform -chdir=./infrastructure init -backend-config="bucket=escribers-infra-${{ inputs.env-type }}-terraform-state" -backend-config="key=state$TEMPENV_VERSION.tfstate" -backend-config="dynamodb_table=lock-dynamo-state${{ env.ENV_NAME }}-terraform-state"
         terraform -chdir=./infrastructure apply -auto-approve || true
         echo "Wait for 30 seconds"
         sleep 30
