@@ -233,7 +233,6 @@ runs:
  # For some reason teraform not seeing route table during first execution. It should be running second time to refresh state and get information about route table resource 
     - name: Deploy infrastructure
       run: |
-        mv ./infrastructure/instances-spot.tf.off ./infrastructure/instances-spot.tf
         terraform -chdir=./infrastructure init -backend-config="bucket=escribers-infra-tempenv-terraform-state" -backend-config="key=state$TEMPENV_VERSION.tfstate" -backend-config="dynamodb_table=lock-dynamo-state$ENV_NAME-terraform-state"
         terraform -chdir=./infrastructure apply -auto-approve || true
         echo "Wait for 30 seconds"
