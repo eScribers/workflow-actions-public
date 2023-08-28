@@ -180,6 +180,16 @@ runs:
     #        pwd
     #   shell: bash
 
+    - name: configure .htaccess
+      # if: steps.check_files.outputs.files_exists == 'true'
+      uses: cuchi/jinja2-action@v1.2.0
+      with:
+        template: ./.htaccess.example.j2
+        output_file: ./.htaccess.example
+        strict: true
+        variables: |
+          CI_ENV="${{ inputs.ci-env }}"
+
     - name: Setup create_db.php file
       uses: cuchi/jinja2-action@v1.2.0
       with:
