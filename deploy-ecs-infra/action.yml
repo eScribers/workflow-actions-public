@@ -83,7 +83,7 @@ runs:
            echo "AWS_ACCESS_KEY_ID=${{ inputs.access-key }}" >> $GITHUB_ENV
            echo "AWS_SECRET_ACCESS_KEY=${{ inputs.secret-key }}" >> $GITHUB_ENV
            echo "AWS_DEFAULT_REGION=${{ inputs.default-region }}" >> $GITHUB_ENV
-           echo "DB_DEFAULT_DATABASE=tabservices${{ inputs.tempenv-version == '-sandbox' && 'null' || inputs.tempenv-version }}" >> $GITHUB_ENV
+           echo "DB_DEFAULT_DATABASE=${{ inputs.tempenv-version == '-sandbox' && 'tabservices' || tabservices'inputs.tempenv-version' }}" >> $GITHUB_ENV
       shell: bash
 
     - name: Checkout devops infra repo
