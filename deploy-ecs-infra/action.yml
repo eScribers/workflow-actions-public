@@ -44,7 +44,7 @@ inputs:
     default: ""
   ci-env:
     description: 'Env type'
-    default: "development"
+    default: "production"
   tabula-url:
     description: 'tabula url'
     default: ""
