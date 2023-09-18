@@ -251,7 +251,7 @@ runs:
         terraform -chdir=./infrastructure apply -auto-approve || true
         echo "Wait for 30 seconds"
         sleep 30
-        terraform -chdir=./infrastructure destroy -auto-approve
+        terraform -chdir=./infrastructure apply -auto-approve
       env:
         AWS_ACCESS_KEY_ID: "${{ env.AWS_ACCESS_KEY_ID }}"
         AWS_SECRET_ACCESS_KEY: "${{ env.AWS_SECRET_ACCESS_KEY }}"
