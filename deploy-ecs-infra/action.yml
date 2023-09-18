@@ -248,9 +248,6 @@ runs:
     - name: Deploy infrastructure
       run: |
         terraform -chdir=./infrastructure init -backend-config="bucket=escribers-infra-${{ inputs.env-type }}-terraform-state" -backend-config="key=state$TEMPENV_VERSION.tfstate" -backend-config="dynamodb_table=lock-dynamo-state${{ env.ENV_NAME }}-terraform-state"
-        terraform -chdir=./infrastructure apply -auto-approve || true
-        echo "Wait for 30 seconds"
-        sleep 30
         terraform -chdir=./infrastructure apply -auto-approve
       env:
         AWS_ACCESS_KEY_ID: "${{ env.AWS_ACCESS_KEY_ID }}"
