@@ -132,14 +132,14 @@ runs:
       id: check_files_ecr_policy_file_json
       uses: andstor/file-existence-action@v1
       with:
-        files: "./tabula/tools/ecr-policy-file.json.j2"
+        files: "./tabula/deploy/ecr-policy-file.json.j2"
 
     - name: configure ecr-policy-file.json
       if: steps.check_files_ecr_policy_file_json.outputs.files_exists == 'true'
       uses: cuchi/jinja2-action@v1.2.0
       with:
-        template: ./tabula/tools/ecr-policy-file.json.j2
-        output_file: ./tabula/tools/ecr-policy-file.json
+        template: ./tabula/deploy/ecr-policy-file.json.j2
+        output_file: ./tabula/deploy/ecr-policy-file.json
         strict: true
         variables: |
           ACCOUNT_ID=${{ inputs.account-id }}
@@ -249,7 +249,7 @@ runs:
         repo: "ecr${{ env.TEMPENV_VERSION }}/tabula"
         tags: "${{ github.sha }}"
         set_repo_policy: 'true'
-        repo_policy_file: tabula/tools/ecr-policy-file.json
+        repo_policy_file: tabula/deploy/ecr-policy-file.json
 
 
     - name: Intall terraform
