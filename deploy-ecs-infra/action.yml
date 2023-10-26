@@ -42,6 +42,10 @@ inputs:
     description: 'Resource AWS Account ID for ECR  from secrets'
     required: true
     default: ""
+  account-id:
+    description: 'Deploy AWS Account ID'
+    required: true
+    default: ""
   ci-env:
     description: 'Env type'
     default: "production"
@@ -123,6 +127,22 @@ runs:
           DOCKERFILE_TAG=${{ env.DOCKERFILE_TAG }}
           AWS_DEFAULT_REGION=${{ env.AWS_DEFAULT_REGION }}
           ACCOUNT_ID=${{ inputs.resource-account-id }}
+
+    - name: Check file ecr-policy-file.json.j2 existence
+      id: check_files_ecr_policy_file_json
+      uses: andstor/file-existence-action@v1
+      with:
+        files: "./tools/ecr-policy-file.json.j2"
+
+    - name: configure ecr-policy-file.json
+      if: steps.check_files_ecr_policy_file_json.outputs.files_exists == 'true'
+      uses: cuchi/jinja2-action@v1.2.0
+      with:
+        template: ./tools/ecr-policy-file.json.j2
+        output_file: ./tools/ecr-policy-file.json
+        strict: true
+        variables: |
+          ACCOUNT_ID=${{ inputs.account-id }}
 
     # - name: DEBUG Etag from S3
     #   run: |
@@ -228,6 +248,9 @@ runs:
         region: "${{ inputs.resource-default-region }}"
         repo: "ecr${{ env.TEMPENV_VERSION }}/tabula"
         tags: "${{ github.sha }}"
+        set_repo_policy: 'true'
+        repo_policy_file: tools/ecr-policy-file.json
+
 
     - name: Intall terraform
       run: |
