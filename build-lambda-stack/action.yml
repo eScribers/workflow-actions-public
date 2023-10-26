@@ -73,7 +73,7 @@ runs:
         echo "============="
         ls -l
         echo "============="
-        sam package --output-template-file packaged.yaml --s3-bucket lambda-devops --region ${{ inputs.aws-region }}
+        sam package --output-template-file packaged.yaml --s3-bucket lambda-functions-devops --region ${{ inputs.aws-region }}
         echo "============="
         ls -l
         echo "============="
