@@ -77,6 +77,9 @@ inputs:
   postmarkapp-processor:
     description: 'postmarkapp-processor'
     default: ""
+  cookie_domain:
+    description: 'DNS domain for website'
+    default: "escribers.io"
 
 runs:
   using: "composite"
@@ -297,4 +300,6 @@ runs:
         TF_VAR_environment_bucket: "${{ inputs.environment-bucket }}"
         TF_VAR_frontend_url: "${{ inputs.frontend_url }}"
         TF_VAR_postmarkapp_processor: "${{ inputs.postmarkapp-processor }}"
+        TF_VAR_cookie_domain: "${{ inputs.cookie_domain }}"
+        TF_VAR_dns_domain: "${{ inputs.cookie_domain }}"
       shell: bash
