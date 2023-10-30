@@ -275,7 +275,7 @@ runs:
     - name: Deploy infrastructure
       run: |
         terraform -chdir=./infrastructure init -backend-config="bucket=escribers-infra-${{ inputs.env-type }}-terraform-state" -backend-config="key=state$TEMPENV_VERSION.tfstate" -backend-config="dynamodb_table=lock-dynamo-state${{ env.ENV_NAME }}-terraform-state"
-        terraform -chdir=./infrastructure plan
+        terraform -chdir=./infrastructure plan -auto-approve
       env:
         AWS_ACCESS_KEY_ID: "${{ env.AWS_ACCESS_KEY_ID }}"
         AWS_SECRET_ACCESS_KEY: "${{ env.AWS_SECRET_ACCESS_KEY }}"
