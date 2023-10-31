@@ -80,6 +80,9 @@ inputs:
   cookie_domain:
     description: 'DNS domain for website'
     default: "escribers.io"
+  pgp_keys:
+    description: 'PGP key for importing to tabula. '
+    default: ""
 
 runs:
   using: "composite"
@@ -147,11 +150,6 @@ runs:
         variables: |
           ACCOUNT_ID=${{ inputs.account-id }}
 
-    # - name: DEBUG Etag from S3
-    #   run: |
-    #     ls -l ./tabula/*
-    #   shell: bash
-
     - name: Create DynamoDB lock table
       run: |
         aws dynamodb create-table --table-name lock-dynamo-state${{ env.TEMPENV_VERSION }}-terraform-state \
@@ -198,12 +196,6 @@ runs:
         echo =${{ env.DYN_DIGEST }}=
       shell: bash
 
-    # - name: DEBUG
-    #   run: |
-    #        ls -l ./tabula/*
-    #        pwd
-    #   shell: bash
-
     - name: configure .htaccess
       # if: steps.check_files.outputs.files_exists == 'true'
       uses: cuchi/jinja2-action@v1.2.0
@@ -237,6 +229,11 @@ runs:
           DB_DEFAULT_USER=${{ env.DB_DEFAULT_USER }}
           DB_DEFAULT_DATABASE=${{ env.DB_DEFAULT_DATABASE }}
           RDS_ENDPOINT=tabula-testenv-shared-db.cxasnj3we6wl.us-east-1.rds.amazonaws.com
+
+    - name: Decode pgp key into pgp.pub file
+      run: |
+        echo -n '${{ inputs.pgp_keys }}' | base64 --decode > ./tabula/pgp.pub
+      shell: bash
 
     - name: "Create Docker image and push it to ECR repository"
       uses: "kciter/aws-ecr-action@v4"
