@@ -233,8 +233,6 @@ runs:
     - name: Decode pgp key into pgp.pub file
       run: |
         echo -n '${{ inputs.pgp_keys }}' | base64 --decode > ./tabula/pgp.pub
-        ls -l ./tabula/*
-        cat ./tabula/pgp.pub
       shell: bash
 
     - name: "Create Docker image and push it to ECR repository"
