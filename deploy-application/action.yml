@@ -57,9 +57,6 @@ inputs:
   postmarkapp-api-key:
     description: 'Public key for adding to server from secrets'
     required: true
-  loggly-key:
-    description: 'Public key for adding to server from secrets'
-    required: true
   fussion-api-key:
     description: 'Public key for adding to server from secrets'
     required: true
@@ -203,7 +200,6 @@ runs:
            echo "TWILIO_VIDEO_SID=${{ inputs.twilio-video-sid }}" >> $GITHUB_ENV
            echo "TWILIO_VIDEO_TOKEN=${{ inputs.twilio-video-token }}" >> $GITHUB_ENV
            echo "POSTMARKAPP_API_KEY=${{ inputs.postmarkapp-api-key }}" >> $GITHUB_ENV
-           echo "LOGGLY_KEY=${{ inputs.loggly-key }}" >> $GITHUB_ENV
            echo "FUSION_API_KEY=${{ inputs.fussion-api-key }}" >> $GITHUB_ENV
            echo "VIDEOAPP_SECRET_KEY=${{ inputs.vieoapp-secret-key }}" >> $GITHUB_ENV
            echo "ENCRYPTION_KEY=${{ inputs.encryption-key }}" >> $GITHUB_ENV
