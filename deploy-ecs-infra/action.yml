@@ -238,14 +238,14 @@ runs:
     - name: "Create Docker image and push it to ECR repository"
       uses: "kciter/aws-ecr-action@v4"
       with:
-        access_key_id: "${{ inputs.resource-access-key }}"
-        secret_access_key: "${{ inputs.resource-secret-key }}"
-        account_id: "${{ inputs.resource-account-id }}"
+        access_key_id: "${{ inputs.access-key }}"
+        secret_access_key: "${{ inputs.secret-key }}"
+        account_id: "${{ inputs.account-id }}"
         create_repo: 'true'
         dockerfile: tabula/Dockerfile.deploy
         extra_build_args: ''
         path: ${{ inputs.docker-path }}/tabula
-        region: "${{ inputs.resource-default-region }}"
+        region: "${{ inputs.default-region }}"
         repo: "ecr${{ env.TEMPENV_VERSION }}/tabula"
         tags: "${{ github.sha }}"
         set_repo_policy: 'true'
