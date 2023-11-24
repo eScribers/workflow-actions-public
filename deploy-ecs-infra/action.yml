@@ -1,5 +1,5 @@
-name: "Run e2e test"
-description: "Run tests..."
+name: "Deploy ECS infra"
+description: "Deploy ECS infra..."
 inputs:
   tempenv-version:
     description: 'Verstion of temp env (tag)'
@@ -132,7 +132,7 @@ runs:
         variables: |
           DOCKERFILE_TAG=${{ env.DOCKERFILE_TAG }}
           AWS_DEFAULT_REGION=${{ env.AWS_DEFAULT_REGION }}
-          ACCOUNT_ID=${{ inputs.resource-account-id }}
+          ACCOUNT_ID=${{ inputs.account-id }}
 
     - name: Check file ecr-policy-file.json.j2 existence
       id: check_files_ecr_policy_file_json
