@@ -168,7 +168,7 @@ runs:
     - name: Run tests
       uses: nick-fields/retry@v2
       with:
-        timeout_minutes: 120
+        timeout_minutes: 180
         # max_attempts: 2
         shell: bash
         command: ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/${{ inputs.test-suite }}
