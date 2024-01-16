@@ -66,6 +66,28 @@ inputs:
     description: 'Email password  for registration email'
     required: false
     default: ""
+  ho-login:
+    description: 'HO login'
+    required: false
+    default: ""
+  contractor-login:
+    description: 'Contractor login'
+    required: false
+    default: ""
+  contractor-password:
+    description: 'Contractor password'
+    required: false
+    default: ""
+  reporter-login:
+    description: 'Reporter login'
+    required: false
+    default: ""
+  reporter-password:
+    description: 'Reporter password'
+    required: false
+    default: ""
+
+
 
 runs:
   using: "composite"
@@ -105,6 +127,11 @@ runs:
           TEAMS_WEBHOOK_URL=${{ inputs.teams-webhook-url }}
           REGISTRATION_EMAIL_ADDRESS=${{ inputs.registration-email-address }}
           REGISTRATION_EMAIL_PASSWORD=${{ inputs.registration-email-password }}
+          HO_LOGIN=${{ inputs.ho-login }}
+          CONTRACTOR_LOGIN=${{ inputs.contractor-login }}
+          CONTRACTOR_PASSWORD=${{ inputs.contractor-password }}
+          REPORTER_LOGIN=${{ inputs.reporter-login }}
+          REPORTER_PASSWORD=${{ inputs.reporter-password }}
 
     - name: Setup Login.xml file
       uses: cuchi/jinja2-action@v1.2.0
