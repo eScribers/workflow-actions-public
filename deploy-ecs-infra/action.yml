@@ -242,6 +242,11 @@ runs:
         aws-secret-access-key: "${{ inputs.secret-key }}"
         aws-region: "${{ inputs.default-region }}"
 
+    - name: Generate .env file
+      run: |
+        ./tabula/deploy/read_secrets_into_envs.sh
+      shell: bash
+
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
@@ -298,7 +303,7 @@ runs:
         TF_VAR_deletion_protection: "false"
         TF_VAR_instance_count: "3"
         TF_VAR_image_tag: "${{ github.sha }}"
-        TF_VAR_image: "${{ inputs.resource-account-id }}.dkr.ecr.${{ inputs.resource-default-region }}.amazonaws.com/ecr${{ env.TEMPENV_VERSION }}/tabula"
+        TF_VAR_image: "${{ inputs.account-id }}.dkr.ecr.${{ inputs.default-region }}.amazonaws.com/ecr${{ env.TEMPENV_VERSION }}/tabula"
         TEMPENV_VERSION: "${{ env.TEMPENV_VERSION }}"
         TF_VAR_ci_env: "${{ inputs.ci-env }}"
         TF_VAR_tabula_url: "${{ inputs.tabula-url }}"
