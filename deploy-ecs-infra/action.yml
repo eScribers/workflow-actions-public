@@ -242,7 +242,14 @@ runs:
         aws-secret-access-key: "${{ inputs.secret-key }}"
         aws-region: "${{ inputs.default-region }}"
 
+    - name: Check file read_secrets_into_envs.sh existence
+      id: check_files_read_secrets_into_envs
+      uses: andstor/file-existence-action@v1
+      with:
+        files: "./tabula/deploy/read_secrets_into_envs.sh"
+
     - name: Generate .env file
+      if: steps.check_files_read_secrets_into_envs.outputs.files_exists == 'true'
       run: |
         ./tabula/deploy/read_secrets_into_envs.sh
         ls -la ./tabula/application/config
