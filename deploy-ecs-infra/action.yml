@@ -252,8 +252,6 @@ runs:
       if: steps.check_files_read_secrets_into_envs.outputs.files_exists == 'true'
       run: |
         ./tabula/deploy/read_secrets_into_envs.sh
-        ls -la ./tabula/application/config
-        cat ./tabula/application/config/.env
       shell: bash
 
     - name: Login to Amazon ECR
