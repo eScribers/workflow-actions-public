@@ -258,21 +258,38 @@ runs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: "Create Docker image and push it to ECR repository"
-      uses: "kciter/aws-ecr-action@v4"
-      with:
-        access_key_id: "${{ inputs.access-key }}"
-        secret_access_key: "${{ inputs.secret-key }}"
-        account_id: "${{ inputs.account-id }}"
-        create_repo: 'true'
-        dockerfile: tabula/Dockerfile.deploy
-        extra_build_args: ''
-        path: ${{ inputs.docker-path }}/tabula
-        region: "${{ inputs.default-region }}"
-        repo: "ecr${{ env.TEMPENV_VERSION }}/tabula"
-        tags: "${{ github.sha }}"
-        set_repo_policy: 'true'
-        repo_policy_file: tabula/deploy/ecr-policy-file.json
+
+    - name: Login to AWS ECR
+      run: aws ecr get-login-password --region ${{ inputs.default-region }} | docker login --username AWS --password-stdin ${{ inputs.account-id }}.dkr.ecr.${{ inputs.default-region }}.amazonaws.com
+
+    - name: Build Docker image
+      run: docker build -t ecr${{ env.TEMPENV_VERSION }}/tabula:${{ github.sha }} -f tabula/Dockerfile.deploy ${{ inputs.docker-path }}/tabula
+
+    - name: Tag Docker image
+      run: docker tag ecr${{ env.TEMPENV_VERSION }}/tabula:${{ github.sha }} ${{ inputs.account-id }}.dkr.ecr.${{ inputs.default-region }}.amazonaws.com/ecr${{ env.TEMPENV_VERSION }}/tabula:${{ github.sha }}
+
+    - name: Push Docker image to ECR
+      run: docker push ${{ inputs.account-id }}.dkr.ecr.${{ inputs.default-region }}.amazonaws.com/ecr${{ env.TEMPENV_VERSION }}/tabula:${{ github.sha }}
+
+    - name: Set repository policy
+      run: aws ecr set-repository-policy --repository-name ecr${{ env.TEMPENV_VERSION }}/tabula --policy-text file://tabula/deploy/ecr-policy-file.json --region ${{ inputs.default-region }}
+
+
+    # - name: "Create Docker image and push it to ECR repository"
+    #   uses: "kciter/aws-ecr-action@v4"
+    #   with:
+    #     access_key_id: "${{ inputs.access-key }}"
+    #     secret_access_key: "${{ inputs.secret-key }}"
+    #     account_id: "${{ inputs.account-id }}"
+    #     create_repo: 'true'
+    #     dockerfile: tabula/Dockerfile.deploy
+    #     extra_build_args: ''
+    #     path: ${{ inputs.docker-path }}/tabula
+    #     region: "${{ inputs.default-region }}"
+    #     repo: "ecr${{ env.TEMPENV_VERSION }}/tabula"
+    #     tags: "${{ github.sha }}"
+    #     set_repo_policy: 'true'
+    #     repo_policy_file: tabula/deploy/ecr-policy-file.json
 
 
     - name: Intall terraform
