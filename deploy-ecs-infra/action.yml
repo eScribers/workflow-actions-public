@@ -263,6 +263,10 @@ runs:
       run: aws ecr get-login-password --region ${{ inputs.default-region }} | docker login --username AWS --password-stdin ${{ inputs.account-id }}.dkr.ecr.${{ inputs.default-region }}.amazonaws.com
       shell: bash
 
+    - name: Create ECR repository
+      run: aws ecr create-repository --repository-name ecr${{ env.TEMPENV_VERSION }}/tabula || true
+      shell: bash
+
     - name: Build Docker image
       run: docker build -t ecr${{ env.TEMPENV_VERSION }}/tabula:${{ github.sha }} -f tabula/Dockerfile.deploy ${{ inputs.docker-path }}/tabula
       shell: bash
