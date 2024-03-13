@@ -283,6 +283,15 @@ runs:
       run: aws ecr set-repository-policy --repository-name ecr${{ env.TEMPENV_VERSION }}/tabula --policy-text file://tabula/deploy/ecr-policy-file.json --region ${{ inputs.default-region }}
       shell: bash
 
+    - name: Deploy AWS inspector rules
+      run: |
+        if [ -e "./infrastructure/inspector_rule.tf.bkp" ]; then
+          cp ./infrastructure/inspector_rule.tf.bkp ./infrastructure/inspector_rule.tf
+          echo "inspector_rule.tf File copied successfully."
+        else
+          echo "inspector_rule.tf file does not exist."
+        fi
+
 
     # - name: "Create Docker image and push it to ECR repository"
     #   uses: "kciter/aws-ecr-action@v4"
