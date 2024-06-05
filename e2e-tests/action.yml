@@ -86,7 +86,14 @@ inputs:
     description: 'Reporter password'
     required: false
     default: ""
-
+  opensearch-username:
+    description: 'Opensearch username'
+    required: false
+    default: ""
+  opensearch-password:
+    description: 'Opensearch password'
+    required: false
+    default: ""
 
 
 runs:
@@ -132,6 +139,8 @@ runs:
           CONTRACTOR_PASSWORD=${{ inputs.contractor-password }}
           REPORTER_LOGIN=${{ inputs.reporter-login }}
           REPORTER_PASSWORD=${{ inputs.reporter-password }}
+          OPENSEARCH_USERNAME=${{ inputs.opensearch-username }}
+          OPENSEARCH_PASSWORD=${{ inputs.opensearch-password }}
 
     - name: Setup Login.xml file
       uses: cuchi/jinja2-action@v1.2.0

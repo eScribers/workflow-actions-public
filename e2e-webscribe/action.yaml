@@ -1,0 +1,132 @@
+name: "Run e2e test"
+description: "Run tests..."
+inputs:
+  pr-number:
+    description: 'PR number where those tests was executed'
+    default: ""
+  project-repo:
+    description: 'Project repo was tested'
+    default: ""
+  action-id:
+    description: 'Action ID for preparint link to workflow'
+    default: ""
+  sender-email-address:
+    description: 'Git reference from where it should be deployed'
+    default: ""
+  sender-email-password:
+    description: 'Git reference from where it should be deployed'
+    default: ""
+  postmark-api:
+    description: 'Api key for Postmark'
+    default: ""
+  git-reference:
+    description: 'Git reference from where it should be deployed'
+    default: "refs/heads/master"
+  dotnet-version:
+    description: 'The dotnet version to use'
+    default: '6.0.x'
+    required: false
+  access-key:
+    description: 'AWS Access Key from secrets'
+    required: false
+  secret-key:
+    description: 'AWS Secret Key from secrets'
+    required: false
+  token:
+    description: 'Token to github'
+    required: false
+  pr-title:
+    description: 'PR Title'
+    required: false
+  pr-creator:
+    description: 'PR Author'
+    required: false
+  test-suite:
+    description: 'Overwrite test suite file'
+    default: 'Smoke.xml'
+    required: false
+  teams-webhook-url:
+    description: 'Webhook for sending notifications to teams'
+    required: false
+    default: ""
+  opensearch-username:
+    description: 'Opensearch username'
+    required: false
+    default: ""
+  opensearch-password:
+    description: 'Opensearch password'
+    required: false
+    default: ""
+  asr-secret:
+    description: 'ASR secret'
+    required: false
+    default: ""
+
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout tabula-automation-tests repo
+      uses: actions/checkout@v2
+      with:
+        repository: eScribers/tabula-automation-tests
+        ref: ${{ inputs.git-reference }}
+        token: ${{ inputs.token }}
+
+    - name: Setup ${{ inputs.test-suite }} file
+      uses: cuchi/jinja2-action@v1.2.0
+      with:
+        template: ./common/TestSuites/SmokeE2E/${{ inputs.test-suite }}.j2
+        output_file: ./common/TestSuites/SmokeE2E/${{ inputs.test-suite }}
+        strict: true
+        variables: |
+          SENDER_EMAIL_ADDRESS=${{ inputs.sender-email-address }}
+          SENDER_EMAIL_PASSWORD=${{ inputs.sender-email-password }}
+          PR_NUMBER=${{ inputs.pr-number }}
+          PROJECT_REPO=${{ inputs.project-repo }}
+          ACTION_ID=${{ inputs.action-id }}
+          PR_TITLE=${{ inputs.pr-title }}
+          PR_AUTHOR=${{ inputs.pr-creator }}
+          POSTMARK_API_KEY=${{ inputs.postmark-api }}
+          TEAMS_WEBHOOK_URL=${{ inputs.teams-webhook-url }}
+          OPENSEARCH_USERNAME=${{ inputs.opensearch-username }}
+          OPENSEARCH_PASSWORD=${{ inputs.opensearch-password }}
+          ASR_SECRET=${{ inputs.asr-secret }}
+
+    - name: Show Authentication.xml
+      run: |
+        cat ./common/TestSuites/SmokeE2E/${{ inputs.test-suite }} || true
+        echo ============
+      #     cat ./Automation.Tests/Authentication/Login.cs || true
+      shell: bash
+
+    - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+      uses: actions/setup-dotnet@v1.7.2
+      with:
+        dotnet-version: ${{ matrix.dotnet-version }}
+
+    - name: Install GoogleChrome Driver
+      run: |
+        google-chrome --version 
+        chromedriver --version
+        wget --no-verbose https://mirror.cs.uchicago.edu/google-chrome/pool/main/g/google-chrome-stable/google-chrome-stable_126.0.6478.55-1_amd64.deb
+        ls -l 
+        sudo dpkg -i google-chrome-stable_126.0.6478.55-1_amd64.deb
+        sudo apt-get install -fy
+        google-chrome --version 
+        chromedriver --version
+      shell: bash
+
+    - name: Build project
+      run: |
+        dotnet build
+      shell: bash
+
+    - name: Run tests
+      uses: nick-fields/retry@v2
+      with:
+        timeout_minutes: 30
+        max_attempts: 3
+        shell: bash
+        command: ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/${{ inputs.test-suite }}
+
