@@ -97,14 +97,14 @@ runs:
       shell: bash
 
     - name: Checkout devops infra repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: eScribers/DEVOPS
         ref: ${{ inputs.git-reference }}
         token: ${{ inputs.token }}
 
     - name: Checkout tabula infra repo
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: eScribers/tabula
         ref: ${{ inputs.tabula-git-reference }}
@@ -118,7 +118,7 @@ runs:
 
     - name: Check file existence
       id: check_files
-      uses: andstor/file-existence-action@v1
+      uses: andstor/file-existence-action@v3
       with:
         files: "./tabula/Dockerfile.deploy.j2"
 
@@ -136,7 +136,7 @@ runs:
 
     - name: Check file ecr-policy-file.json.j2 existence
       id: check_files_ecr_policy_file_json
-      uses: andstor/file-existence-action@v1
+      uses: andstor/file-existence-action@v3
       with:
         files: "./tabula/deploy/ecr-policy-file.json.j2"
 
@@ -236,7 +236,7 @@ runs:
       shell: bash
 
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: "${{ inputs.access-key }}"
         aws-secret-access-key: "${{ inputs.secret-key }}"
@@ -244,7 +244,7 @@ runs:
 
     - name: Check file read_secrets_into_envs.sh existence
       id: check_files_read_secrets_into_envs
-      uses: andstor/file-existence-action@v1
+      uses: andstor/file-existence-action@v3
       with:
         files: "./tabula/deploy/read_secrets_into_envs.sh"
 
@@ -256,7 +256,7 @@ runs:
 
     - name: Login to Amazon ECR
       id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      uses: aws-actions/amazon-ecr-login@v2
 
 
     - name: Login to AWS ECR
