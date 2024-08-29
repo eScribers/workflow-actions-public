@@ -109,6 +109,8 @@ runs:
       run: |
         google-chrome --version 
         chromedriver --version
+        wget --no-verbose http://archive.ubuntu.com/ubuntu/pool/main/libu/libu2f-host/libu2f-udev_1.1.10-1_all.deb
+        sudo dpkg -i libu2f-udev_1.1.10-1_all.deb
         wget --no-verbose https://mirror.cs.uchicago.edu/google-chrome/pool/main/g/google-chrome-stable/google-chrome-stable_126.0.6478.55-1_amd64.deb
         ls -l 
         sudo dpkg -i google-chrome-stable_126.0.6478.55-1_amd64.deb
