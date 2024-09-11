@@ -149,13 +149,13 @@ runs:
       shell: bash
 
     - name: Upload private_ip
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: private_ip
         path: infrastructure/private_ip
           
     - name: Upload public_ip
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v4
       with:
         name: public_ip
         path: infrastructure/public_ip
