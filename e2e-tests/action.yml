@@ -86,14 +86,7 @@ inputs:
     description: 'Reporter password'
     required: false
     default: ""
-  opensearch-username:
-    description: 'Opensearch username'
-    required: false
-    default: ""
-  opensearch-password:
-    description: 'Opensearch password'
-    required: false
-    default: ""
+
 
 
 runs:
@@ -139,8 +132,6 @@ runs:
           CONTRACTOR_PASSWORD=${{ inputs.contractor-password }}
           REPORTER_LOGIN=${{ inputs.reporter-login }}
           REPORTER_PASSWORD=${{ inputs.reporter-password }}
-          OPENSEARCH_USERNAME=${{ inputs.opensearch-username }}
-          OPENSEARCH_PASSWORD=${{ inputs.opensearch-password }}
 
     - name: Setup Login.xml file
       uses: cuchi/jinja2-action@v1.2.0
@@ -194,7 +185,7 @@ runs:
 
     - name: Build project
       run: |
-        dotnet build 
+        dotnet build
       shell: bash
 
     - name: Execute prelogin
@@ -222,5 +213,6 @@ runs:
     - name: Upload report to S3
       if: always()
       run: |
-        aws s3 cp ./TestPerformer/bin/Debug/net6.0/Reports/ s3://escribers-automation-tests-e2e-reports/ --recursive 
+        aws s3 cp ./TestPerformer/bin/Debug/net6.0/Reports/ s3://escribers-automation-tests-e2e-reports/ --recursive
       shell: bash
+
