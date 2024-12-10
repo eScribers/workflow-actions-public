@@ -98,7 +98,7 @@ inputs:
 
 runs:
   using: "composite"
-  steps: 
+  steps:
     - name: Checkout tabula-automation-tests repo
       uses: actions/checkout@v2
       with:
@@ -106,11 +106,11 @@ runs:
         ref: ${{ inputs.git-reference }}
         token: ${{ inputs.token }}
 
-    - name: Define variables 
+    - name: Define variables
       run: |
-           echo "BACKEND_URL=${{ inputs.backend-url }}" >> $GITHUB_ENV
-           echo "TABULA_LOGIN=${{ inputs.tabula-login }}" >> $GITHUB_ENV
-           echo "TABULA_PASSWORD=${{ inputs.tabula-password }}" >> $GITHUB_ENV
+        echo "BACKEND_URL=${{ inputs.backend-url }}" >> $GITHUB_ENV
+        echo "TABULA_LOGIN=${{ inputs.tabula-login }}" >> $GITHUB_ENV
+        echo "TABULA_PASSWORD=${{ inputs.tabula-password }}" >> $GITHUB_ENV
       shell: bash
 
     - name: Setup ${{ inputs.test-suite }} file
@@ -165,7 +165,7 @@ runs:
       run: |
         cat ./common/TestSuites/SmokeE2E/${{ inputs.test-suite }} || true
         echo ============
-    #     cat ./Automation.Tests/Authentication/Login.cs || true
+      #     cat ./Automation.Tests/Authentication/Login.cs || true
       shell: bash
 
     - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
@@ -211,7 +211,7 @@ runs:
         shell: bash
         command: ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/${{ inputs.test-suite }}
 
-    - name: Add credentials to Amazon 
+    - name: Add credentials to Amazon
       uses: "aws-actions/configure-aws-credentials@v1"
       if: always()
       with:
@@ -224,4 +224,3 @@ runs:
       run: |
         aws s3 cp ./TestPerformer/bin/Debug/net6.0/Reports/ s3://escribers-automation-tests-e2e-reports/ --recursive 
       shell: bash
-
