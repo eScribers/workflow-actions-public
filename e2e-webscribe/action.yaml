@@ -26,24 +26,15 @@ inputs:
     description: 'The dotnet version to use'
     default: '6.0.x'
     required: false
-  backend-url:
-    description: 'URL to tabula deployed'
-    required: true
-  tabula-login:
-    description: 'Login to tabula portal'
-    required: true
-  tabula-password:
-    description: 'Password to tabula portal'
-    required: true
   access-key:
     description: 'AWS Access Key from secrets'
-    required: true
+    required: false
   secret-key:
     description: 'AWS Secret Key from secrets'
-    required: true
+    required: false
   token:
     description: 'Token to github'
-    required: true
+    required: false
   pr-title:
     description: 'PR Title'
     required: false
@@ -58,35 +49,18 @@ inputs:
     description: 'Webhook for sending notifications to teams'
     required: false
     default: ""
-  registration-email-address:
-    description: 'Email address for registration'
+  opensearch-username:
+    description: 'Opensearch username'
     required: false
     default: ""
-  registration-email-password:
-    description: 'Email password  for registration email'
+  opensearch-password:
+    description: 'Opensearch password'
     required: false
     default: ""
-  ho-login:
-    description: 'HO login'
+  asr-secret:
+    description: 'ASR secret'
     required: false
     default: ""
-  contractor-login:
-    description: 'Contractor login'
-    required: false
-    default: ""
-  contractor-password:
-    description: 'Contractor password'
-    required: false
-    default: ""
-  reporter-login:
-    description: 'Reporter login'
-    required: false
-    default: ""
-  reporter-password:
-    description: 'Reporter password'
-    required: false
-    default: ""
-
 
 
 runs:
@@ -99,13 +73,6 @@ runs:
         ref: ${{ inputs.git-reference }}
         token: ${{ inputs.token }}
 
-    - name: Define variables
-      run: |
-        echo "BACKEND_URL=${{ inputs.backend-url }}" >> $GITHUB_ENV
-        echo "TABULA_LOGIN=${{ inputs.tabula-login }}" >> $GITHUB_ENV
-        echo "TABULA_PASSWORD=${{ inputs.tabula-password }}" >> $GITHUB_ENV
-      shell: bash
-
     - name: Setup ${{ inputs.test-suite }} file
       uses: cuchi/jinja2-action@v1.2.0
       with:
@@ -113,9 +80,6 @@ runs:
         output_file: ./common/TestSuites/SmokeE2E/${{ inputs.test-suite }}
         strict: true
         variables: |
-          BACKEND_URL=${{ env.BACKEND_URL }}
-          TABULA_LOGIN=${{ env.TABULA_LOGIN }}
-          TABULA_PASSWORD=${{ env.TABULA_PASSWORD }}
           SENDER_EMAIL_ADDRESS=${{ inputs.sender-email-address }}
           SENDER_EMAIL_PASSWORD=${{ inputs.sender-email-password }}
           PR_NUMBER=${{ inputs.pr-number }}
@@ -125,32 +89,9 @@ runs:
           PR_AUTHOR=${{ inputs.pr-creator }}
           POSTMARK_API_KEY=${{ inputs.postmark-api }}
           TEAMS_WEBHOOK_URL=${{ inputs.teams-webhook-url }}
-          REGISTRATION_EMAIL_ADDRESS=${{ inputs.registration-email-address }}
-          REGISTRATION_EMAIL_PASSWORD=${{ inputs.registration-email-password }}
-          HO_LOGIN=${{ inputs.ho-login }}
-          CONTRACTOR_LOGIN=${{ inputs.contractor-login }}
-          CONTRACTOR_PASSWORD=${{ inputs.contractor-password }}
-          REPORTER_LOGIN=${{ inputs.reporter-login }}
-          REPORTER_PASSWORD=${{ inputs.reporter-password }}
-
-    - name: Setup Login.xml file
-      uses: cuchi/jinja2-action@v1.2.0
-      with:
-        template: ./common/TestSuites/SmokeE2E/Login.xml.j2
-        output_file: ./common/TestSuites/SmokeE2E/Login.xml
-        strict: true
-        variables: |
-          BACKEND_URL=${{ env.BACKEND_URL }}
-          TABULA_LOGIN=${{ env.TABULA_LOGIN }}
-          TABULA_PASSWORD=${{ env.TABULA_PASSWORD }}
-          SENDER_EMAIL_ADDRESS=${{ inputs.sender-email-address }}
-          SENDER_EMAIL_PASSWORD=${{ inputs.sender-email-password }}
-          PR_NUMBER=${{ inputs.pr-number }}
-          PROJECT_REPO=${{ inputs.project-repo }}
-          ACTION_ID=${{ inputs.action-id }}
-          PR_TITLE=${{ inputs.pr-title }}
-          PR_AUTHOR=${{ inputs.pr-creator }}
-          POSTMARK_API_KEY=${{ inputs.postmark-api }}
+          OPENSEARCH_USERNAME=${{ inputs.opensearch-username }}
+          OPENSEARCH_PASSWORD=${{ inputs.opensearch-password }}
+          ASR_SECRET=${{ inputs.asr-secret }}
 
     - name: Show Authentication.xml
       run: |
@@ -188,31 +129,11 @@ runs:
         dotnet build
       shell: bash
 
-    - name: Execute prelogin
-      if: ${{ inputs.test-suite == 'Smoke.xml' }}
-      run: |
-        ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/Login.xml
-      shell: bash
-
     - name: Run tests
       uses: nick-fields/retry@v2
       with:
-        timeout_minutes: 180
-        # max_attempts: 2
+        timeout_minutes: 30
+        max_attempts: 3
         shell: bash
         command: ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/${{ inputs.test-suite }}
-
-    - name: Add credentials to Amazon
-      uses: "aws-actions/configure-aws-credentials@v1"
-      if: always()
-      with:
-        aws-access-key-id: "${{ inputs.access-key }}"
-        aws-region: "us-east-1"
-        aws-secret-access-key: "${{ inputs.secret-key }}"
-
-    - name: Upload report to S3
-      if: always()
-      run: |
-        aws s3 cp ./TestPerformer/bin/Debug/net6.0/Reports/ s3://escribers-automation-tests-e2e-reports/ --recursive
-      shell: bash
 
