@@ -93,7 +93,7 @@ runs:
   using: "composite"
   steps:
     - name: Checkout tabula-automation-tests repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: eScribers/tabula-automation-tests
         ref: ${{ inputs.git-reference }}
@@ -160,7 +160,7 @@ runs:
       shell: bash
 
     - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
-      uses: actions/setup-dotnet@v1.7.2
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{ matrix.dotnet-version }}
 
@@ -195,7 +195,7 @@ runs:
       shell: bash
 
     - name: Run tests
-      uses: nick-fields/retry@v2
+      uses: nick-fields/retry@v3
       with:
         timeout_minutes: 180
         # max_attempts: 2
@@ -203,7 +203,7 @@ runs:
         command: ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/${{ inputs.test-suite }}
 
     - name: Add credentials to Amazon
-      uses: "aws-actions/configure-aws-credentials@v1"
+      uses: "aws-actions/configure-aws-credentials@v4"
       if: always()
       with:
         aws-access-key-id: "${{ inputs.access-key }}"
