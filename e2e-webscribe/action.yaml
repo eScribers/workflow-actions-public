@@ -100,10 +100,10 @@ runs:
       #     cat ./Automation.Tests/Authentication/Login.cs || true
       shell: bash
 
-    - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+    - name: Setup .NET Core SDK ${{ inputs.dotnet-version }}
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: ${{ matrix.dotnet-version }}
+        dotnet-version: ${{ inputs.dotnet-version }}
 
     - name: Install GoogleChrome Driver
       run: |
