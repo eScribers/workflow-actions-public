@@ -173,7 +173,7 @@ runs:
         sudo mv chromedriver /usr/bin/chromedriver
         sudo chown root:root /usr/bin/chromedriver
         sudo chmod +x /usr/bin/chromedriver
-        wget --no-verbose https://pkgs.geos.ed.ac.uk/chrome/pool/main/g/google-chrome-stable/google-chrome-stable_126.0.6478.55-1_amd64.deb
+        wget --no-verbose https://mirror.cs.uchicago.edu/google-chrome/pool/main/g/google-chrome-stable/google-chrome-stable_126.0.6478.55-1_amd64.deb
         wget --no-verbose http://archive.ubuntu.com/ubuntu/pool/main/libu/libu2f-host/libu2f-udev_1.1.10-1_all.deb
         ls -l 
         sudo dpkg -i libu2f-udev_1.1.10-1_all.deb
