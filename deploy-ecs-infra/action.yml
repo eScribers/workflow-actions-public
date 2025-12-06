@@ -22,7 +22,7 @@ inputs:
     required: true
   git-reference:
     description: 'Git reference from where it should be deployed'
-    default: "refs/heads/master"
+    default: "refs/heads/in-place-tag-propagation"
   tabula-git-reference:
     description: 'Git reference from where it should be deployed'
     default: "refs/heads/master"
