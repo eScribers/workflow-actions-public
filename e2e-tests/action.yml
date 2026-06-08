@@ -165,9 +165,16 @@ runs:
         dotnet-version: ${{ inputs.dotnet-version }}
 
     - name: Pin Chrome 126 (matches bundled Selenium.WebDriver.ChromeDriver)
+      id: chrome
       uses: browser-actions/setup-chrome@v1
       with:
         chrome-version: 126.0.6478.55
+
+    - name: Make pinned Chrome the system google-chrome
+      shell: bash
+      run: |
+        sudo ln -sf "${{ steps.chrome.outputs.chrome-path }}" /usr/bin/google-chrome
+        sudo ln -sf "${{ steps.chrome.outputs.chrome-path }}" /usr/bin/google-chrome-stable
 
     - name: Show Chrome/ChromeDriver versions
       run: |
