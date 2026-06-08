@@ -175,10 +175,14 @@ runs:
       run: |
         sudo ln -sf "${{ steps.chrome.outputs.chrome-path }}" /usr/bin/google-chrome
         sudo ln -sf "${{ steps.chrome.outputs.chrome-path }}" /usr/bin/google-chrome-stable
+        sudo mkdir -p /opt/google/chrome
+        sudo ln -sf "${{ steps.chrome.outputs.chrome-path }}" /opt/google/chrome/chrome
+        sudo ln -sf "${{ steps.chrome.outputs.chrome-path }}" /opt/google/chrome/google-chrome
 
     - name: Show Chrome/ChromeDriver versions
       run: |
-        google-chrome --version
+        /usr/bin/google-chrome --version
+        /opt/google/chrome/chrome --version
         chromedriver --version
       shell: bash
 
