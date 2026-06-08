@@ -182,6 +182,23 @@ runs:
         chromedriver --version
       shell: bash
 
+    - name: TAB-7894 diagnostic — can Chrome launch with / without --no-sandbox?
+      shell: bash
+      run: |
+        set +e
+        echo "::group::chrome --headless (default flags)"
+        google-chrome --headless --disable-gpu --dump-dom https://example.com >/dev/null 2>&1
+        echo "exit=$?"
+        echo "::endgroup::"
+        echo "::group::chrome --headless --no-sandbox"
+        google-chrome --headless --no-sandbox --disable-gpu --dump-dom https://example.com >/dev/null 2>&1
+        echo "exit=$?"
+        echo "::endgroup::"
+        echo "::group::chrome --headless --no-sandbox stderr (last 40 lines)"
+        google-chrome --headless --no-sandbox --disable-gpu --dump-dom https://example.com 2>&1 >/dev/null | tail -40
+        echo "exit=$?"
+        echo "::endgroup::"
+
     - name: Build project
       run: |
         dotnet build
