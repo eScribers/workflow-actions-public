@@ -164,6 +164,11 @@ runs:
       with:
         dotnet-version: ${{ inputs.dotnet-version }}
 
+    - name: Pin Chrome 126 (matches bundled Selenium.WebDriver.ChromeDriver)
+      uses: browser-actions/setup-chrome@v1
+      with:
+        chrome-version: 126.0.6478.55
+
     - name: Show Chrome/ChromeDriver versions
       run: |
         google-chrome --version
