@@ -207,9 +207,13 @@ runs:
 
     - name: Surface FATAL in step summary
       if: failure()
+      continue-on-error: true
       shell: bash
       run: |
-        LATEST=$(ls -td ./TestPerformer/bin/Debug/net6.0/Reports/*/ 2>/dev/null | head -1)
+        # Diagnostics only — must never look like an extra failure. The || true
+        # guards the pipefail when Reports/ doesn't exist yet (job failed
+        # before TestPerformer ran).
+        LATEST=$(ls -td ./TestPerformer/bin/Debug/net6.0/Reports/*/ 2>/dev/null | head -1 || true)
         if [ -n "$LATEST" ] && [ -f "${LATEST}TestPerformer.log" ]; then
           EXCERPT=$(grep -A 50 -B 2 "FATAL" "${LATEST}TestPerformer.log" 2>/dev/null | tail -80 || true)
           if [ -n "$EXCERPT" ]; then
@@ -224,6 +228,9 @@ runs:
 
     - name: Upload test reports (GH artifact)
       if: always()
+      # Diagnostics must not be load-bearing: a transient artifact-service
+      # failure must never turn a green test run red.
+      continue-on-error: true
       uses: actions/upload-artifact@v4
       with:
         name: e2e-reports-${{ github.run_id }}-${{ github.run_attempt }}-${{ inputs.test-suite }}
