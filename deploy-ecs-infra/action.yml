@@ -97,14 +97,14 @@ runs:
       shell: bash
 
     - name: Checkout devops infra repo
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: eScribers/DEVOPS
         ref: ${{ inputs.git-reference }}
         token: ${{ inputs.token }}
 
     - name: Checkout tabula infra repo
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: eScribers/tabula
         ref: ${{ inputs.tabula-git-reference }}
@@ -236,7 +236,7 @@ runs:
       shell: bash
 
     - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
+      uses: aws-actions/configure-aws-credentials@v6
       with:
         aws-access-key-id: "${{ inputs.access-key }}"
         aws-secret-access-key: "${{ inputs.secret-key }}"
