@@ -93,7 +93,7 @@ runs:
   using: "composite"
   steps:
     - name: Checkout tabula-automation-tests repo
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         repository: eScribers/tabula-automation-tests
         ref: ${{ inputs.git-reference }}
@@ -198,7 +198,7 @@ runs:
       shell: bash
 
     - name: Run tests
-      uses: nick-fields/retry@v3
+      uses: nick-fields/retry@v4
       with:
         timeout_minutes: 180
         # max_attempts: 2
@@ -239,7 +239,7 @@ runs:
         if-no-files-found: warn
 
     - name: Add credentials to Amazon
-      uses: "aws-actions/configure-aws-credentials@v4"
+      uses: "aws-actions/configure-aws-credentials@v6"
       if: always()
       with:
         aws-access-key-id: "${{ inputs.access-key }}"
