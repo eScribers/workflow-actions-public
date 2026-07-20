@@ -200,10 +200,21 @@ runs:
     - name: Run tests
       uses: nick-fields/retry@v4
       with:
-        timeout_minutes: 180
-        # max_attempts: 2
+        # Cap a hung attempt at 25 min (a healthy suite runs in a few minutes). The
+        # ephemeral e2e env can vanish mid-run (its DNS record disappears), and the
+        # old 180-min budget let a dead-env attempt grind for hours before failing.
+        timeout_minutes: 25
+        max_attempts: 2
+        retry_wait_seconds: 30
         shell: bash
-        command: ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/${{ inputs.test-suite }}
+        # Liveness pre-check: if the env is already unreachable (DNS gone / task dead),
+        # abort this attempt in seconds instead of accumulating per-test Selenium timeouts.
+        command: |
+          if ! curl -sfS --max-time 15 -o /dev/null "$BACKEND_URL"; then
+            echo "::error::e2e environment unreachable at $BACKEND_URL — aborting attempt (env torn down or task gone)."
+            exit 1
+          fi
+          ./TestPerformer/bin/Debug/net6.0/TestPerformer load ./Automation.Tests/bin/Debug/netcoreapp3.1/Automation.Tests.dll // run ./common/TestSuites/SmokeE2E/${{ inputs.test-suite }}
 
     - name: Surface FATAL in step summary
       if: failure()
