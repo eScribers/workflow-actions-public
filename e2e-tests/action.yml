@@ -257,6 +257,34 @@ runs:
         aws-region: "us-east-1"
         aws-secret-access-key: "${{ inputs.secret-key }}"
 
+    - name: Collect application logs from CloudWatch
+      if: always()
+      # Diagnostics only — must never look like an extra failure, and must never
+      # hold up the report upload behind a slow or missing log stream.
+      continue-on-error: true
+      shell: bash
+      run: |
+        # The environment's log group is destroyed along with the environment, so a
+        # failed run's application logs are gone before anyone investigates. Pull
+        # them into the report folder now, while the environment still exists, so
+        # they travel with the screenshots and page sources (TAB-8440).
+        LATEST=$(ls -td ./TestPerformer/bin/Debug/net6.0/Reports/*/ 2>/dev/null | head -1 || true)
+        if [ -z "$LATEST" ]; then
+          echo "No report folder — nothing to attach application logs to."
+          exit 0
+        fi
+
+        # https://tabula-e2e-1234-1.escribers.io -> tabula-e2e-1234-1-ecs-cloudwatch-loggroup,
+        # which is how terraform names it ("${project}${env_name}-ecs-cloudwatch-loggroup").
+        GROUP="$(echo "${{ inputs.backend-url }}" | sed -E 's#^https?://([^./]+).*#\1#')-ecs-cloudwatch-loggroup"
+        echo "Collecting application logs from $GROUP"
+
+        # Bounded: a large or unresponsive stream must not stall the upload that follows.
+        timeout 120 aws logs tail "$GROUP" --since 3h --format short \
+          > "${LATEST}application-logs.txt" 2>&1 || true
+
+        wc -c "${LATEST}application-logs.txt" 2>/dev/null || true
+
     - name: Upload report to S3
       if: always()
       run: |
