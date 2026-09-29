@@ -54,6 +54,14 @@ inputs:
     description: 'Overwrite test suite file'
     default: 'Smoke.xml'
     required: false
+  timeout-minutes:
+    description: 'Per-attempt time limit for the test run, in minutes'
+    required: false
+    default: '25'
+  max-attempts:
+    description: 'How many times to attempt the test run'
+    required: false
+    default: '2'
   teams-webhook-url:
     description: 'Webhook for sending notifications to teams'
     required: false
@@ -200,11 +208,12 @@ runs:
     - name: Run tests
       uses: nick-fields/retry@v4
       with:
-        # Cap a hung attempt at 25 min (a healthy suite runs in a few minutes). The
+        # Default cap of 25 min suits Smoke (a healthy run takes a few minutes): the
         # ephemeral e2e env can vanish mid-run (its DNS record disappears), and the
         # old 180-min budget let a dead-env attempt grind for hours before failing.
-        timeout_minutes: 25
-        max_attempts: 2
+        # Long suites on a persistent env (NightTests, ~76 min) pass their own limit.
+        timeout_minutes: ${{ inputs.timeout-minutes }}
+        max_attempts: ${{ inputs.max-attempts }}
         retry_wait_seconds: 30
         shell: bash
         # Liveness pre-check: if the env is already unreachable (DNS gone / task dead),
