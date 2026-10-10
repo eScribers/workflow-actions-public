@@ -73,7 +73,7 @@ inputs:
     default: ""
   frontend_url:
     description: 'frontend_url'
-    default: "https://tabula-frontend-prep-02-aws-us-east-1.s3.amazonaws.com"
+    default: "https://fe.escribers.io"
   postmarkapp-processor:
     description: 'postmarkapp-processor'
     default: ""
