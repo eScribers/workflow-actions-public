@@ -114,32 +114,68 @@ runs:
         echo "TABULA_PASSWORD=${{ inputs.tabula-password }}" >> $GITHUB_ENV
       shell: bash
 
+    # cuchi/jinja2-action decodes its `variables:` input with unicode_escape, which reads
+    # UTF-8 as Latin-1 and turns backslash sequences into control characters (TAB-8682),
+    # so the values reach the templates through a JSON data file instead.
+    - name: Write template data
+      shell: bash
+      env:
+        E2E_TEMPLATE_BACKEND_URL: ${{ env.BACKEND_URL }}
+        E2E_TEMPLATE_TABULA_LOGIN: ${{ env.TABULA_LOGIN }}
+        E2E_TEMPLATE_TABULA_PASSWORD: ${{ env.TABULA_PASSWORD }}
+        E2E_TEMPLATE_SENDER_EMAIL_ADDRESS: ${{ inputs.sender-email-address }}
+        E2E_TEMPLATE_SENDER_EMAIL_PASSWORD: ${{ inputs.sender-email-password }}
+        E2E_TEMPLATE_PR_NUMBER: ${{ inputs.pr-number }}
+        E2E_TEMPLATE_PROJECT_REPO: ${{ inputs.project-repo }}
+        E2E_TEMPLATE_ACTION_ID: ${{ inputs.action-id }}
+        E2E_TEMPLATE_PR_TITLE: ${{ inputs.pr-title }}
+        E2E_TEMPLATE_PR_AUTHOR: ${{ inputs.pr-creator }}
+        E2E_TEMPLATE_POSTMARK_API_KEY: ${{ inputs.postmark-api }}
+        E2E_TEMPLATE_TEAMS_WEBHOOK_URL: ${{ inputs.teams-webhook-url }}
+        E2E_TEMPLATE_REGISTRATION_EMAIL_ADDRESS: ${{ inputs.registration-email-address }}
+        E2E_TEMPLATE_REGISTRATION_EMAIL_PASSWORD: ${{ inputs.registration-email-password }}
+        E2E_TEMPLATE_HO_LOGIN: ${{ inputs.ho-login }}
+        E2E_TEMPLATE_CONTRACTOR_LOGIN: ${{ inputs.contractor-login }}
+        E2E_TEMPLATE_CONTRACTOR_PASSWORD: ${{ inputs.contractor-password }}
+        E2E_TEMPLATE_REPORTER_LOGIN: ${{ inputs.reporter-login }}
+        E2E_TEMPLATE_REPORTER_PASSWORD: ${{ inputs.reporter-password }}
+      run: |
+        python3 - <<'PY'
+        import json, os
+
+        names = (
+            'BACKEND_URL', 'TABULA_LOGIN', 'TABULA_PASSWORD',
+            'SENDER_EMAIL_ADDRESS', 'SENDER_EMAIL_PASSWORD',
+            'PR_NUMBER', 'PROJECT_REPO', 'ACTION_ID', 'PR_TITLE', 'PR_AUTHOR',
+            'POSTMARK_API_KEY', 'TEAMS_WEBHOOK_URL',
+            'REGISTRATION_EMAIL_ADDRESS', 'REGISTRATION_EMAIL_PASSWORD',
+            'HO_LOGIN', 'CONTRACTOR_LOGIN', 'CONTRACTOR_PASSWORD',
+            'REPORTER_LOGIN', 'REPORTER_PASSWORD',
+        )
+        # rstrip matches the old variables: parser, which stripped each line, so a secret
+        # saved with a trailing newline keeps working.
+        data = {name: os.environ.get('E2E_TEMPLATE_' + name, '').rstrip() for name in names}
+
+        path = os.path.join(os.environ['RUNNER_TEMP'], 'e2e-tests-template-data.json')
+        try:
+            os.unlink(path)
+        except FileNotFoundError:
+            pass
+        fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+        with os.fdopen(fd, 'w', encoding='ascii') as f:
+            # ensure_ascii writes non-ASCII as escapes, so the container's locale can't
+            # change how the file is read.
+            json.dump(data, f, ensure_ascii=True)
+        PY
+
     - name: Setup ${{ inputs.test-suite }} file
       uses: cuchi/jinja2-action@v1.2.0
       with:
         template: ./common/TestSuites/SmokeE2E/${{ inputs.test-suite }}.j2
         output_file: ./common/TestSuites/SmokeE2E/${{ inputs.test-suite }}
         strict: true
-        variables: |
-          BACKEND_URL=${{ env.BACKEND_URL }}
-          TABULA_LOGIN=${{ env.TABULA_LOGIN }}
-          TABULA_PASSWORD=${{ env.TABULA_PASSWORD }}
-          SENDER_EMAIL_ADDRESS=${{ inputs.sender-email-address }}
-          SENDER_EMAIL_PASSWORD=${{ inputs.sender-email-password }}
-          PR_NUMBER=${{ inputs.pr-number }}
-          PROJECT_REPO=${{ inputs.project-repo }}
-          ACTION_ID=${{ inputs.action-id }}
-          PR_TITLE=${{ inputs.pr-title }}
-          PR_AUTHOR=${{ inputs.pr-creator }}
-          POSTMARK_API_KEY=${{ inputs.postmark-api }}
-          TEAMS_WEBHOOK_URL=${{ inputs.teams-webhook-url }}
-          REGISTRATION_EMAIL_ADDRESS=${{ inputs.registration-email-address }}
-          REGISTRATION_EMAIL_PASSWORD=${{ inputs.registration-email-password }}
-          HO_LOGIN=${{ inputs.ho-login }}
-          CONTRACTOR_LOGIN=${{ inputs.contractor-login }}
-          CONTRACTOR_PASSWORD=${{ inputs.contractor-password }}
-          REPORTER_LOGIN=${{ inputs.reporter-login }}
-          REPORTER_PASSWORD=${{ inputs.reporter-password }}
+        data_file: ${{ runner.temp }}/e2e-tests-template-data.json
+        data_format: json
 
     - name: Setup Login.xml file
       uses: cuchi/jinja2-action@v1.2.0
@@ -147,18 +183,13 @@ runs:
         template: ./common/TestSuites/SmokeE2E/Login.xml.j2
         output_file: ./common/TestSuites/SmokeE2E/Login.xml
         strict: true
-        variables: |
-          BACKEND_URL=${{ env.BACKEND_URL }}
-          TABULA_LOGIN=${{ env.TABULA_LOGIN }}
-          TABULA_PASSWORD=${{ env.TABULA_PASSWORD }}
-          SENDER_EMAIL_ADDRESS=${{ inputs.sender-email-address }}
-          SENDER_EMAIL_PASSWORD=${{ inputs.sender-email-password }}
-          PR_NUMBER=${{ inputs.pr-number }}
-          PROJECT_REPO=${{ inputs.project-repo }}
-          ACTION_ID=${{ inputs.action-id }}
-          PR_TITLE=${{ inputs.pr-title }}
-          PR_AUTHOR=${{ inputs.pr-creator }}
-          POSTMARK_API_KEY=${{ inputs.postmark-api }}
+        data_file: ${{ runner.temp }}/e2e-tests-template-data.json
+        data_format: json
+
+    - name: Remove template data
+      if: always()
+      shell: bash
+      run: rm -f -- "$RUNNER_TEMP/e2e-tests-template-data.json"
 
     - name: Show Authentication.xml
       run: |
