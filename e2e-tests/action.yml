@@ -50,6 +50,18 @@ inputs:
   pr-creator:
     description: 'PR Author'
     required: false
+  git-branch:
+    description: 'Branch the run tested (the PR head branch on PR runs)'
+    required: false
+    default: ""
+  git-sha:
+    description: 'Full SHA of the commit the run tested; the report links it to GitHub'
+    required: false
+    default: ""
+  actor:
+    description: 'GitHub user who started the run (the triggering actor on re-runs)'
+    required: false
+    default: ""
   test-suite:
     description: 'Overwrite test suite file'
     default: 'Smoke.xml'
@@ -130,6 +142,9 @@ runs:
         E2E_TEMPLATE_ACTION_ID: ${{ inputs.action-id }}
         E2E_TEMPLATE_PR_TITLE: ${{ inputs.pr-title }}
         E2E_TEMPLATE_PR_AUTHOR: ${{ inputs.pr-creator }}
+        E2E_TEMPLATE_GIT_BRANCH: ${{ inputs.git-branch }}
+        E2E_TEMPLATE_GIT_SHA: ${{ inputs.git-sha }}
+        E2E_TEMPLATE_ACTOR: ${{ inputs.actor }}
         E2E_TEMPLATE_POSTMARK_API_KEY: ${{ inputs.postmark-api }}
         E2E_TEMPLATE_TEAMS_WEBHOOK_URL: ${{ inputs.teams-webhook-url }}
         E2E_TEMPLATE_REGISTRATION_EMAIL_ADDRESS: ${{ inputs.registration-email-address }}
@@ -147,6 +162,7 @@ runs:
             'BACKEND_URL', 'TABULA_LOGIN', 'TABULA_PASSWORD',
             'SENDER_EMAIL_ADDRESS', 'SENDER_EMAIL_PASSWORD',
             'PR_NUMBER', 'PROJECT_REPO', 'ACTION_ID', 'PR_TITLE', 'PR_AUTHOR',
+            'GIT_BRANCH', 'GIT_SHA', 'ACTOR',
             'POSTMARK_API_KEY', 'TEAMS_WEBHOOK_URL',
             'REGISTRATION_EMAIL_ADDRESS', 'REGISTRATION_EMAIL_PASSWORD',
             'HO_LOGIN', 'CONTRACTOR_LOGIN', 'CONTRACTOR_PASSWORD',
